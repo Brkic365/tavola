@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
+# Committed on purpose: holds only a non-secret local SQLite path so the
+# documented setup (prisma migrate + seed + dev) works on a fresh clone.
+!.env
 
 # dev server log
 dev.log
