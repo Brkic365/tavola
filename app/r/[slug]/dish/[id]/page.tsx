@@ -81,7 +81,7 @@ export default async function DishPage({ params }: Params) {
       <div className="mt-5 space-y-5">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-stone-900">
+            <h1 className="font-serif text-3xl font-bold tracking-tight text-stone-900">
               {dish.name}
             </h1>
             {dish.serves && (
@@ -90,7 +90,7 @@ export default async function DishPage({ params }: Params) {
               </p>
             )}
           </div>
-          <span className="shrink-0 text-xl font-bold text-stone-900">
+          <span className="shrink-0 font-serif text-2xl font-bold text-stone-900">
             {formatPrice(dish.price, restaurant.currency)}
           </span>
         </div>
