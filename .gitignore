@@ -37,8 +37,9 @@ yarn-error.log*
 # documented setup (prisma migrate + seed + dev) works on a fresh clone.
 !.env
 
-# dev server log
+# dev server / tunnel logs
 dev.log
+tunnel.log
 
 # local SQLite database
 *.db
