@@ -1,0 +1,84 @@
+// Tavola — true-to-scale AR dish preview for restaurant menus
+// Prisma schema. Local SQLite DB (file:./dev.db) — no external credentials needed.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Restaurant {
+  id         String     @id @default(cuid())
+  name       String
+  slug       String     @unique // used for the public menu at /r/[slug]
+  logoUrl    String?
+  brandColor String? // hex, e.g. "#0F766E" — used for light per-restaurant theming
+  currency   String     @default("EUR")
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  categories Category[]
+  dishes     Dish[]
+}
+
+model Category {
+  id           String     @id @default(cuid())
+  restaurantId String
+  name         String
+  sortOrder    Int        @default(0)
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  dishes       Dish[]
+
+  @@index([restaurantId])
+}
+
+model Dish {
+  id           String      @id @default(cuid())
+  restaurantId String
+  categoryId   String?
+  name         String
+  description  String?
+  price        Float       @default(0)
+
+  // 3D / AR assets. glbUrl drives the in-browser viewer + Android Scene Viewer.
+  // usdzUrl is required for iOS Quick Look; null => iOS AR gracefully disabled.
+  glbUrl       String
+  usdzUrl      String?
+  thumbnailUrl String?
+
+  // Real-world portion info — the hero value of Tavola (portion transparency).
+  // Models are authored at 1 unit = 1 meter so AR shows true size.
+  widthCm      Float?
+  depthCm      Float?
+  heightCm     Float?
+  weightG      Int?
+  serves       String? // e.g. "1-2"
+  allergens    String? // comma-separated list, e.g. "gluten,shellfish"
+
+  featured     Boolean     @default(false)
+  sortOrder    Int         @default(0)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  category     Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  arViews      ArView[]
+
+  @@index([restaurantId])
+  @@index([categoryId])
+}
+
+// Lightweight analytics: one row per AR launch.
+model ArView {
+  id        String   @id @default(cuid())
+  dishId    String
+  createdAt DateTime @default(now())
+
+  dish      Dish     @relation(fields: [dishId], references: [id], onDelete: Cascade)
+
+  @@index([dishId])
+}

@@ -1,0 +1,167 @@
+import "dotenv/config";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+// Local placeholder models live in /public/models and are referenced by URL.
+// NOTE: these are stand-ins (Khronos / model-viewer sample assets). Real food
+// models authored at 1 unit = 1 meter come later via photogrammetry/AI.
+const M = (file: string) => `/models/${file}`;
+
+async function main() {
+  // Idempotent: wipe and reseed so re-running gives a clean demo state.
+  await prisma.arView.deleteMany();
+  await prisma.dish.deleteMany();
+  await prisma.category.deleteMany();
+  await prisma.restaurant.deleteMany();
+
+  const restaurant = await prisma.restaurant.create({
+    data: {
+      name: "Konoba Tavola",
+      slug: "tavola-demo",
+      brandColor: "#0F766E", // Adriatic teal
+      currency: "EUR",
+    },
+  });
+
+  const predjela = await prisma.category.create({
+    data: { restaurantId: restaurant.id, name: "Predjela", sortOrder: 0 },
+  });
+  const glavna = await prisma.category.create({
+    data: { restaurantId: restaurant.id, name: "Glavna jela", sortOrder: 1 },
+  });
+  const dijeljenje = await prisma.category.create({
+    data: {
+      restaurantId: restaurant.id,
+      name: "Za dijeljenje i slatko",
+      sortOrder: 2,
+    },
+  });
+
+  const dishes = [
+    {
+      categoryId: predjela.id,
+      name: "Dalmatinski pršut i sir",
+      description:
+        "Domaći dalmatinski pršut, paški sir i masline — klasično jadransko predjelo za dijeljenje.",
+      price: 14,
+      // Only seeded dish with a USDZ → demonstrates the full iOS Quick Look path.
+      glbUrl: M("astronaut.glb"),
+      usdzUrl: M("astronaut.usdz"),
+      widthCm: 28,
+      depthCm: 20,
+      heightCm: 4,
+      weightG: 250,
+      serves: "1-2",
+      allergens: "dairy",
+      featured: false,
+      sortOrder: 0,
+    },
+    {
+      categoryId: glavna.id,
+      name: "Crni rižot",
+      description:
+        "Kremasti rižot s sipom i sipinim crnilom, maslinovo ulje i peršin.",
+      price: 18,
+      glbUrl: M("avocado.glb"),
+      usdzUrl: null,
+      widthCm: 24,
+      depthCm: 24,
+      heightCm: 5,
+      weightG: 380,
+      serves: "1",
+      allergens: "molluscs,shellfish",
+      featured: true,
+      sortOrder: 0,
+    },
+    {
+      categoryId: glavna.id,
+      name: "Hobotnica ispod peke",
+      description:
+        "Hobotnica i krumpir polako pečeni ispod peke s aromatičnim biljem.",
+      price: 26,
+      glbUrl: M("waterbottle.glb"),
+      usdzUrl: null,
+      widthCm: 34,
+      depthCm: 28,
+      heightCm: 9,
+      weightG: 900,
+      serves: "2-3",
+      allergens: "molluscs",
+      featured: true,
+      sortOrder: 1,
+    },
+    {
+      categoryId: glavna.id,
+      name: "Tartufi pljukanci",
+      description:
+        "Ručno valjani pljukanci s istarskim tartufima i vrhnjem.",
+      price: 19,
+      glbUrl: M("duck.glb"),
+      usdzUrl: null,
+      widthCm: 22,
+      depthCm: 22,
+      heightCm: 6,
+      weightG: 320,
+      serves: "1",
+      allergens: "gluten,dairy,eggs",
+      featured: false,
+      sortOrder: 2,
+    },
+    {
+      categoryId: dijeljenje.id,
+      name: "Miješana plata za 2",
+      description:
+        "Bogata plata plodova mora — škampi, dagnje, lignje i bijela riba na žaru.",
+      price: 48,
+      glbUrl: M("boombox.glb"),
+      usdzUrl: null,
+      widthCm: 40,
+      depthCm: 30,
+      heightCm: 10,
+      weightG: 1400,
+      serves: "2",
+      allergens: "fish,shellfish,molluscs,crustaceans",
+      featured: true,
+      sortOrder: 0,
+    },
+    {
+      categoryId: dijeljenje.id,
+      name: "Rožata",
+      description:
+        "Tradicionalni dubrovački kremasti desert s karamelom i notom ruže.",
+      price: 7,
+      glbUrl: M("avocado.glb"), // reused stand-in
+      usdzUrl: null,
+      widthCm: 12,
+      depthCm: 12,
+      heightCm: 6,
+      weightG: 160,
+      serves: "1",
+      allergens: "dairy,eggs",
+      featured: false,
+      sortOrder: 1,
+    },
+  ];
+
+  for (const d of dishes) {
+    await prisma.dish.create({
+      data: { restaurantId: restaurant.id, ...d },
+    });
+  }
+
+  const count = await prisma.dish.count();
+  console.log(
+    `Seeded "${restaurant.name}" (/r/${restaurant.slug}) with ${count} dishes across 3 categories.`,
+  );
+}
+
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });
