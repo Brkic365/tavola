@@ -8,6 +8,9 @@ import { createRestaurant } from "./actions";
 
 export const metadata = { title: "Admin · Tavola" };
 
+// Always reflect current DB state.
+export const dynamic = "force-dynamic";
+
 const inputCls =
   "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500";
 

@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
+// Always reflect current DB state (restaurants change via admin).
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const restaurants = await prisma.restaurant.findMany({
     orderBy: { createdAt: "asc" },
