@@ -70,7 +70,7 @@ export default async function ManageRestaurantPage({ params }: Params) {
   );
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-8">
+    <main id="main-content" className="mx-auto w-full max-w-3xl flex-1 px-5 py-8">
       <div className="mb-6 flex items-center justify-between">
         <Link
           href="/admin"
@@ -79,6 +79,13 @@ export default async function ManageRestaurantPage({ params }: Params) {
           ← All restaurants
         </Link>
         <div className="flex items-center gap-4 text-sm">
+          <Link
+            href={`/r/${slug}/menu`}
+            target="_blank"
+            className="font-medium text-stone-500 hover:text-stone-800"
+          >
+            Printable menu ↗
+          </Link>
           <Link
             href={`/r/${slug}`}
             target="_blank"

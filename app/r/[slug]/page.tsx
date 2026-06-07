@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { brandStyle } from "@/lib/theme";
@@ -77,10 +78,21 @@ export default async function MenuPage({ params }: Params) {
           <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-sm">
             📐 See real portions in AR before you order
           </p>
+          <p className="mt-3 text-sm">
+            <Link
+              href={`/r/${restaurant.slug}/menu`}
+              className="text-white/80 underline underline-offset-2 hover:text-white"
+            >
+              📄 Plain-text / printable menu
+            </Link>
+          </p>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-5">
+      <main
+        id="main-content"
+        className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-5"
+      >
         {groups.length === 0 ? (
           <p className="rounded-xl border border-dashed border-stone-300 p-8 text-center text-stone-500">
             This menu has no dishes yet.

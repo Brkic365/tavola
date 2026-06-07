@@ -43,7 +43,10 @@ export default async function Home() {
       </nav>
 
       {/* hero */}
-      <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-5 py-12 md:grid-cols-2 md:py-20">
+      <section
+        id="main-content"
+        className="mx-auto grid w-full max-w-6xl items-center gap-10 px-5 py-12 md:grid-cols-2 md:py-20"
+      >
         <div>
           <div className="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-800">
             <span>📐</span> True-to-scale AR menu

@@ -20,7 +20,7 @@ export default async function AdminPage() {
   });
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-10">
+    <main id="main-content" className="mx-auto w-full max-w-3xl flex-1 px-5 py-10">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight text-stone-900">
           Restaurant admin

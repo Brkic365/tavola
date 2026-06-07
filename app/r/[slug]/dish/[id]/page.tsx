@@ -60,7 +60,8 @@ export default async function DishPage({ params }: Params) {
   ].filter(Boolean);
 
   return (
-    <div
+    <main
+      id="main-content"
       style={brandStyle(restaurant.brandColor)}
       className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-4"
     >
@@ -157,6 +158,6 @@ export default async function DishPage({ params }: Params) {
           </section>
         )}
       </div>
-    </div>
+    </main>
   );
 }

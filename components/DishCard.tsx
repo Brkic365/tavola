@@ -74,6 +74,9 @@ export default function DishCard({ slug, currency, dish }: DishCardProps) {
           {dish.calories != null && <span>🔥 {dish.calories} kcal</span>}
           {allergens.length > 0 && (
             <span title={allergens.map((a) => a.label).join(", ")}>
+              <span className="sr-only">
+                Allergens: {allergens.map((a) => a.label).join(", ")}
+              </span>
               {allergens.map((a) => (
                 <span key={a.key} aria-hidden className="mr-0.5">
                   {a.icon}
