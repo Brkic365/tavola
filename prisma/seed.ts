@@ -184,9 +184,10 @@ async function main() {
     Rožata: { calories: 320, dietary: "vegetarian,gluten-free" },
   };
 
+  let idx = 0;
   for (const d of dishes) {
     const file = d.glbUrl.split("/").pop() ?? "";
-    await prisma.dish.create({
+    const created = await prisma.dish.create({
       data: {
         restaurantId: restaurant.id,
         ...(MODEL_DIMS[file] ?? {}),
@@ -194,6 +195,20 @@ async function main() {
         ...d,
       },
     });
+
+    // Seed a believable view → AR-launch funnel so the analytics dashboard is
+    // populated on a fresh demo (featured dishes get more traffic + AR rate).
+    const views = (created.featured ? 16 : 7) + idx * 2;
+    const arViews = Math.round(views * (created.featured ? 0.5 : 0.25));
+    await prisma.dishView.createMany({
+      data: Array.from({ length: views }, () => ({ dishId: created.id })),
+    });
+    if (arViews > 0) {
+      await prisma.arView.createMany({
+        data: Array.from({ length: arViews }, () => ({ dishId: created.id })),
+      });
+    }
+    idx++;
   }
 
   const count = await prisma.dish.count();

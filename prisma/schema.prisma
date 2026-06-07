@@ -80,6 +80,7 @@ model Dish {
   restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   category     Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   arViews      ArView[]
+  views        DishView[]
 
   @@index([restaurantId])
   @@index([categoryId])
@@ -87,6 +88,17 @@ model Dish {
 
 // Lightweight analytics: one row per AR launch.
 model ArView {
+  id        String   @id @default(cuid())
+  dishId    String
+  createdAt DateTime @default(now())
+
+  dish      Dish     @relation(fields: [dishId], references: [id], onDelete: Cascade)
+
+  @@index([dishId])
+}
+
+// One row per dish-detail view — the top of the "view → AR launch" funnel.
+model DishView {
   id        String   @id @default(cuid())
   dishId    String
   createdAt DateTime @default(now())

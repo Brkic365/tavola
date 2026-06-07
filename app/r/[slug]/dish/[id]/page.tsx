@@ -9,6 +9,7 @@ import { parseDietary } from "@/lib/dietary";
 import { scaleStatus } from "@/lib/scale";
 import ModelViewer from "@/components/ModelViewer";
 import PortionPanel from "@/components/PortionPanel";
+import ViewBeacon from "@/components/ViewBeacon";
 
 type Params = { params: Promise<{ slug: string; id: string }> };
 
@@ -65,6 +66,7 @@ export default async function DishPage({ params }: Params) {
       style={brandStyle(restaurant.brandColor)}
       className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-4"
     >
+      <ViewBeacon dishId={dish.id} />
       <Link
         href={`/r/${slug}`}
         className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-stone-500 hover:text-stone-800"

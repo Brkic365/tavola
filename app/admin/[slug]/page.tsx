@@ -80,6 +80,12 @@ export default async function ManageRestaurantPage({ params }: Params) {
         </Link>
         <div className="flex items-center gap-4 text-sm">
           <Link
+            href={`/admin/${slug}/analytics`}
+            className="font-medium text-stone-500 hover:text-stone-800"
+          >
+            📊 Analytics
+          </Link>
+          <Link
             href={`/r/${slug}/menu`}
             target="_blank"
             className="font-medium text-stone-500 hover:text-stone-800"
