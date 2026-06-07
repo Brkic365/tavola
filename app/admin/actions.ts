@@ -66,6 +66,27 @@ export async function logout() {
   redirect("/admin/login");
 }
 
+export async function updateAccount(formData: FormData) {
+  const user = await requireUser();
+  const name = str(formData, "name");
+  const currentPassword = String(formData.get("currentPassword") ?? "");
+  const newPassword = String(formData.get("newPassword") ?? "");
+
+  const data: { name: string | null; passwordHash?: string } = { name };
+
+  if (newPassword) {
+    if (newPassword.length < 6) redirect("/admin/account?error=weak");
+    const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
+    if (!dbUser || !(await verifyPassword(currentPassword, dbUser.passwordHash))) {
+      redirect("/admin/account?error=wrongpw");
+    }
+    data.passwordHash = await hashPassword(newPassword);
+  }
+
+  await prisma.user.update({ where: { id: user.id }, data });
+  redirect("/admin/account?saved=1");
+}
+
 // ---- form parsing helpers -------------------------------------------------
 
 function str(fd: FormData, key: string): string | null {
@@ -196,6 +217,7 @@ export async function updateRestaurant(formData: FormData) {
       brandColor: str(formData, "brandColor"),
       currency: str(formData, "currency") ?? "EUR",
       defaultLocale: str(formData, "defaultLocale"),
+      logoUrl: str(formData, "logoUrl"),
     },
   });
 

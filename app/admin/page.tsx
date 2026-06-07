@@ -38,6 +38,12 @@ export default async function AdminPage() {
               </span>
             )}
           </span>
+          <Link
+            href="/admin/account"
+            className="text-stone-500 hover:text-stone-800"
+          >
+            Account
+          </Link>
           <Link href="/" className="text-stone-500 hover:text-stone-800">
             ← Home
           </Link>

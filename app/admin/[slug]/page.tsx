@@ -18,6 +18,7 @@ import {
 import DishFormFields from "@/components/admin/DishFormFields";
 import DeleteDishButton from "@/components/admin/DeleteDishButton";
 import DeleteCategoryButton from "@/components/admin/DeleteCategoryButton";
+import FileUpload from "@/components/admin/FileUpload";
 import CopyLinkButton from "@/components/admin/CopyLinkButton";
 import MenuQR from "@/components/admin/MenuQR";
 import DishThumb from "@/components/DishThumb";
@@ -200,6 +201,34 @@ export default async function ManageRestaurantPage({ params }: Params) {
                 ))}
               </select>
             </label>
+            <div>
+              <span className={labelCls}>Logo</span>
+              <div className="mt-1 flex items-center gap-3">
+                {restaurant.logoUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={restaurant.logoUrl}
+                    alt=""
+                    className="h-10 w-10 rounded-full object-cover ring-1 ring-stone-200"
+                  />
+                )}
+                <input
+                  id="restaurant-logoUrl"
+                  type="hidden"
+                  name="logoUrl"
+                  defaultValue={restaurant.logoUrl ?? ""}
+                />
+                <FileUpload
+                  targetId="restaurant-logoUrl"
+                  kind="image"
+                  accept="image/*"
+                  label="Upload logo"
+                />
+              </div>
+              <p className="mt-1 text-[11px] text-stone-400">
+                Save settings after uploading to apply the new logo.
+              </p>
+            </div>
             <button
               type="submit"
               className="rounded-lg bg-stone-800 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-900"

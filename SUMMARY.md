@@ -42,7 +42,8 @@ Three.js.
   every mutation enforces ownership. _Verified: wrong-pw rejected; owner sees
   only own restaurants and is redirected away from others'._
 - **Dish CRUD**, reorder; **category CRUD** (rename + translations, reorder,
-  delete → dishes fall back to Uncategorized); settings; **table QR code**.
+  delete → dishes fall back to Uncategorized); settings (incl. **logo upload**);
+  **table QR code**; **account page** (change name / password).
 - **📐 Measure from 3D model** — reads the GLB bounding box (`getDimensions`),
   auto-fills/validates the stated dimensions.
 - **⤴ Upload GLB / thumbnail** + **⤓ Generate USDZ from GLB** — file upload
