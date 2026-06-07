@@ -9,6 +9,7 @@ import { parseDietary } from "@/lib/dietary";
 import { scaleStatus } from "@/lib/scale";
 import ModelViewer from "@/components/ModelViewer";
 import PortionPanel from "@/components/PortionPanel";
+import PortionScale from "@/components/PortionScale";
 import ViewBeacon from "@/components/ViewBeacon";
 
 type Params = { params: Promise<{ slug: string; id: string }> };
@@ -121,6 +122,8 @@ export default async function DishPage({ params }: Params) {
           serves={dish.serves}
           verified={verifiedToScale}
         />
+
+        <PortionScale widthCm={dish.widthCm} depthCm={dish.depthCm} />
 
         {(dietary.length > 0 || dish.calories != null) && (
           <section className="flex flex-wrap items-center gap-2">
