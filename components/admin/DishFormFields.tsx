@@ -1,5 +1,6 @@
 import { BUNDLED_GLB, BUNDLED_USDZ } from "@/lib/bundledModels";
 import DimensionMeasurer from "@/components/admin/DimensionMeasurer";
+import UsdzGenerator from "@/components/admin/UsdzGenerator";
 
 type DishDefaults = {
   name?: string;
@@ -116,25 +117,28 @@ export default function DishFormFields({
         </datalist>
       </label>
 
-      <label className="col-span-2">
-        <span className={labelCls}>
-          USDZ model URL (iOS AR — optional)
-        </span>
-        <input
-          name="usdzUrl"
-          list={`${idPrefix}-usdz`}
-          defaultValue={v(dish?.usdzUrl) as string}
-          className={inputCls}
-          placeholder="/models/astronaut.usdz (leave blank → iOS AR disabled)"
-        />
-        <datalist id={`${idPrefix}-usdz`}>
-          {BUNDLED_USDZ.map((m) => (
-            <option key={m.url} value={m.url}>
-              {m.label}
-            </option>
-          ))}
-        </datalist>
-      </label>
+      <div className="col-span-2">
+        <label>
+          <span className={labelCls}>USDZ model URL (iOS AR — optional)</span>
+          <input
+            id={`${idPrefix}-usdzUrl`}
+            name="usdzUrl"
+            list={`${idPrefix}-usdz`}
+            defaultValue={v(dish?.usdzUrl) as string}
+            className={inputCls}
+            placeholder="/models/astronaut.usdz (leave blank → iOS AR disabled)"
+          />
+          <datalist id={`${idPrefix}-usdz`}>
+            {BUNDLED_USDZ.map((m) => (
+              <option key={m.url} value={m.url}>
+                {m.label}
+              </option>
+            ))}
+          </datalist>
+        </label>
+        {/* One-tap GLB→USDZ conversion so iOS Quick Look works for this dish. */}
+        <UsdzGenerator idPrefix={idPrefix} />
+      </div>
 
       <label className="col-span-2">
         <span className={labelCls}>Thumbnail URL (optional)</span>

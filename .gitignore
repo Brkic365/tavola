@@ -41,6 +41,9 @@ yarn-error.log*
 dev.log
 tunnel.log
 
+# runtime-generated USDZ conversions (regenerated on demand in admin)
+/public/models/generated/
+
 # local SQLite database
 *.db
 *.db-journal
