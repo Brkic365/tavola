@@ -28,6 +28,7 @@ import LeaveRestaurantButton from "@/components/admin/LeaveRestaurantButton";
 import FileUpload from "@/components/admin/FileUpload";
 import CopyLinkButton from "@/components/admin/CopyLinkButton";
 import MenuQR from "@/components/admin/MenuQR";
+import MenuHealth from "@/components/admin/MenuHealth";
 import DishThumb from "@/components/DishThumb";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -169,6 +170,8 @@ export default async function ManageRestaurantPage({ params }: Params) {
           </div>
         </div>
       </section>
+
+      <MenuHealth dishes={restaurant.dishes} />
 
       {/* ---- restaurant settings ---- */}
       <details className="mt-4 rounded-2xl border border-stone-200 bg-white shadow-sm">
