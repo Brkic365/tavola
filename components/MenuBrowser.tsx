@@ -215,8 +215,33 @@ export default function MenuBrowser({
         </p>
       ) : (
         <div className="space-y-12">
+          {filteredGroups.length >= 2 && (
+            <nav
+              aria-label={t(locale, "menu")}
+              className="sticky top-0 z-10 -mx-4 mb-2 flex gap-2 overflow-x-auto border-b border-stone-200/70 bg-white/85 px-4 py-2.5 backdrop-blur [scrollbar-width:none] sm:-mx-5 sm:px-5"
+            >
+              {filteredGroups.map((group) => (
+                <button
+                  key={group.key}
+                  type="button"
+                  onClick={() =>
+                    document
+                      .getElementById(`cat-sec-${group.key}`)
+                      ?.scrollIntoView({ behavior: "smooth", block: "start" })
+                  }
+                  className="shrink-0 whitespace-nowrap rounded-full bg-stone-100 px-3 py-1 text-sm font-medium text-stone-700 transition hover:bg-stone-200"
+                >
+                  {group.name}
+                </button>
+              ))}
+            </nav>
+          )}
           {filteredGroups.map((group) => (
-            <section key={group.key}>
+            <section
+              key={group.key}
+              id={`cat-sec-${group.key}`}
+              className="scroll-mt-16"
+            >
               <div className="mb-5 flex items-center gap-4">
                 <span className="h-px flex-1 bg-stone-300/70" />
                 <h2 className="font-serif text-2xl font-semibold tracking-tight text-stone-800">
