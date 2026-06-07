@@ -14,6 +14,12 @@ Three.js.
   calories), allergen icons + dietary badges, gradient/emoji thumbnails.
 - **Dietary + allergen filtering** — chips to require a diet or exclude an
   allergen (client-side, live count). _Verified: Vegetarian → 2 dishes._
+- **Live search** — filter dishes by name + description, composing with the
+  diet/allergen chips and result count. _Verified: name + description match,
+  empty state, clear-restore._
+- **Sold-out / "86" treatment** — out-of-stock dishes are greyed with a
+  thumbnail overlay + badge on the menu, "(Sold out)" on the printable menu,
+  and a banner on the dish page.
 - **Dish detail** — in-browser **3D + AR** via `<model-viewer>`:
   - **True scale** (`ar-scale="fixed"`, models authored 1 unit = 1 m). Android
     Scene Viewer; iOS Quick Look via USDZ with graceful degradation.
@@ -45,9 +51,11 @@ Three.js.
   **members** (co-manage that restaurant); owner-only Team panel lists/removes
   members. _Verified: no access → join via link → access (no Team panel) →
   owner removes → membership gone._
-- **Dish CRUD**, reorder; **category CRUD** (rename + translations, reorder,
-  delete → dishes fall back to Uncategorized); settings (incl. **logo upload**);
-  **table QR code**; **account page** (change name / password).
+- **Dish CRUD**, reorder, **duplicate** (clone all metadata + translations),
+  **mark sold out (86)** with a one-tap toggle; **category CRUD** (rename +
+  translations, reorder, delete → dishes fall back to Uncategorized); settings
+  (incl. **logo upload**); **table QR code**; **account page** (change name /
+  password); **delete restaurant** (owner) / **leave team** (member).
 - **📐 Measure from 3D model** — reads the GLB bounding box (`getDimensions`),
   auto-fills/validates the stated dimensions.
 - **⤴ Upload GLB / thumbnail** + **⤓ Generate USDZ from GLB** — file upload
