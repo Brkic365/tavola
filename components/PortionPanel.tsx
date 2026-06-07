@@ -6,6 +6,8 @@ type Props = {
   heightCm: number | null;
   weightG: number | null;
   serves: string | null;
+  // true when the stated dimensions were verified against the 3D model's size
+  verified?: boolean;
 };
 
 /**
@@ -19,6 +21,7 @@ export default function PortionPanel({
   heightCm,
   weightG,
   serves,
+  verified = false,
 }: Props) {
   const dims = formatDimensions(widthCm, depthCm, heightCm);
   const weight = formatWeight(weightG);
@@ -28,9 +31,19 @@ export default function PortionPanel({
 
   return (
     <section className="rounded-2xl border border-teal-100 bg-teal-50/60 p-4">
-      <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-teal-800">
-        📐 Real portion size
-      </h2>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-teal-800">
+          📐 Real portion size
+        </h2>
+        {verified && (
+          <span
+            className="inline-flex items-center gap-1 rounded-full bg-teal-700 px-2.5 py-1 text-xs font-semibold text-white"
+            title="The stated size was checked against the 3D model — what you see in AR is the real size."
+          >
+            ✓ Verified to scale
+          </span>
+        )}
+      </div>
 
       <div className="mt-3 grid grid-cols-3 gap-3">
         <Stat label="Size" value={dims ?? "—"} hint="W × D × H" />

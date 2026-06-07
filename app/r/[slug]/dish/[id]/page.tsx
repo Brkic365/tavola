@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { brandStyle } from "@/lib/theme";
 import { formatPrice, formatDimensions, formatWeight } from "@/lib/format";
 import { parseAllergens } from "@/lib/allergens";
+import { scaleStatus } from "@/lib/scale";
 import ModelViewer from "@/components/ModelViewer";
 import PortionPanel from "@/components/PortionPanel";
 
@@ -39,6 +40,13 @@ export default async function DishPage({ params }: Params) {
   const dims = formatDimensions(dish.widthCm, dish.depthCm, dish.heightCm);
   const weight = formatWeight(dish.weightG);
   const allergens = parseAllergens(dish.allergens);
+
+  // True-to-scale check: do the stated dimensions match the measured 3D model?
+  const verifiedToScale =
+    scaleStatus(
+      { w: dish.widthCm, d: dish.depthCm, h: dish.heightCm },
+      { w: dish.modelWidthCm, d: dish.modelDepthCm, h: dish.modelHeightCm },
+    ) === "verified";
 
   // Caption shown right under the AR viewer so portion info is visible even
   // without launching AR.
@@ -105,6 +113,7 @@ export default async function DishPage({ params }: Params) {
           heightCm={dish.heightCm}
           weightG={dish.weightG}
           serves={dish.serves}
+          verified={verifiedToScale}
         />
 
         {allergens.length > 0 && (

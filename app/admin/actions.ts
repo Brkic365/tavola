@@ -127,6 +127,11 @@ function dishDataFromForm(formData: FormData) {
     widthCm: num(formData, "widthCm"),
     depthCm: num(formData, "depthCm"),
     heightCm: num(formData, "heightCm"),
+    // Measured from the GLB in admin (model-viewer.getDimensions); powers the
+    // public "Verified to scale" badge.
+    modelWidthCm: num(formData, "modelWidthCm"),
+    modelDepthCm: num(formData, "modelDepthCm"),
+    modelHeightCm: num(formData, "modelHeightCm"),
     weightG: int(formData, "weightG"),
     serves: str(formData, "serves"),
     allergens: str(formData, "allergens"),

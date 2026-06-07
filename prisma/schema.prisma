@@ -51,13 +51,20 @@ model Dish {
   thumbnailUrl String?
 
   // Real-world portion info — the hero value of Tavola (portion transparency).
-  // Models are authored at 1 unit = 1 meter so AR shows true size.
+  // These are the operator-STATED real dimensions (editorial).
   widthCm      Float?
   depthCm      Float?
   heightCm     Float?
   weightG      Int?
   serves       String? // e.g. "1-2"
   allergens    String? // comma-separated list, e.g. "gluten,shellfish"
+
+  // MEASURED bounding box of the GLB in cm (authored at 1 unit = 1 m). Captured
+  // in admin via model-viewer.getDimensions(). When these agree with the stated
+  // dimensions, the dish is genuinely true-to-scale → "Verified to scale" badge.
+  modelWidthCm  Float?
+  modelDepthCm  Float?
+  modelHeightCm Float?
 
   featured     Boolean     @default(false)
   sortOrder    Int         @default(0)

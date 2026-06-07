@@ -144,9 +144,34 @@ async function main() {
     },
   ];
 
+  // Real measured bounding boxes of the placeholder GLBs (cm), from
+  // model-viewer.getDimensions(). These are stand-ins, so they intentionally do
+  // NOT match the stated food dimensions — which is the point: the admin flags
+  // the mismatch and no dish gets a false "Verified to scale" badge. Real
+  // to-scale food models will verify automatically.
+  const MODEL_DIMS: Record<
+    string,
+    { modelWidthCm: number; modelDepthCm: number; modelHeightCm: number }
+  > = {
+    "avocado.glb": { modelWidthCm: 4.3, modelDepthCm: 2.8, modelHeightCm: 6.3 },
+    "boombox.glb": { modelWidthCm: 2, modelDepthCm: 2, modelHeightCm: 2 },
+    "waterbottle.glb": {
+      modelWidthCm: 10.9,
+      modelDepthCm: 10.9,
+      modelHeightCm: 26,
+    },
+    "duck.glb": { modelWidthCm: 165.5, modelDepthCm: 115.3, modelHeightCm: 154 },
+    "astronaut.glb": {
+      modelWidthCm: 112,
+      modelDepthCm: 72.4,
+      modelHeightCm: 201.1,
+    },
+  };
+
   for (const d of dishes) {
+    const file = d.glbUrl.split("/").pop() ?? "";
     await prisma.dish.create({
-      data: { restaurantId: restaurant.id, ...d },
+      data: { restaurantId: restaurant.id, ...(MODEL_DIMS[file] ?? {}), ...d },
     });
   }
 

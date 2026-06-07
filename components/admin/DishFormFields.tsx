@@ -1,4 +1,5 @@
 import { BUNDLED_GLB, BUNDLED_USDZ } from "@/lib/bundledModels";
+import DimensionMeasurer from "@/components/admin/DimensionMeasurer";
 
 type DishDefaults = {
   name?: string;
@@ -15,6 +16,9 @@ type DishDefaults = {
   allergens?: string | null;
   featured?: boolean;
   categoryId?: string | null;
+  modelWidthCm?: number | null;
+  modelDepthCm?: number | null;
+  modelHeightCm?: number | null;
 };
 
 const inputCls =
@@ -95,6 +99,7 @@ export default function DishFormFields({
       <label className="col-span-2">
         <span className={labelCls}>GLB model URL * (3D + Android AR)</span>
         <input
+          id={`${idPrefix}-glbUrl`}
           name="glbUrl"
           required
           list={`${idPrefix}-glb`}
@@ -145,6 +150,7 @@ export default function DishFormFields({
         <label>
           <span className={labelCls}>Width (cm)</span>
           <input
+            id={`${idPrefix}-widthCm`}
             name="widthCm"
             type="number"
             step="0.1"
@@ -156,6 +162,7 @@ export default function DishFormFields({
         <label>
           <span className={labelCls}>Depth (cm)</span>
           <input
+            id={`${idPrefix}-depthCm`}
             name="depthCm"
             type="number"
             step="0.1"
@@ -167,6 +174,7 @@ export default function DishFormFields({
         <label>
           <span className={labelCls}>Height (cm)</span>
           <input
+            id={`${idPrefix}-heightCm`}
             name="heightCm"
             type="number"
             step="0.1"
@@ -187,6 +195,37 @@ export default function DishFormFields({
           />
         </label>
       </fieldset>
+
+      {/* True-to-scale check: measure the GLB's real size and compare it to the
+          stated dimensions. Hidden inputs carry the measurement to the server. */}
+      <div className="col-span-2">
+        <DimensionMeasurer
+          idPrefix={idPrefix}
+          initialModel={{
+            w: dish?.modelWidthCm ?? null,
+            d: dish?.modelDepthCm ?? null,
+            h: dish?.modelHeightCm ?? null,
+          }}
+        />
+        <input
+          type="hidden"
+          id={`${idPrefix}-modelWidthCm`}
+          name="modelWidthCm"
+          defaultValue={v(dish?.modelWidthCm)}
+        />
+        <input
+          type="hidden"
+          id={`${idPrefix}-modelDepthCm`}
+          name="modelDepthCm"
+          defaultValue={v(dish?.modelDepthCm)}
+        />
+        <input
+          type="hidden"
+          id={`${idPrefix}-modelHeightCm`}
+          name="modelHeightCm"
+          defaultValue={v(dish?.modelHeightCm)}
+        />
+      </div>
 
       <label>
         <span className={labelCls}>Serves</span>
