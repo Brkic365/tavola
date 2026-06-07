@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { uploadAsset } from "@/lib/uploadAsset";
 
 // model-viewer needs a USDZ for iOS Quick Look. Rather than authoring one by
 // hand, we convert the dish's GLB → USDZ right in the browser using Three.js
@@ -53,18 +54,15 @@ export default function UsdzGenerator({ idPrefix }: { idPrefix: string }) {
 
       setMsg("Saving…");
       const name = glb.split("/").pop()?.replace(/\.[^.]+$/, "") ?? "model";
-      const up = await fetch(`/api/usdz?name=${encodeURIComponent(name)}`, {
-        method: "POST",
-        headers: { "Content-Type": "model/vnd.usdz+zip" },
-        body: usdz as BodyInit,
+      const blob = new Blob([usdz as BlobPart], {
+        type: "model/vnd.usdz+zip",
       });
-      const data = (await up.json()) as { url?: string; error?: string };
-      if (!up.ok || !data.url) throw new Error(data.error ?? "Upload failed.");
+      const url = await uploadAsset(blob, "usdz", `${name}.usdz`);
 
       const usdzInput = input("usdzUrl");
-      if (usdzInput) usdzInput.value = data.url;
+      if (usdzInput) usdzInput.value = url;
       setStatus("done");
-      setMsg(`✓ Generated ${data.url} — iOS AR is now enabled for this dish.`);
+      setMsg(`✓ Generated — iOS AR is now enabled for this dish.`);
     } catch (e) {
       setStatus("error");
       setMsg(e instanceof Error ? e.message : "Conversion failed.");

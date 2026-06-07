@@ -81,7 +81,9 @@ The app is Vercel-ready (Postgres + Blob; `vercel.json` runs
 2. **Add Postgres** — Vercel dashboard → _Storage → Create → Postgres_ (Neon).
    Connect it to the project; it injects `POSTGRES_*` vars.
 3. **Add Blob** — _Storage → Create → Blob_ (sets `BLOB_READ_WRITE_TOKEN`,
-   used for iOS USDZ uploads).
+   used for uploaded models/images + generated USDZ). Also set
+   **`NEXT_PUBLIC_BLOB_ENABLED=true`** so large uploads go browser→Blob directly
+   (bypasses the ~4.5 MB serverless body limit).
 4. **Set env vars** (Project → Settings → Environment Variables):
    - `DATABASE_URL` → the **pooled** Postgres URL (`POSTGRES_PRISMA_URL`)
    - `DIRECT_URL` → the **non-pooled** URL (`POSTGRES_URL_NON_POOLING`)

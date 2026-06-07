@@ -61,9 +61,10 @@ Three.js.
   the measured-vs-stated mismatch is surfaced honestly (no false "Verified"
   badge).
 - **Thumbnails** — gradient + emoji placeholders (`thumbnailUrl` supported).
-- **Large-file uploads on Vercel** — `/api/upload` POSTs bytes through the
-  function (~4.5 MB serverless body limit). For big models, switch to
-  client-direct-to-Blob (`@vercel/blob/client` `upload()`). Works fully in dev.
+- **AI / photo 3D capture** — upload exists (GLB/image/USDZ, with large files
+  going **browser→Blob directly** in prod via `NEXT_PUBLIC_BLOB_ENABLED`); the
+  remaining gap is generating models (Meshy/Luma/Object Capture), not storing
+  them.
 - **Auth depth** — single shared admin password; no per-restaurant
   ownership/roles. Swap in Clerk/NextAuth for multi-tenant.
 - **AR reference object** — comparator is a 2D bar chart; a to-scale plate

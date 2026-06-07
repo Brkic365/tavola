@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { uploadAsset } from "@/lib/uploadAsset";
 
 /**
  * Upload a file (GLB model or thumbnail image) and write the resulting URL into
@@ -30,19 +31,9 @@ export default function FileUpload({
     setStatus("uploading");
     setMsg(`Uploading ${file.name}…`);
     try {
-      const res = await fetch(
-        `/api/upload?kind=${kind}&name=${encodeURIComponent(file.name)}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": file.type || "application/octet-stream" },
-          body: file,
-        },
-      );
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) throw new Error(data.error ?? "Upload failed.");
-
+      const url = await uploadAsset(file, kind, file.name);
       const target = document.getElementById(targetId) as HTMLInputElement | null;
-      if (target) target.value = data.url;
+      if (target) target.value = url;
       setStatus("done");
       setMsg(`✓ Uploaded`);
     } catch (err) {
