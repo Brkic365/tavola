@@ -24,6 +24,7 @@ type DishCardProps = {
     calories: number | null;
     dietary: string | null;
     featured: boolean;
+    available: boolean;
   };
 };
 
@@ -38,25 +39,41 @@ export default function DishCard({
   const weight = formatWeight(dish.weightG);
   const allergens = parseAllergens(dish.allergens, locale);
   const dietary = parseDietary(dish.dietary, locale);
+  const soldOut = !dish.available;
 
   return (
     <Link
       href={`/r/${slug}/dish/${dish.id}`}
-      className="group flex gap-4 px-4 py-4 transition-colors hover:bg-stone-50"
+      aria-disabled={soldOut}
+      className={`group flex gap-4 px-4 py-4 transition-colors hover:bg-stone-50 ${
+        soldOut ? "opacity-60" : ""
+      }`}
     >
       {/* thumbnail with a small 3D/AR affordance */}
       <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl ring-1 ring-stone-200/70">
         <DishThumb name={dish.name} seed={dish.id} thumbnailUrl={dish.thumbnailUrl} />
-        <span className="absolute bottom-1 right-1 rounded-md bg-stone-900/75 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
-          3D · AR
-        </span>
+        {soldOut ? (
+          <span className="absolute inset-0 flex items-center justify-center bg-stone-900/55 text-center text-[9px] font-bold uppercase leading-tight tracking-wide text-white">
+            {t(locale, "soldOut")}
+          </span>
+        ) : (
+          <span className="absolute bottom-1 right-1 rounded-md bg-stone-900/75 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+            3D · AR
+          </span>
+        )}
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {dish.featured && (
-          <span className="mb-1 inline-flex w-fit items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800">
-            ★ {t(locale, "chefsPick")}
+        {soldOut ? (
+          <span className="mb-1 inline-flex w-fit items-center gap-1 rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-rose-700">
+            {t(locale, "soldOut")}
           </span>
+        ) : (
+          dish.featured && (
+            <span className="mb-1 inline-flex w-fit items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800">
+              ★ {t(locale, "chefsPick")}
+            </span>
+          )
         )}
         <div className="flex items-baseline justify-between gap-3">
           <h3 className="font-serif text-lg font-semibold leading-snug text-stone-900">

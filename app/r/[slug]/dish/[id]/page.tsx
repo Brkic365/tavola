@@ -79,6 +79,15 @@ export default async function DishPage({ params }: Params) {
         ← {restaurant.name}
       </Link>
 
+      {!dish.available && (
+        <div className="mb-3 flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-700">
+          <span className="rounded-full bg-rose-600 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
+            {t(locale, "soldOut")}
+          </span>
+          {t(locale, "soldOutNote")}
+        </div>
+      )}
+
       {/* 3D + AR viewer (client component). True-to-scale via ar-scale="fixed". */}
       <ModelViewer
         src={dish.glbUrl}

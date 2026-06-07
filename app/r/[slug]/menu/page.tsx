@@ -116,6 +116,11 @@ export default async function TextMenuPage({ params }: Params) {
                         <div className="flex items-baseline justify-between gap-3">
                           <h3 className="font-serif text-lg font-semibold">
                             {dish.name}
+                            {!dish.available && (
+                              <span className="ml-2 align-middle text-xs font-semibold uppercase tracking-wide text-rose-700">
+                                ({t(locale, "soldOut")})
+                              </span>
+                            )}
                           </h3>
                           <span className="shrink-0 font-serif text-lg font-semibold tabular-nums">
                             {formatPrice(dish.price, restaurant.currency)}

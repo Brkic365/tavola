@@ -143,6 +143,7 @@ async function main() {
       serves: "1",
       allergens: "gluten,dairy,eggs",
       featured: false,
+      available: false, // demo: "86'd" / temporarily sold out
       sortOrder: 2,
     },
     {

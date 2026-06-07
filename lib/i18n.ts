@@ -58,6 +58,18 @@ const DICT: Dict = {
     de: "Empfehlung",
     it: "Scelta dello chef",
   },
+  soldOut: {
+    en: "Sold out",
+    hr: "Rasprodano",
+    de: "Ausverkauft",
+    it: "Esaurito",
+  },
+  soldOutNote: {
+    en: "Temporarily unavailable",
+    hr: "Privremeno nedostupno",
+    de: "Vorübergehend nicht verfügbar",
+    it: "Temporaneamente non disponibile",
+  },
   viewInAr: {
     en: "View in AR",
     hr: "Pogledaj u AR-u",

@@ -21,6 +21,7 @@ export type MenuDish = {
   calories: number | null;
   dietary: string | null;
   featured: boolean;
+  available: boolean;
 };
 
 type Group = { key: string; name: string; dishes: MenuDish[] };

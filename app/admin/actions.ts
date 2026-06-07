@@ -444,8 +444,28 @@ function dishDataFromForm(formData: FormData) {
     calories: int(formData, "calories"),
     dietary: str(formData, "dietary"),
     featured: bool(formData, "featured"),
+    // The form carries "soldOut"; absence (new dishes) => available.
+    available: !bool(formData, "soldOut"),
     categoryId: str(formData, "categoryId"), // null => uncategorized
   };
+}
+
+/** Quick "86" toggle from the dish list — flip a dish in/out of stock. */
+export async function setDishAvailability(formData: FormData) {
+  const id = str(formData, "id");
+  const slug = str(formData, "slug");
+  if (!id) return;
+  await assertCanManage(await restaurantIdOfDish(id));
+
+  await prisma.dish.update({
+    where: { id },
+    data: { available: bool(formData, "available") },
+  });
+
+  if (slug) {
+    revalidatePath(`/admin/${slug}`);
+    revalidatePath(`/r/${slug}`);
+  }
 }
 
 export async function createDish(formData: FormData) {

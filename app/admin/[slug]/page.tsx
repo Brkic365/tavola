@@ -10,6 +10,7 @@ import {
   createDish,
   updateDish,
   moveDish,
+  setDishAvailability,
   createCategory,
   updateCategory,
   moveCategory,
@@ -467,12 +468,23 @@ export default async function ManageRestaurantPage({ params }: Params) {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="truncate font-semibold text-stone-900">
+                          <p
+                            className={`truncate font-semibold ${
+                              dish.available
+                                ? "text-stone-900"
+                                : "text-stone-400 line-through"
+                            }`}
+                          >
                             {dish.name}
                           </p>
                           {dish.featured && (
                             <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">
                               ★
+                            </span>
+                          )}
+                          {!dish.available && (
+                            <span className="rounded-full bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-rose-700">
+                              Sold out
                             </span>
                           )}
                         </div>
@@ -507,11 +519,18 @@ export default async function ManageRestaurantPage({ params }: Params) {
                     </div>
 
                     <div className="mt-2 flex items-center justify-between border-t border-stone-100 pt-2">
-                      <DeleteDishButton
-                        id={dish.id}
-                        slug={restaurant.slug}
-                        name={dish.name}
-                      />
+                      <div className="flex items-center gap-1">
+                        <DeleteDishButton
+                          id={dish.id}
+                          slug={restaurant.slug}
+                          name={dish.name}
+                        />
+                        <AvailabilityToggle
+                          id={dish.id}
+                          slug={restaurant.slug}
+                          available={dish.available}
+                        />
+                      </div>
                       <details className="group">
                         <summary className="cursor-pointer rounded-lg px-2.5 py-1.5 text-sm font-medium text-teal-700 hover:bg-teal-50">
                           Edit
@@ -605,6 +624,35 @@ function ReorderButton({
         className="px-1.5 text-stone-400 hover:text-stone-700"
       >
         {direction === "up" ? "▲" : "▼"}
+      </button>
+    </form>
+  );
+}
+
+/** One-tap "86" toggle — submits the desired next availability state. */
+function AvailabilityToggle({
+  id,
+  slug,
+  available,
+}: {
+  id: string;
+  slug: string;
+  available: boolean;
+}) {
+  return (
+    <form action={setDishAvailability}>
+      <input type="hidden" name="id" value={id} />
+      <input type="hidden" name="slug" value={slug} />
+      <input type="hidden" name="available" value={available ? "false" : "true"} />
+      <button
+        type="submit"
+        className={`rounded-lg px-2.5 py-1.5 text-sm font-medium ${
+          available
+            ? "text-stone-600 hover:bg-stone-100"
+            : "text-emerald-700 hover:bg-emerald-50"
+        }`}
+      >
+        {available ? "Mark sold out" : "Mark available"}
       </button>
     </form>
   );

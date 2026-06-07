@@ -116,6 +116,8 @@ model Dish {
   modelHeightCm Float?
 
   featured     Boolean     @default(false)
+  // Operator can "86" a dish (temporarily out of stock) without deleting it.
+  available    Boolean     @default(true)
   sortOrder    Int         @default(0)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt

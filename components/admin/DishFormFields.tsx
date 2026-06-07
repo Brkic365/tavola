@@ -24,6 +24,7 @@ type DishDefaults = {
   calories?: number | null;
   dietary?: string | null;
   featured?: boolean;
+  available?: boolean;
   categoryId?: string | null;
   modelWidthCm?: number | null;
   modelDepthCm?: number | null;
@@ -351,6 +352,18 @@ export default function DishFormFields({
         />
         <span className="text-sm font-medium text-stone-700">
           Feature this dish (Chef&apos;s pick)
+        </span>
+      </label>
+
+      <label className="col-span-2 flex items-center gap-2">
+        <input
+          name="soldOut"
+          type="checkbox"
+          defaultChecked={dish?.available === false}
+          className="h-4 w-4 rounded border-stone-300 text-rose-600 focus:ring-rose-500"
+        />
+        <span className="text-sm font-medium text-stone-700">
+          Mark as sold out (86) — shown greyed-out on the menu
         </span>
       </label>
     </div>
