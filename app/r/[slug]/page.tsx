@@ -3,7 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { brandStyle } from "@/lib/theme";
+import { getLocale } from "@/lib/locale";
+import { t, localizeContent } from "@/lib/i18n";
 import MenuBrowser from "@/components/MenuBrowser";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -41,14 +44,29 @@ export default async function MenuPage({ params }: Params) {
   const restaurant = await getRestaurant(slug);
   if (!restaurant) notFound();
 
+  const locale = await getLocale();
+  // Strip the raw translations JSON before it reaches the client component —
+  // only the resolved name/description for the active locale is sent.
+  const localizeDishes = (dishes: typeof restaurant.dishes) =>
+    dishes.map(({ translations, ...d }) => ({
+      ...d,
+      ...localizeContent(d, translations, locale),
+    }));
+
   const groups = [
     ...restaurant.categories.map((c) => ({
       key: c.id,
-      name: c.name,
-      dishes: c.dishes,
+      name: localizeContent({ name: c.name }, c.translations, locale).name,
+      dishes: localizeDishes(c.dishes),
     })),
     ...(restaurant.dishes.length > 0
-      ? [{ key: "uncategorized", name: "Other", dishes: restaurant.dishes }]
+      ? [
+          {
+            key: "uncategorized",
+            name: "Other",
+            dishes: localizeDishes(restaurant.dishes),
+          },
+        ]
       : []),
   ].filter((g) => g.dishes.length > 0);
 
@@ -57,7 +75,10 @@ export default async function MenuPage({ params }: Params) {
   return (
     <div style={brandStyle(restaurant.brandColor)} className="flex flex-1 flex-col">
       <header className="bg-brand text-white">
-        <div className="mx-auto w-full max-w-2xl px-5 py-10 text-center">
+        <div className="mx-auto w-full max-w-2xl px-5 py-8 text-center">
+          <div className="mb-4 flex justify-end">
+            <LanguageSwitcher current={locale} />
+          </div>
           {restaurant.logoUrl && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -67,23 +88,23 @@ export default async function MenuPage({ params }: Params) {
             />
           )}
           <p className="text-xs font-medium uppercase tracking-[0.3em] text-white/70">
-            Menu
+            {t(locale, "menu")}
           </p>
           <h1 className="mt-2 font-serif text-4xl font-bold tracking-tight">
             {restaurant.name}
           </h1>
           <p className="mt-2 text-sm text-white/70">
-            {totalDishes} dishes · tap any dish to view it life-size
+            {totalDishes} · {t(locale, "tapHint")}
           </p>
           <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-sm">
-            📐 See real portions in AR before you order
+            📐 {t(locale, "tagline")}
           </p>
           <p className="mt-3 text-sm">
             <Link
               href={`/r/${restaurant.slug}/menu`}
               className="text-white/80 underline underline-offset-2 hover:text-white"
             >
-              📄 Plain-text / printable menu
+              📄 {t(locale, "printable")}
             </Link>
           </p>
         </div>
@@ -102,12 +123,13 @@ export default async function MenuPage({ params }: Params) {
             groups={groups}
             slug={restaurant.slug}
             currency={restaurant.currency}
+            locale={locale}
           />
         )}
       </main>
 
       <footer className="mx-auto w-full max-w-2xl px-5 py-8 text-center text-xs text-stone-400">
-        <p>Adults need around 2000 kcal a day.</p>
+        <p>{t(locale, "kcalStatement")}</p>
         <p className="mt-1">
           Powered by <span className="font-serif">Tavola</span> · true-to-scale
           AR menus

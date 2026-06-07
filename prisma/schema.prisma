@@ -33,6 +33,8 @@ model Category {
   restaurantId String
   name         String
   sortOrder    Int        @default(0)
+  // { [locale]: { name } } — localized category names
+  translations Json?
 
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   dishes       Dish[]
@@ -46,6 +48,8 @@ model Dish {
   categoryId   String?
   name         String
   description  String?
+  // { [locale]: { name, description } } — localized dish content
+  translations Json?
   price        Float       @default(0)
 
   // 3D / AR assets. glbUrl drives the in-browser viewer + Android Scene Viewer.

@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { t, type Locale } from "@/lib/i18n";
 
 type Props = {
   src: string; // GLB — drives the in-browser viewer + Android Scene Viewer
   iosSrc?: string | null; // USDZ — required for iOS Quick Look
   alt: string;
   dishId: string; // used to log AR launches (analytics)
+  locale: Locale;
 };
 
 type Vec3 = { x: number; y: number; z: number };
@@ -103,7 +105,13 @@ function buildDimData(mv: ModelViewerElement): DimData | null {
  * NOTE: AR launch requires HTTPS; over plain http the viewer works but the OS
  * blocks the AR handoff. TODO: GLB→USDZ is generated in admin (see UsdzGenerator).
  */
-export default function ModelViewer({ src, iosSrc, alt, dishId }: Props) {
+export default function ModelViewer({
+  src,
+  iosSrc,
+  alt,
+  dishId,
+  locale,
+}: Props) {
   const ref = useRef<ModelViewerElement | null>(null);
   const lineRefs = useRef<Array<SVGLineElement | null>>([]);
   const [isIOS, setIsIOS] = useState(false);
@@ -296,7 +304,7 @@ export default function ModelViewer({ src, iosSrc, alt, dishId }: Props) {
             onClick={launchAR}
             className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-teal-700 px-6 py-3 text-sm font-semibold text-white shadow-lg ring-1 ring-black/5 transition active:scale-95"
           >
-            📐 View in your space
+            📐 {t(locale, "viewInSpace")}
           </button>
         )}
       </div>

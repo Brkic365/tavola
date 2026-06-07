@@ -2,13 +2,15 @@
 // guest gets instant portion intuition without launching AR. All bars share one
 // cm scale, so relative size is obvious.
 
-type Ref = { key: string; label: string; icon: string; cm: number };
+import { t, type Locale } from "@/lib/i18n";
+
+type Ref = { key: string; tkey: "refCard" | "refPhone" | "refHand" | "refPlate"; icon: string; cm: number };
 
 const REFERENCES: Ref[] = [
-  { key: "card", label: "Credit card", icon: "💳", cm: 8.5 },
-  { key: "phone", label: "Smartphone", icon: "📱", cm: 15 },
-  { key: "hand", label: "Hand span", icon: "🖐", cm: 18 },
-  { key: "plate", label: "Dinner plate", icon: "🍽️", cm: 27 },
+  { key: "card", tkey: "refCard", icon: "💳", cm: 8.5 },
+  { key: "phone", tkey: "refPhone", icon: "📱", cm: 15 },
+  { key: "hand", tkey: "refHand", icon: "🖐", cm: 18 },
+  { key: "plate", tkey: "refPlate", icon: "🍽️", cm: 27 },
 ];
 
 function trim(n: number): string {
@@ -18,17 +20,31 @@ function trim(n: number): string {
 export default function PortionScale({
   widthCm,
   depthCm,
+  locale,
 }: {
   widthCm: number | null;
   depthCm: number | null;
+  locale: Locale;
 }) {
   // Footprint = the larger horizontal dimension (how much table it takes).
   const footprint = Math.max(widthCm ?? 0, depthCm ?? 0);
   if (footprint <= 0) return null;
 
   const rows = [
-    { key: "dish", label: "This dish", icon: "📐", cm: footprint, dish: true },
-    ...REFERENCES.map((r) => ({ ...r, dish: false })),
+    {
+      key: "dish",
+      label: t(locale, "thisDish"),
+      icon: "📐",
+      cm: footprint,
+      dish: true,
+    },
+    ...REFERENCES.map((r) => ({
+      key: r.key,
+      label: t(locale, r.tkey),
+      icon: r.icon,
+      cm: r.cm,
+      dish: false,
+    })),
   ].sort((a, b) => a.cm - b.cm);
 
   const maxCm = Math.max(...rows.map((r) => r.cm));
@@ -36,10 +52,10 @@ export default function PortionScale({
   return (
     <section className="rounded-2xl border border-stone-200 bg-white p-4">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
-        Size at a glance
+        {t(locale, "sizeAtGlance")}
       </h2>
       <p className="mt-0.5 text-xs text-stone-400">
-        Footprint vs everyday objects ({trim(footprint)} cm across)
+        {t(locale, "footprintVs")} ({trim(footprint)} cm)
       </p>
 
       <ul className="mt-3 space-y-2">

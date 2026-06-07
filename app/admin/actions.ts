@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   SESSION_COOKIE,
@@ -151,10 +152,26 @@ export async function createCategory(formData: FormData) {
 
 // ---- dishes ---------------------------------------------------------------
 
+function translationsFromForm(fd: FormData) {
+  const out: Record<string, { name?: string; description?: string }> = {};
+  for (const loc of ["en", "de", "it"]) {
+    const name = str(fd, `tr_${loc}_name`);
+    const description = str(fd, `tr_${loc}_description`);
+    if (name || description) {
+      out[loc] = {};
+      if (name) out[loc].name = name;
+      if (description) out[loc].description = description;
+    }
+  }
+  // Prisma.DbNull clears a nullable Json column; an object sets it.
+  return Object.keys(out).length ? out : Prisma.DbNull;
+}
+
 function dishDataFromForm(formData: FormData) {
   return {
     name: str(formData, "name") ?? "Untitled dish",
     description: str(formData, "description"),
+    translations: translationsFromForm(formData),
     price: num(formData, "price") ?? 0,
     glbUrl: str(formData, "glbUrl") ?? "",
     usdzUrl: str(formData, "usdzUrl"),

@@ -25,16 +25,39 @@ async function main() {
   });
 
   const predjela = await prisma.category.create({
-    data: { restaurantId: restaurant.id, name: "Predjela", sortOrder: 0 },
+    data: {
+      restaurantId: restaurant.id,
+      name: "Predjela",
+      sortOrder: 0,
+      translations: {
+        en: { name: "Starters" },
+        de: { name: "Vorspeisen" },
+        it: { name: "Antipasti" },
+      },
+    },
   });
   const glavna = await prisma.category.create({
-    data: { restaurantId: restaurant.id, name: "Glavna jela", sortOrder: 1 },
+    data: {
+      restaurantId: restaurant.id,
+      name: "Glavna jela",
+      sortOrder: 1,
+      translations: {
+        en: { name: "Main courses" },
+        de: { name: "Hauptgerichte" },
+        it: { name: "Secondi" },
+      },
+    },
   });
   const dijeljenje = await prisma.category.create({
     data: {
       restaurantId: restaurant.id,
       name: "Za dijeljenje i slatko",
       sortOrder: 2,
+      translations: {
+        en: { name: "To share & sweet" },
+        de: { name: "Zum Teilen & Süßes" },
+        it: { name: "Da condividere & dolci" },
+      },
     },
   });
 
@@ -184,6 +207,115 @@ async function main() {
     Rožata: { calories: 320, dietary: "vegetarian,gluten-free" },
   };
 
+  // Localized dish content (base content is Croatian). en / de / it.
+  const DISH_TRANSLATIONS: Record<
+    string,
+    Record<string, { name: string; description: string }>
+  > = {
+    "Dalmatinski pršut i sir": {
+      en: {
+        name: "Dalmatian prosciutto & cheese",
+        description:
+          "Home-style Dalmatian prosciutto, Pag cheese and olives — a classic Adriatic sharing starter.",
+      },
+      de: {
+        name: "Dalmatinischer Schinken & Käse",
+        description:
+          "Hausgemachter dalmatinischer Schinken, Pag-Käse und Oliven — eine klassische adriatische Vorspeise zum Teilen.",
+      },
+      it: {
+        name: "Prosciutto e formaggio dalmati",
+        description:
+          "Prosciutto dalmata fatto in casa, formaggio di Pag e olive — un classico antipasto adriatico da condividere.",
+      },
+    },
+    "Crni rižot": {
+      en: {
+        name: "Squid-ink risotto",
+        description:
+          "Creamy cuttlefish risotto with squid ink, olive oil and parsley.",
+      },
+      de: {
+        name: "Tintenfisch-Risotto",
+        description:
+          "Cremiges Sepia-Risotto mit Tintenfischtinte, Olivenöl und Petersilie.",
+      },
+      it: {
+        name: "Risotto al nero di seppia",
+        description:
+          "Risotto cremoso alla seppia con nero di seppia, olio d'oliva e prezzemolo.",
+      },
+    },
+    "Hobotnica ispod peke": {
+      en: {
+        name: "Octopus under the bell (peka)",
+        description:
+          "Octopus and potatoes slow-roasted under the peka bell with aromatic herbs.",
+      },
+      de: {
+        name: "Oktopus unter der Glocke (Peka)",
+        description:
+          "Oktopus und Kartoffeln langsam unter der Peka-Glocke geschmort, mit aromatischen Kräutern.",
+      },
+      it: {
+        name: "Polpo sotto la campana (peka)",
+        description:
+          "Polpo e patate cotti lentamente sotto la campana peka con erbe aromatiche.",
+      },
+    },
+    "Tartufi pljukanci": {
+      en: {
+        name: "Pljukanci with truffles",
+        description:
+          "Hand-rolled pljukanci pasta with Istrian truffles and cream.",
+      },
+      de: {
+        name: "Pljukanci mit Trüffeln",
+        description:
+          "Handgerollte Pljukanci-Nudeln mit istrischen Trüffeln und Sahne.",
+      },
+      it: {
+        name: "Pljukanci ai tartufi",
+        description:
+          "Pasta pljukanci fatta a mano con tartufi istriani e panna.",
+      },
+    },
+    "Miješana plata za 2": {
+      en: {
+        name: "Mixed seafood platter for 2",
+        description:
+          "A generous seafood platter — prawns, mussels, squid and grilled white fish.",
+      },
+      de: {
+        name: "Gemischte Meeresfrüchteplatte für 2",
+        description:
+          "Eine üppige Meeresfrüchteplatte — Garnelen, Muscheln, Tintenfisch und gegrillter Weißfisch.",
+      },
+      it: {
+        name: "Grigliata mista di mare per 2",
+        description:
+          "Un ricco piatto di mare — gamberi, cozze, calamari e pesce bianco alla griglia.",
+      },
+    },
+    Rožata: {
+      en: {
+        name: "Rožata (custard)",
+        description:
+          "Traditional Dubrovnik custard dessert with caramel and a hint of rose.",
+      },
+      de: {
+        name: "Rožata (Pudding)",
+        description:
+          "Traditionelles Dessert aus Dubrovnik mit Karamell und einer Rosennote.",
+      },
+      it: {
+        name: "Rožata (crema)",
+        description:
+          "Dolce tradizionale di Dubrovnik con caramello e una nota di rosa.",
+      },
+    },
+  };
+
   let idx = 0;
   for (const d of dishes) {
     const file = d.glbUrl.split("/").pop() ?? "";
@@ -192,6 +324,7 @@ async function main() {
         restaurantId: restaurant.id,
         ...(MODEL_DIMS[file] ?? {}),
         ...(NUTRITION[d.name] ?? {}),
+        translations: DISH_TRANSLATIONS[d.name] ?? undefined,
         ...d,
       },
     });

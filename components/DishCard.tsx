@@ -3,10 +3,12 @@ import DishThumb from "@/components/DishThumb";
 import { formatPrice, formatDimensions, formatWeight } from "@/lib/format";
 import { parseAllergens } from "@/lib/allergens";
 import { parseDietary } from "@/lib/dietary";
+import { t, type Locale } from "@/lib/i18n";
 
 type DishCardProps = {
   slug: string;
   currency: string;
+  locale: Locale;
   dish: {
     id: string;
     name: string;
@@ -26,7 +28,12 @@ type DishCardProps = {
 };
 
 /** A single menu entry, styled like a restaurant menu row (not an app card). */
-export default function DishCard({ slug, currency, dish }: DishCardProps) {
+export default function DishCard({
+  slug,
+  currency,
+  locale,
+  dish,
+}: DishCardProps) {
   const dims = formatDimensions(dish.widthCm, dish.depthCm, dish.heightCm);
   const weight = formatWeight(dish.weightG);
   const allergens = parseAllergens(dish.allergens);
@@ -48,7 +55,7 @@ export default function DishCard({ slug, currency, dish }: DishCardProps) {
       <div className="flex min-w-0 flex-1 flex-col">
         {dish.featured && (
           <span className="mb-1 inline-flex w-fit items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800">
-            ★ Chef&apos;s pick
+            ★ {t(locale, "chefsPick")}
           </span>
         )}
         <div className="flex items-baseline justify-between gap-3">
@@ -68,14 +75,19 @@ export default function DishCard({ slug, currency, dish }: DishCardProps) {
 
         {/* portion line — the Tavola differentiator, kept understated */}
         <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500">
-          {dish.serves && <span>👥 Serves {dish.serves}</span>}
+          {dish.serves && (
+            <span>
+              👥 {t(locale, "serves")} {dish.serves}
+            </span>
+          )}
           {dims && <span>📐 {dims}</span>}
           {weight && <span>⚖️ {weight}</span>}
           {dish.calories != null && <span>🔥 {dish.calories} kcal</span>}
           {allergens.length > 0 && (
             <span title={allergens.map((a) => a.label).join(", ")}>
               <span className="sr-only">
-                Allergens: {allergens.map((a) => a.label).join(", ")}
+                {t(locale, "allergens")}:{" "}
+                {allergens.map((a) => a.label).join(", ")}
               </span>
               {allergens.map((a) => (
                 <span key={a.key} aria-hidden className="mr-0.5">
@@ -101,7 +113,7 @@ export default function DishCard({ slug, currency, dish }: DishCardProps) {
         )}
 
         <span className="mt-2 text-sm font-medium text-brand opacity-90 group-hover:opacity-100">
-          View in AR →
+          {t(locale, "viewInAr")} →
         </span>
       </div>
     </Link>

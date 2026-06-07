@@ -1,7 +1,11 @@
 import { BUNDLED_GLB, BUNDLED_USDZ } from "@/lib/bundledModels";
 import { KNOWN_DIETARY } from "@/lib/dietary";
+import { LOCALES } from "@/lib/i18n";
 import DimensionMeasurer from "@/components/admin/DimensionMeasurer";
 import UsdzGenerator from "@/components/admin/UsdzGenerator";
+
+// Locales offered for translation (base content is the main name/description).
+const TRANSLATION_LOCALES = LOCALES.filter((l) => l.code !== "hr");
 
 type DishDefaults = {
   name?: string;
@@ -23,7 +27,10 @@ type DishDefaults = {
   modelWidthCm?: number | null;
   modelDepthCm?: number | null;
   modelHeightCm?: number | null;
+  translations?: unknown;
 };
+
+type TrMap = Record<string, { name?: string; description?: string }>;
 
 const inputCls =
   "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500";
@@ -99,6 +106,38 @@ export default function DishFormFields({
           placeholder="Short, appetizing description"
         />
       </label>
+
+      {/* Per-locale translations (the name/description above are the base). */}
+      <details className="col-span-2 rounded-xl border border-stone-200 bg-stone-50 p-3">
+        <summary className="cursor-pointer text-sm font-medium text-stone-700">
+          🌐 Translations (optional)
+        </summary>
+        <div className="mt-3 space-y-3">
+          {TRANSLATION_LOCALES.map((l) => {
+            const tr =
+              (dish?.translations as TrMap | null | undefined)?.[l.code] ?? {};
+            return (
+              <div key={l.code} className="grid grid-cols-2 gap-2">
+                <label className="col-span-2 text-xs font-semibold text-stone-500">
+                  {l.flag} {l.label}
+                </label>
+                <input
+                  name={`tr_${l.code}_name`}
+                  defaultValue={tr.name ?? ""}
+                  className={inputCls}
+                  placeholder="Name"
+                />
+                <input
+                  name={`tr_${l.code}_description`}
+                  defaultValue={tr.description ?? ""}
+                  className={inputCls}
+                  placeholder="Description"
+                />
+              </div>
+            );
+          })}
+        </div>
+      </details>
 
       <label className="col-span-2">
         <span className={labelCls}>GLB model URL * (3D + Android AR)</span>

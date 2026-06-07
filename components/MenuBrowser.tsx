@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import DishCard from "@/components/DishCard";
 import { parseDietary, type DietaryInfo } from "@/lib/dietary";
 import { parseAllergens, type AllergenInfo } from "@/lib/allergens";
+import { t, type Locale } from "@/lib/i18n";
 
 export type MenuDish = {
   id: string;
@@ -33,10 +34,12 @@ export default function MenuBrowser({
   groups,
   slug,
   currency,
+  locale,
 }: {
   groups: Group[];
   slug: string;
   currency: string;
+  locale: Locale;
 }) {
   const allDishes = useMemo(() => groups.flatMap((g) => g.dishes), [groups]);
 
@@ -90,7 +93,7 @@ export default function MenuBrowser({
           {dietaryOptions.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-wide text-stone-400">
-                Dietary
+                {t(locale, "dietary")}
               </span>
               {dietaryOptions.map((d) => {
                 const on = diet.has(d.key);
@@ -116,7 +119,7 @@ export default function MenuBrowser({
           {allergenOptions.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-wide text-stone-400">
-                Avoid
+                {t(locale, "avoid")}
               </span>
               {allergenOptions.map((a) => {
                 const on = avoid.has(a.key);
@@ -132,7 +135,8 @@ export default function MenuBrowser({
                         : "bg-stone-50 text-stone-600 ring-stone-200 hover:bg-stone-100"
                     }`}
                   >
-                    <span aria-hidden>{a.icon}</span> No {a.label.toLowerCase()}
+                    <span aria-hidden>{a.icon}</span> {t(locale, "no")}{" "}
+                    {a.label.toLowerCase()}
                   </button>
                 );
               })}
@@ -142,7 +146,7 @@ export default function MenuBrowser({
           {active && (
             <div className="flex items-center justify-between border-t border-stone-100 pt-2 text-xs">
               <span className="text-stone-500">
-                {total} {total === 1 ? "dish" : "dishes"} match
+                {total} {t(locale, "match")}
               </span>
               <button
                 type="button"
@@ -152,7 +156,7 @@ export default function MenuBrowser({
                 }}
                 className="font-medium text-teal-700 hover:underline"
               >
-                Clear filters
+                {t(locale, "clearFilters")}
               </button>
             </div>
           )}
@@ -161,7 +165,7 @@ export default function MenuBrowser({
 
       {filteredGroups.length === 0 ? (
         <p className="rounded-xl border border-dashed border-stone-300 p-8 text-center text-stone-500">
-          No dishes match those filters.{" "}
+          {t(locale, "noMatch")}{" "}
           <button
             type="button"
             onClick={() => {
@@ -170,7 +174,7 @@ export default function MenuBrowser({
             }}
             className="font-medium text-teal-700 hover:underline"
           >
-            Clear
+            {t(locale, "clearFilters")}
           </button>
         </p>
       ) : (
@@ -187,7 +191,12 @@ export default function MenuBrowser({
               <ul className="divide-y divide-stone-200/80 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
                 {group.dishes.map((dish) => (
                   <li key={dish.id}>
-                    <DishCard slug={slug} currency={currency} dish={dish} />
+                    <DishCard
+                      slug={slug}
+                      currency={currency}
+                      dish={dish}
+                      locale={locale}
+                    />
                   </li>
                 ))}
               </ul>

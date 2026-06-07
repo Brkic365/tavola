@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { formatPrice, formatDimensions, formatWeight } from "@/lib/format";
 import { parseAllergens } from "@/lib/allergens";
 import { parseDietary } from "@/lib/dietary";
+import { getLocale } from "@/lib/locale";
+import { t, localizeContent } from "@/lib/i18n";
 import PrintButton from "@/components/PrintButton";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -43,14 +45,18 @@ export default async function TextMenuPage({ params }: Params) {
   const restaurant = await getRestaurant(slug);
   if (!restaurant) notFound();
 
+  const locale = await getLocale();
+  const localizeDishes = (dishes: typeof restaurant.dishes) =>
+    dishes.map((d) => ({ ...d, ...localizeContent(d, d.translations, locale) }));
+
   const groups = [
     ...restaurant.categories.map((c) => ({
       key: c.id,
-      name: c.name,
-      dishes: c.dishes,
+      name: localizeContent({ name: c.name }, c.translations, locale).name,
+      dishes: localizeDishes(c.dishes),
     })),
     ...(restaurant.dishes.length > 0
-      ? [{ key: "other", name: "Other", dishes: restaurant.dishes }]
+      ? [{ key: "other", name: "Other", dishes: localizeDishes(restaurant.dishes) }]
       : []),
   ].filter((g) => g.dishes.length > 0);
 
@@ -65,14 +71,14 @@ export default async function TextMenuPage({ params }: Params) {
           href={`/r/${slug}`}
           className="text-sm font-medium text-teal-700 hover:underline"
         >
-          ← Interactive AR menu
+          ← {t(locale, "interactiveMenu")}
         </Link>
-        <PrintButton />
+        <PrintButton label={t(locale, "print")} />
       </div>
 
       <header className="mb-6 border-b border-stone-300 pb-4 text-center">
         <h1 className="font-serif text-3xl font-bold">{restaurant.name}</h1>
-        <p className="mt-1 text-sm text-stone-600">Menu</p>
+        <p className="mt-1 text-sm text-stone-600">{t(locale, "menu")}</p>
       </header>
 
       {groups.length === 0 ? (
@@ -98,7 +104,7 @@ export default async function TextMenuPage({ params }: Params) {
                   const allergens = parseAllergens(dish.allergens);
                   const dietary = parseDietary(dish.dietary);
                   const portion = [
-                    dish.serves ? `serves ${dish.serves}` : null,
+                    dish.serves ? `${t(locale, "serves")} ${dish.serves}` : null,
                     dims,
                     weight,
                     dish.calories != null ? `${dish.calories} kcal` : null,
@@ -117,7 +123,7 @@ export default async function TextMenuPage({ params }: Params) {
                         </div>
                         {dish.description && (
                           <p
-                            lang="hr"
+                            lang={locale}
                             className="mt-0.5 text-sm leading-relaxed text-stone-600"
                           >
                             {dish.description}
@@ -130,13 +136,17 @@ export default async function TextMenuPage({ params }: Params) {
                         )}
                         {allergens.length > 0 && (
                           <p className="mt-1 text-sm text-stone-700">
-                            <span className="font-semibold">Allergens:</span>{" "}
+                            <span className="font-semibold">
+                              {t(locale, "allergens")}:
+                            </span>{" "}
                             {allergens.map((a) => a.label).join(", ")}
                           </p>
                         )}
                         {dietary.length > 0 && (
                           <p className="mt-0.5 text-sm text-stone-700">
-                            <span className="font-semibold">Dietary:</span>{" "}
+                            <span className="font-semibold">
+                              {t(locale, "dietary")}:
+                            </span>{" "}
                             {dietary.map((d) => d.label).join(", ")}
                           </p>
                         )}
@@ -151,10 +161,8 @@ export default async function TextMenuPage({ params }: Params) {
       )}
 
       <footer className="mt-10 border-t border-stone-300 pt-4 text-center text-xs text-stone-500">
-        <p>Adults need around 2000 kcal a day.</p>
-        <p className="mt-1">
-          Please tell us about any allergies. Powered by Tavola.
-        </p>
+        <p>{t(locale, "kcalStatement")}</p>
+        <p className="mt-1">Powered by Tavola.</p>
       </footer>
     </main>
   );

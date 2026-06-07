@@ -7,6 +7,8 @@ import { formatPrice, formatDimensions, formatWeight } from "@/lib/format";
 import { parseAllergens } from "@/lib/allergens";
 import { parseDietary } from "@/lib/dietary";
 import { scaleStatus } from "@/lib/scale";
+import { getLocale } from "@/lib/locale";
+import { t, localizeContent } from "@/lib/i18n";
 import ModelViewer from "@/components/ModelViewer";
 import PortionPanel from "@/components/PortionPanel";
 import PortionScale from "@/components/PortionScale";
@@ -40,6 +42,8 @@ export default async function DishPage({ params }: Params) {
   if (!dish) notFound();
 
   const { restaurant } = dish;
+  const locale = await getLocale();
+  const content = localizeContent(dish, dish.translations, locale);
   const dims = formatDimensions(dish.widthCm, dish.depthCm, dish.heightCm);
   const weight = formatWeight(dish.weightG);
   const allergens = parseAllergens(dish.allergens);
@@ -57,7 +61,7 @@ export default async function DishPage({ params }: Params) {
   const captionParts = [
     dims,
     weight,
-    dish.serves ? `serves ${dish.serves}` : null,
+    dish.serves ? `${t(locale, "serves")} ${dish.serves}` : null,
     dish.calories != null ? `${dish.calories} kcal` : null,
   ].filter(Boolean);
 
@@ -79,17 +83,14 @@ export default async function DishPage({ params }: Params) {
       <ModelViewer
         src={dish.glbUrl}
         iosSrc={dish.usdzUrl}
-        alt={`3D model of ${dish.name}`}
+        alt={`3D model of ${content.name}`}
         dishId={dish.id}
+        locale={locale}
       />
 
       {captionParts.length > 0 && (
         <p className="mt-2 text-center text-xs text-stone-500">
-          {captionParts.join(" · ")} — tap{" "}
-          <span className="font-medium text-stone-700">
-            “View in your space”
-          </span>{" "}
-          to see it life-size
+          {captionParts.join(" · ")}
         </p>
       )}
 
@@ -97,11 +98,11 @@ export default async function DishPage({ params }: Params) {
         <div className="flex items-start justify-between gap-3">
           <div>
             <h1 className="font-serif text-3xl font-bold tracking-tight text-stone-900">
-              {dish.name}
+              {content.name}
             </h1>
             {dish.serves && (
               <p className="mt-1 text-sm text-stone-500">
-                Serves {dish.serves}
+                {t(locale, "serves")} {dish.serves}
               </p>
             )}
           </div>
@@ -110,8 +111,8 @@ export default async function DishPage({ params }: Params) {
           </span>
         </div>
 
-        {dish.description && (
-          <p className="leading-relaxed text-stone-600">{dish.description}</p>
+        {content.description && (
+          <p className="leading-relaxed text-stone-600">{content.description}</p>
         )}
 
         <PortionPanel
@@ -121,15 +122,20 @@ export default async function DishPage({ params }: Params) {
           weightG={dish.weightG}
           serves={dish.serves}
           verified={verifiedToScale}
+          locale={locale}
         />
 
-        <PortionScale widthCm={dish.widthCm} depthCm={dish.depthCm} />
+        <PortionScale
+          widthCm={dish.widthCm}
+          depthCm={dish.depthCm}
+          locale={locale}
+        />
 
         {(dietary.length > 0 || dish.calories != null) && (
           <section className="flex flex-wrap items-center gap-2">
             {dish.calories != null && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-sm font-medium text-stone-700">
-                🔥 {dish.calories} kcal per portion
+                🔥 {dish.calories} {t(locale, "caloriesPerPortion")}
               </span>
             )}
             {dietary.map((d) => (
@@ -147,7 +153,7 @@ export default async function DishPage({ params }: Params) {
         {allergens.length > 0 && (
           <section>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
-              Allergens
+              {t(locale, "allergens")}
             </h2>
             <ul className="mt-2 flex flex-wrap gap-2">
               {allergens.map((a) => (
