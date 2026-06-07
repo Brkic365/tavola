@@ -46,8 +46,8 @@ export default async function DishPage({ params }: Params) {
   const content = localizeContent(dish, dish.translations, locale);
   const dims = formatDimensions(dish.widthCm, dish.depthCm, dish.heightCm);
   const weight = formatWeight(dish.weightG);
-  const allergens = parseAllergens(dish.allergens);
-  const dietary = parseDietary(dish.dietary);
+  const allergens = parseAllergens(dish.allergens, locale);
+  const dietary = parseDietary(dish.dietary, locale);
 
   // True-to-scale check: do the stated dimensions match the measured 3D model?
   const verifiedToScale =

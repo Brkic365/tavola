@@ -101,8 +101,8 @@ export default async function TextMenuPage({ params }: Params) {
                     dish.heightCm,
                   );
                   const weight = formatWeight(dish.weightG);
-                  const allergens = parseAllergens(dish.allergens);
-                  const dietary = parseDietary(dish.dietary);
+                  const allergens = parseAllergens(dish.allergens, locale);
+                  const dietary = parseDietary(dish.dietary, locale);
                   const portion = [
                     dish.serves ? `${t(locale, "serves")} ${dish.serves}` : null,
                     dims,

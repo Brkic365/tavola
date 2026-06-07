@@ -46,16 +46,16 @@ export default function MenuBrowser({
   const dietaryOptions = useMemo(() => {
     const map = new Map<string, DietaryInfo>();
     for (const d of allDishes)
-      for (const t of parseDietary(d.dietary)) map.set(t.key, t);
+      for (const info of parseDietary(d.dietary, locale)) map.set(info.key, info);
     return [...map.values()];
-  }, [allDishes]);
+  }, [allDishes, locale]);
 
   const allergenOptions = useMemo(() => {
     const map = new Map<string, AllergenInfo>();
     for (const d of allDishes)
-      for (const a of parseAllergens(d.allergens)) map.set(a.key, a);
+      for (const a of parseAllergens(d.allergens, locale)) map.set(a.key, a);
     return [...map.values()];
-  }, [allDishes]);
+  }, [allDishes, locale]);
 
   const [diet, setDiet] = useState<Set<string>>(new Set());
   const [avoid, setAvoid] = useState<Set<string>>(new Set());

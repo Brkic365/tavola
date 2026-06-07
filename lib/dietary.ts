@@ -1,33 +1,44 @@
 // Dietary attributes are stored as a comma-separated string on Dish.dietary
-// (positive attributes a guest can filter the menu by).
+// (positive attributes a guest can filter the menu by). Labels are localized.
+
+import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 
 export type DietaryInfo = { key: string; label: string; icon: string };
 
-const DIETARY_MAP: Record<string, DietaryInfo> = {
-  vegetarian: { key: "vegetarian", label: "Vegetarian", icon: "🥬" },
-  vegan: { key: "vegan", label: "Vegan", icon: "🌿" },
-  "gluten-free": { key: "gluten-free", label: "Gluten-free", icon: "🌾" },
-  "dairy-free": { key: "dairy-free", label: "Dairy-free", icon: "🥛" },
-  pescatarian: { key: "pescatarian", label: "Pescatarian", icon: "🐟" },
-  "nut-free": { key: "nut-free", label: "Nut-free", icon: "🥜" },
-  halal: { key: "halal", label: "Halal", icon: "☪️" },
-  spicy: { key: "spicy", label: "Spicy", icon: "🌶️" },
+type Labels = Record<Locale, string>;
+
+const DIETARY_MAP: Record<string, { icon: string; labels: Labels }> = {
+  vegetarian: { icon: "🥬", labels: { en: "Vegetarian", hr: "Vegetarijansko", de: "Vegetarisch", it: "Vegetariano" } },
+  vegan: { icon: "🌿", labels: { en: "Vegan", hr: "Vegansko", de: "Vegan", it: "Vegano" } },
+  "gluten-free": { icon: "🌾", labels: { en: "Gluten-free", hr: "Bez glutena", de: "Glutenfrei", it: "Senza glutine" } },
+  "dairy-free": { icon: "🥛", labels: { en: "Dairy-free", hr: "Bez mlijeka", de: "Laktosefrei", it: "Senza lattosio" } },
+  pescatarian: { icon: "🐟", labels: { en: "Pescatarian", hr: "Pescetarijansko", de: "Pescetarisch", it: "Pescetariano" } },
+  "nut-free": { icon: "🥜", labels: { en: "Nut-free", hr: "Bez orašastih", de: "Nussfrei", it: "Senza frutta a guscio" } },
+  halal: { icon: "☪️", labels: { en: "Halal", hr: "Halal", de: "Halal", it: "Halal" } },
+  spicy: { icon: "🌶️", labels: { en: "Spicy", hr: "Ljuto", de: "Scharf", it: "Piccante" } },
 };
 
-export function parseDietary(raw?: string | null): DietaryInfo[] {
+function pretty(k: string): string {
+  return k.charAt(0).toUpperCase() + k.slice(1).replace(/-/g, " ");
+}
+
+export function parseDietary(
+  raw?: string | null,
+  locale: Locale = DEFAULT_LOCALE,
+): DietaryInfo[] {
   if (!raw) return [];
   return raw
     .split(",")
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean)
-    .map(
-      (k) =>
-        DIETARY_MAP[k] ?? {
-          key: k,
-          label: k.charAt(0).toUpperCase() + k.slice(1).replace(/-/g, " "),
-          icon: "•",
-        },
-    );
+    .map((k) => {
+      const e = DIETARY_MAP[k];
+      return e
+        ? { key: k, icon: e.icon, label: e.labels[locale] ?? e.labels.en }
+        : { key: k, icon: "•", label: pretty(k) };
+    });
 }
 
-export const KNOWN_DIETARY = Object.values(DIETARY_MAP);
+export const KNOWN_DIETARY: DietaryInfo[] = Object.entries(DIETARY_MAP).map(
+  ([key, e]) => ({ key, icon: e.icon, label: e.labels.en }),
+);
