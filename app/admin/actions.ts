@@ -243,6 +243,20 @@ export async function updateRestaurant(formData: FormData) {
   if (slug) revalidatePath(`/r/${slug}`);
 }
 
+export async function deleteRestaurant(formData: FormData) {
+  const id = str(formData, "id");
+  const slug = str(formData, "slug");
+  if (!id) return;
+  await assertIsOwner(id);
+
+  // Cascades categories, dishes, memberships, and analytics rows.
+  await prisma.restaurant.delete({ where: { id } });
+
+  if (slug) revalidatePath(`/r/${slug}`);
+  revalidatePath("/admin");
+  redirect("/admin");
+}
+
 // ---- team -----------------------------------------------------------------
 
 /** Accept an invite link → become a member of the restaurant. */
@@ -280,6 +294,19 @@ export async function removeMember(formData: FormData) {
 
   await prisma.membership.deleteMany({ where: { restaurantId, userId } });
   reval(slug);
+}
+
+/** A member leaves a restaurant they were invited to. */
+export async function leaveRestaurant(formData: FormData) {
+  const user = await requireUser();
+  const restaurantId = str(formData, "restaurantId");
+  if (!restaurantId) return;
+
+  await prisma.membership.deleteMany({
+    where: { restaurantId, userId: user.id },
+  });
+  revalidatePath("/admin");
+  redirect("/admin");
 }
 
 // ---- categories -----------------------------------------------------------

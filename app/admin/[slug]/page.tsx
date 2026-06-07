@@ -21,6 +21,8 @@ import DishFormFields from "@/components/admin/DishFormFields";
 import DeleteDishButton from "@/components/admin/DeleteDishButton";
 import DeleteCategoryButton from "@/components/admin/DeleteCategoryButton";
 import RemoveMemberButton from "@/components/admin/RemoveMemberButton";
+import DeleteRestaurantButton from "@/components/admin/DeleteRestaurantButton";
+import LeaveRestaurantButton from "@/components/admin/LeaveRestaurantButton";
 import FileUpload from "@/components/admin/FileUpload";
 import CopyLinkButton from "@/components/admin/CopyLinkButton";
 import MenuQR from "@/components/admin/MenuQR";
@@ -543,6 +545,40 @@ export default async function ManageRestaurantPage({ params }: Params) {
               </ul>
             </div>
           ))
+        )}
+      </section>
+
+      {/* Danger zone (owner) / Leave team (member) */}
+      <section className="mt-12 border-t border-stone-200 pt-6">
+        {owner ? (
+          <div className="rounded-2xl border border-red-200 bg-red-50/40 p-5">
+            <h2 className="text-lg font-semibold text-red-800">Danger zone</h2>
+            <p className="mt-1 max-w-xl text-sm text-stone-600">
+              Permanently delete this restaurant and everything in it — dishes,
+              categories, team members and analytics. This cannot be undone.
+            </p>
+            <div className="mt-4">
+              <DeleteRestaurantButton
+                id={restaurant.id}
+                slug={restaurant.slug}
+                name={restaurant.name}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
+            <h2 className="text-lg font-semibold text-stone-800">Leave team</h2>
+            <p className="mt-1 max-w-xl text-sm text-stone-600">
+              Remove yourself from this restaurant&apos;s team. You&apos;ll lose
+              access until an owner re-invites you.
+            </p>
+            <div className="mt-4">
+              <LeaveRestaurantButton
+                restaurantId={restaurant.id}
+                name={restaurant.name}
+              />
+            </div>
+          </div>
         )}
       </section>
     </main>
