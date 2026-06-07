@@ -9,11 +9,14 @@ import {
   updateDish,
   moveDish,
   createCategory,
+  updateCategory,
+  moveCategory,
   updateRestaurant,
   logout,
 } from "@/app/admin/actions";
 import DishFormFields from "@/components/admin/DishFormFields";
 import DeleteDishButton from "@/components/admin/DeleteDishButton";
+import DeleteCategoryButton from "@/components/admin/DeleteCategoryButton";
 import CopyLinkButton from "@/components/admin/CopyLinkButton";
 import MenuQR from "@/components/admin/MenuQR";
 import DishThumb from "@/components/DishThumb";
@@ -220,13 +223,91 @@ export default async function ManageRestaurantPage({ params }: Params) {
             >
               Add category
             </button>
-            {categories.length > 0 && (
-              <p className="text-xs text-stone-500">
-                Current: {categories.map((c) => c.name).join(", ")}
-              </p>
-            )}
           </form>
         </div>
+
+        {restaurant.categories.length > 0 && (
+          <div className="border-t border-stone-100 p-4">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-400">
+              Categories
+            </p>
+            <ul className="space-y-2">
+              {restaurant.categories.map((c, i) => {
+                const tr =
+                  (c.translations as Record<string, { name?: string }> | null) ??
+                  {};
+                return (
+                  <li
+                    key={c.id}
+                    className="rounded-xl border border-stone-200 p-2"
+                  >
+                    <div className="flex items-start gap-2">
+                      <form
+                        action={updateCategory}
+                        className="flex-1 space-y-2"
+                      >
+                        <input type="hidden" name="id" value={c.id} />
+                        <input
+                          type="hidden"
+                          name="slug"
+                          value={restaurant.slug}
+                        />
+                        <div className="flex items-center gap-2">
+                          <input
+                            name="name"
+                            defaultValue={c.name}
+                            className={`${inputCls} mt-0 flex-1`}
+                          />
+                          <button
+                            type="submit"
+                            className="shrink-0 rounded-lg bg-stone-800 px-3 py-2 text-xs font-semibold text-white hover:bg-stone-900"
+                          >
+                            Save
+                          </button>
+                        </div>
+                        <details>
+                          <summary className="cursor-pointer text-xs font-medium text-stone-500">
+                            🌐 Translations (EN/DE/IT)
+                          </summary>
+                          <div className="mt-2 grid grid-cols-3 gap-2">
+                            {(["en", "de", "it"] as const).map((loc) => (
+                              <input
+                                key={loc}
+                                name={`tr_${loc}_name`}
+                                defaultValue={tr[loc]?.name ?? ""}
+                                placeholder={loc.toUpperCase()}
+                                className={`${inputCls} mt-0`}
+                              />
+                            ))}
+                          </div>
+                        </details>
+                      </form>
+                      <div className="flex flex-col">
+                        <CategoryMove
+                          id={c.id}
+                          slug={restaurant.slug}
+                          direction="up"
+                          disabled={i === 0}
+                        />
+                        <CategoryMove
+                          id={c.id}
+                          slug={restaurant.slug}
+                          direction="down"
+                          disabled={i === restaurant.categories.length - 1}
+                        />
+                      </div>
+                      <DeleteCategoryButton
+                        id={c.id}
+                        slug={restaurant.slug}
+                        name={c.name}
+                      />
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
       </details>
 
       {/* ---- add dish ---- */}
@@ -380,6 +461,34 @@ function ReorderButton({
         type="submit"
         aria-label={`Move ${direction}`}
         className="px-1.5 text-stone-400 hover:text-stone-700"
+      >
+        {direction === "up" ? "▲" : "▼"}
+      </button>
+    </form>
+  );
+}
+
+function CategoryMove({
+  id,
+  slug,
+  direction,
+  disabled,
+}: {
+  id: string;
+  slug: string;
+  direction: "up" | "down";
+  disabled: boolean;
+}) {
+  return (
+    <form action={moveCategory}>
+      <input type="hidden" name="id" value={id} />
+      <input type="hidden" name="slug" value={slug} />
+      <input type="hidden" name="direction" value={direction} />
+      <button
+        type="submit"
+        disabled={disabled}
+        aria-label={`Move category ${direction}`}
+        className="px-1.5 text-xs text-stone-400 hover:text-stone-700 disabled:opacity-30"
       >
         {direction === "up" ? "▲" : "▼"}
       </button>

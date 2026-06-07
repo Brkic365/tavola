@@ -137,6 +137,22 @@ export async function updateRestaurant(formData: FormData) {
 
 // ---- categories -----------------------------------------------------------
 
+function categoryTranslationsFromForm(fd: FormData) {
+  const out: Record<string, { name?: string }> = {};
+  for (const loc of ["en", "de", "it"]) {
+    const name = str(fd, `tr_${loc}_name`);
+    if (name) out[loc] = { name };
+  }
+  return Object.keys(out).length ? out : Prisma.DbNull;
+}
+
+function reval(slug: string | null) {
+  if (slug) {
+    revalidatePath(`/admin/${slug}`);
+    revalidatePath(`/r/${slug}`);
+  }
+}
+
 export async function createCategory(formData: FormData) {
   const restaurantId = str(formData, "restaurantId");
   const slug = str(formData, "slug");
@@ -148,7 +164,66 @@ export async function createCategory(formData: FormData) {
     data: { restaurantId, name, sortOrder: count },
   });
 
-  if (slug) revalidatePath(`/admin/${slug}`);
+  reval(slug);
+}
+
+export async function updateCategory(formData: FormData) {
+  const id = str(formData, "id");
+  const slug = str(formData, "slug");
+  const name = str(formData, "name");
+  if (!id || !name) return;
+
+  await prisma.category.update({
+    where: { id },
+    data: { name, translations: categoryTranslationsFromForm(formData) },
+  });
+
+  reval(slug);
+}
+
+export async function deleteCategory(formData: FormData) {
+  const id = str(formData, "id");
+  const slug = str(formData, "slug");
+  if (!id) return;
+
+  // Dishes keep existing — their categoryId is set null (onDelete: SetNull).
+  await prisma.category.delete({ where: { id } });
+
+  reval(slug);
+}
+
+/** Swap a category with its neighbour to reorder. */
+export async function moveCategory(formData: FormData) {
+  const id = str(formData, "id");
+  const slug = str(formData, "slug");
+  const direction = str(formData, "direction"); // "up" | "down"
+  if (!id || !direction) return;
+
+  const cat = await prisma.category.findUnique({ where: { id } });
+  if (!cat) return;
+
+  const siblings = await prisma.category.findMany({
+    where: { restaurantId: cat.restaurantId },
+    orderBy: { sortOrder: "asc" },
+  });
+  const idx = siblings.findIndex((c) => c.id === id);
+  const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+  if (swapIdx < 0 || swapIdx >= siblings.length) return;
+
+  const a = siblings[idx];
+  const b = siblings[swapIdx];
+  await prisma.$transaction([
+    prisma.category.update({
+      where: { id: a.id },
+      data: { sortOrder: b.sortOrder },
+    }),
+    prisma.category.update({
+      where: { id: b.id },
+      data: { sortOrder: a.sortOrder },
+    }),
+  ]);
+
+  reval(slug);
 }
 
 // ---- dishes ---------------------------------------------------------------
