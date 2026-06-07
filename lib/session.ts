@@ -21,11 +21,29 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   return user;
 }
 
-/** ADMINs can edit anything; OWNERs only restaurants they own. */
-export function canEdit(
+/** Owner-level: ADMIN, or the restaurant's owner. (Team management, delete.) */
+export function isOwner(
   user: SessionUser | null,
   ownerId: string | null | undefined,
 ): boolean {
   if (!user) return false;
   return user.role === "ADMIN" || (!!ownerId && ownerId === user.id);
+}
+
+/** Manage-level: ADMIN, owner, OR an invited member of the restaurant. */
+export async function canManageRestaurant(
+  user: SessionUser | null,
+  restaurantId: string,
+): Promise<boolean> {
+  if (!user) return false;
+  if (user.role === "ADMIN") return true;
+  const r = await prisma.restaurant.findUnique({
+    where: { id: restaurantId },
+    select: { ownerId: true },
+  });
+  if (r?.ownerId === user.id) return true;
+  const m = await prisma.membership.findUnique({
+    where: { userId_restaurantId: { userId: user.id, restaurantId } },
+  });
+  return !!m;
 }

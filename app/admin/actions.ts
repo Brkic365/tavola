@@ -11,6 +11,7 @@ import {
   createSessionToken,
   hashPassword,
   verifyPassword,
+  verifyInviteToken,
 } from "@/lib/auth";
 import { getCurrentUser } from "@/lib/session";
 
@@ -121,8 +122,8 @@ async function requireUser() {
   return user;
 }
 
-/** Ensure the current user may edit the given restaurant (owner or ADMIN). */
-async function assertOwnsRestaurant(restaurantId: string | null) {
+/** May the current user MANAGE this restaurant? (ADMIN, owner, or member.) */
+async function assertCanManage(restaurantId: string | null) {
   const user = await requireUser();
   if (user.role === "ADMIN") return user;
   if (!restaurantId) redirect("/admin");
@@ -130,7 +131,24 @@ async function assertOwnsRestaurant(restaurantId: string | null) {
     where: { id: restaurantId },
     select: { ownerId: true },
   });
-  if (!r || r.ownerId !== user.id) redirect("/admin");
+  if (r?.ownerId === user.id) return user;
+  const m = await prisma.membership.findUnique({
+    where: { userId_restaurantId: { userId: user.id, restaurantId } },
+  });
+  if (!m) redirect("/admin");
+  return user;
+}
+
+/** Owner-only (ADMIN or owner) — for team management. */
+async function assertIsOwner(restaurantId: string | null) {
+  const user = await requireUser();
+  if (user.role === "ADMIN") return user;
+  if (!restaurantId) redirect("/admin");
+  const r = await prisma.restaurant.findUnique({
+    where: { id: restaurantId },
+    select: { ownerId: true },
+  });
+  if (r?.ownerId !== user.id) redirect("/admin");
   return user;
 }
 
@@ -208,7 +226,7 @@ export async function updateRestaurant(formData: FormData) {
   const id = str(formData, "id");
   const slug = str(formData, "slug");
   if (!id) return;
-  await assertOwnsRestaurant(id);
+  await assertCanManage(id);
 
   await prisma.restaurant.update({
     where: { id },
@@ -223,6 +241,45 @@ export async function updateRestaurant(formData: FormData) {
 
   revalidatePath(`/admin/${slug}`);
   if (slug) revalidatePath(`/r/${slug}`);
+}
+
+// ---- team -----------------------------------------------------------------
+
+/** Accept an invite link → become a member of the restaurant. */
+export async function joinRestaurant(formData: FormData) {
+  const user = await requireUser();
+  const inv = await verifyInviteToken(String(formData.get("token") ?? ""));
+  if (!inv) redirect("/admin?error=invite");
+
+  const restaurant = await prisma.restaurant.findUnique({
+    where: { id: inv.restaurantId },
+    select: { slug: true, ownerId: true },
+  });
+  if (!restaurant) redirect("/admin?error=invite");
+
+  // The owner already has full access — no membership needed.
+  if (restaurant.ownerId !== user.id) {
+    await prisma.membership.upsert({
+      where: {
+        userId_restaurantId: { userId: user.id, restaurantId: inv.restaurantId },
+      },
+      create: { userId: user.id, restaurantId: inv.restaurantId },
+      update: {},
+    });
+  }
+  redirect(`/admin/${restaurant.slug}`);
+}
+
+/** Owner removes a member. */
+export async function removeMember(formData: FormData) {
+  const restaurantId = str(formData, "restaurantId");
+  const userId = str(formData, "userId");
+  const slug = str(formData, "slug");
+  if (!restaurantId || !userId) return;
+  await assertIsOwner(restaurantId);
+
+  await prisma.membership.deleteMany({ where: { restaurantId, userId } });
+  reval(slug);
 }
 
 // ---- categories -----------------------------------------------------------
@@ -248,7 +305,7 @@ export async function createCategory(formData: FormData) {
   const slug = str(formData, "slug");
   const name = str(formData, "name");
   if (!restaurantId || !name) return;
-  await assertOwnsRestaurant(restaurantId);
+  await assertCanManage(restaurantId);
 
   const count = await prisma.category.count({ where: { restaurantId } });
   await prisma.category.create({
@@ -263,7 +320,7 @@ export async function updateCategory(formData: FormData) {
   const slug = str(formData, "slug");
   const name = str(formData, "name");
   if (!id || !name) return;
-  await assertOwnsRestaurant(await restaurantIdOfCategory(id));
+  await assertCanManage(await restaurantIdOfCategory(id));
 
   await prisma.category.update({
     where: { id },
@@ -277,7 +334,7 @@ export async function deleteCategory(formData: FormData) {
   const id = str(formData, "id");
   const slug = str(formData, "slug");
   if (!id) return;
-  await assertOwnsRestaurant(await restaurantIdOfCategory(id));
+  await assertCanManage(await restaurantIdOfCategory(id));
 
   // Dishes keep existing — their categoryId is set null (onDelete: SetNull).
   await prisma.category.delete({ where: { id } });
@@ -291,7 +348,7 @@ export async function moveCategory(formData: FormData) {
   const slug = str(formData, "slug");
   const direction = str(formData, "direction"); // "up" | "down"
   if (!id || !direction) return;
-  await assertOwnsRestaurant(await restaurantIdOfCategory(id));
+  await assertCanManage(await restaurantIdOfCategory(id));
 
   const cat = await prisma.category.findUnique({ where: { id } });
   if (!cat) return;
@@ -368,7 +425,7 @@ export async function createDish(formData: FormData) {
   const restaurantId = str(formData, "restaurantId");
   const slug = str(formData, "slug");
   if (!restaurantId) return;
-  await assertOwnsRestaurant(restaurantId);
+  await assertCanManage(restaurantId);
 
   const data = dishDataFromForm(formData);
   if (!data.glbUrl) return; // a model is required to be useful
@@ -391,7 +448,7 @@ export async function updateDish(formData: FormData) {
   const id = str(formData, "id");
   const slug = str(formData, "slug");
   if (!id) return;
-  await assertOwnsRestaurant(await restaurantIdOfDish(id));
+  await assertCanManage(await restaurantIdOfDish(id));
 
   const data = dishDataFromForm(formData);
   await prisma.dish.update({ where: { id }, data });
@@ -406,7 +463,7 @@ export async function deleteDish(formData: FormData) {
   const id = str(formData, "id");
   const slug = str(formData, "slug");
   if (!id) return;
-  await assertOwnsRestaurant(await restaurantIdOfDish(id));
+  await assertCanManage(await restaurantIdOfDish(id));
 
   await prisma.dish.delete({ where: { id } });
 
@@ -422,7 +479,7 @@ export async function moveDish(formData: FormData) {
   const slug = str(formData, "slug");
   const direction = str(formData, "direction"); // "up" | "down"
   if (!id || !direction) return;
-  await assertOwnsRestaurant(await restaurantIdOfDish(id));
+  await assertCanManage(await restaurantIdOfDish(id));
 
   const dish = await prisma.dish.findUnique({ where: { id } });
   if (!dish) return;

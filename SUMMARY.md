@@ -39,8 +39,12 @@ Three.js.
 - **User accounts & roles** — email + PBKDF2-hashed password, signup/login,
   signed httpOnly session (`proxy.ts` gates `/admin/*` + upload APIs).
   **OWNER**s see/manage only their own restaurants; platform **ADMIN** sees all;
-  every mutation enforces ownership. _Verified: wrong-pw rejected; owner sees
-  only own restaurants and is redirected away from others'._
+  every mutation enforces access. _Verified: wrong-pw rejected; owner sees only
+  own restaurants and is redirected away from others'._
+- **Team invites** — owners share a signed invite link; invitees join as
+  **members** (co-manage that restaurant); owner-only Team panel lists/removes
+  members. _Verified: no access → join via link → access (no Team panel) →
+  owner removes → membership gone._
 - **Dish CRUD**, reorder; **category CRUD** (rename + translations, reorder,
   delete → dishes fall back to Uncategorized); settings (incl. **logo upload**);
   **table QR code**; **account page** (change name / password).
@@ -74,9 +78,9 @@ Three.js.
   going **browser→Blob directly** in prod via `NEXT_PUBLIC_BLOB_ENABLED`); the
   remaining gap is generating models (Meshy/Luma/Object Capture), not storing
   them.
-- **Auth depth** — accounts have ADMIN/OWNER roles + ownership, but no
-  per-restaurant member invites or password reset yet. PBKDF2 hashing is fine;
-  a managed provider (Clerk/NextAuth) would add SSO/MFA.
+- **Auth depth** — accounts (ADMIN/OWNER), ownership, and team invites are in;
+  no **password reset** (needs an email provider) or SSO/MFA yet (a managed
+  provider like Clerk/NextAuth would add those).
 - **AR reference object** — comparator is a 2D bar chart; a to-scale plate
   _inside_ the AR scene is a future nicety.
 

@@ -2,7 +2,8 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser, canEdit } from "@/lib/session";
+import { getCurrentUser, isOwner, canManageRestaurant } from "@/lib/session";
+import { createInviteToken } from "@/lib/auth";
 import { formatPrice } from "@/lib/format";
 import { LOCALES } from "@/lib/i18n";
 import {
@@ -13,11 +14,13 @@ import {
   updateCategory,
   moveCategory,
   updateRestaurant,
+  removeMember,
   logout,
 } from "@/app/admin/actions";
 import DishFormFields from "@/components/admin/DishFormFields";
 import DeleteDishButton from "@/components/admin/DeleteDishButton";
 import DeleteCategoryButton from "@/components/admin/DeleteCategoryButton";
+import RemoveMemberButton from "@/components/admin/RemoveMemberButton";
 import FileUpload from "@/components/admin/FileUpload";
 import CopyLinkButton from "@/components/admin/CopyLinkButton";
 import MenuQR from "@/components/admin/MenuQR";
@@ -38,6 +41,11 @@ export default async function ManageRestaurantPage({ params }: Params) {
   const restaurant = await prisma.restaurant.findUnique({
     where: { slug },
     include: {
+      owner: { select: { email: true, name: true } },
+      memberships: {
+        include: { user: { select: { id: true, email: true, name: true } } },
+        orderBy: { createdAt: "asc" },
+      },
       categories: { orderBy: { sortOrder: "asc" } },
       dishes: {
         orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
@@ -46,8 +54,9 @@ export default async function ManageRestaurantPage({ params }: Params) {
     },
   });
   if (!restaurant) notFound();
-  // Owners can only manage their own restaurants.
-  if (!canEdit(user, restaurant.ownerId)) redirect("/admin");
+  // Members + owner + admin may manage; everyone else is bounced.
+  if (!(await canManageRestaurant(user, restaurant.id))) redirect("/admin");
+  const owner = isOwner(user, restaurant.ownerId);
 
   // Build the absolute public menu URL for the QR code.
   const h = await headers();
@@ -55,6 +64,9 @@ export default async function ManageRestaurantPage({ params }: Params) {
   const proto =
     h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
   const menuUrl = `${proto}://${host}/r/${slug}`;
+  const inviteUrl = owner
+    ? `${proto}://${host}/admin/join/${await createInviteToken(restaurant.id)}`
+    : null;
 
   const categories = restaurant.categories.map((c) => ({
     id: c.id,
@@ -344,6 +356,65 @@ export default async function ManageRestaurantPage({ params }: Params) {
           </div>
         )}
       </details>
+
+      {/* ---- team (owner only) ---- */}
+      {owner && inviteUrl && (
+        <details className="mt-4 rounded-2xl border border-stone-200 bg-white shadow-sm">
+          <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-stone-700">
+            👥 Team
+          </summary>
+          <div className="space-y-5 border-t border-stone-100 p-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+                Invite link
+              </p>
+              <p className="mt-1 text-sm text-stone-500">
+                Anyone with this link can join as a manager (expires in 7 days).
+              </p>
+              <code className="mt-2 block truncate rounded-lg bg-stone-100 px-3 py-2 text-xs text-stone-700">
+                {inviteUrl}
+              </code>
+              <div className="mt-2">
+                <CopyLinkButton url={inviteUrl} />
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+                Members
+              </p>
+              <ul className="mt-2 space-y-1.5 text-sm">
+                <li className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-2">
+                  <span className="text-stone-700">
+                    {restaurant.owner?.email ?? "—"}
+                  </span>
+                  <span className="rounded-full bg-teal-100 px-2 py-0.5 text-[10px] font-bold uppercase text-teal-800">
+                    owner
+                  </span>
+                </li>
+                {restaurant.memberships.map((m) => (
+                  <li
+                    key={m.id}
+                    className="flex items-center justify-between rounded-lg border border-stone-200 px-3 py-2"
+                  >
+                    <span className="text-stone-700">{m.user.email}</span>
+                    <RemoveMemberButton
+                      restaurantId={restaurant.id}
+                      userId={m.user.id}
+                      slug={restaurant.slug}
+                      email={m.user.email}
+                    />
+                  </li>
+                ))}
+                {restaurant.memberships.length === 0 && (
+                  <li className="px-3 py-2 text-stone-400">
+                    No members yet — share the invite link.
+                  </li>
+                )}
+              </ul>
+            </div>
+          </div>
+        </details>
+      )}
 
       {/* ---- add dish ---- */}
       <details className="mt-4 rounded-2xl border border-teal-200 bg-white shadow-sm">

@@ -74,6 +74,30 @@ export async function verifySessionToken(
   return timingSafeEqual(sig, expected) ? userId : null;
 }
 
+// ---- team invite tokens ---------------------------------------------------
+
+const INVITE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** Signed, expiring token that grants membership of a restaurant. */
+export async function createInviteToken(restaurantId: string): Promise<string> {
+  const exp = Date.now() + INVITE_MAX_AGE_MS;
+  const payload = `inv.${restaurantId}.${exp}`;
+  return `${payload}.${await sign(payload)}`;
+}
+
+export async function verifyInviteToken(
+  token: string | undefined | null,
+): Promise<{ restaurantId: string } | null> {
+  if (!token) return null;
+  const parts = token.split(".");
+  if (parts.length !== 4 || parts[0] !== "inv") return null;
+  const [, restaurantId, expStr, sig] = parts;
+  const exp = Number(expStr);
+  if (!restaurantId || !Number.isFinite(exp) || exp < Date.now()) return null;
+  const expected = await sign(`inv.${restaurantId}.${expStr}`);
+  return timingSafeEqual(sig, expected) ? { restaurantId } : null;
+}
+
 // ---- password hashing -----------------------------------------------------
 
 const PBKDF2_ITERATIONS = 100_000;

@@ -154,7 +154,7 @@ Lightspeed, not a worse order-and-pay clone.
 | ✅ N1 | **Model-derived & validated dimensions** — compute the GLB bounding box (cm), auto-fill W/D/H, flag stated-vs-modeled mismatches | Makes "true-to-scale" actually *true*; closes the credibility hole; core to the brand |
 | ◑ N2 | **3D content pipeline** — GLB→USDZ auto-conversion ✅ + GLB/image/USDZ upload→Blob ✅ + AI/photo capture ⬜ | The operational unlock; removes the historical #1 failure mode |
 | ✅ N3 | **Dimension hotspots** + connector lines + in-viewer **scale reference** ("Size at a glance") | Portion intuition even without launching AR |
-| ✅ N4 | **Auth + roles** — user accounts, restaurant ownership, ADMIN/OWNER (member invites ⬜) | Table stakes for real customers |
+| ✅ N4 | **Auth + roles** — user accounts, restaurant ownership, ADMIN/OWNER, team invites (members co-manage) | Table stakes for real customers |
 | ✅ N5 | **Accessible printable fallback menu** (semantic, WCAG, no-smartphone path) | Legal + adoption risk; counters QR backlash |
 
 ### Next — become a *menu*, add the value/compliance layer (3–9 mo)

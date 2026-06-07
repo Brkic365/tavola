@@ -18,9 +18,19 @@ export default async function AdminPage() {
   if (!user) redirect("/admin/login");
 
   const restaurants = await prisma.restaurant.findMany({
-    where: user.role === "ADMIN" ? undefined : { ownerId: user.id },
+    where:
+      user.role === "ADMIN"
+        ? undefined
+        : {
+            OR: [
+              { ownerId: user.id },
+              { memberships: { some: { userId: user.id } } },
+            ],
+          },
     orderBy: { createdAt: "asc" },
-    include: { _count: { select: { dishes: true } } },
+    include: {
+      _count: { select: { dishes: true } },
+    },
   });
 
   return (

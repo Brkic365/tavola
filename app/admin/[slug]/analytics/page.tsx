@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser, canEdit } from "@/lib/session";
+import { getCurrentUser, canManageRestaurant } from "@/lib/session";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -29,7 +29,7 @@ export default async function AnalyticsPage({ params }: Params) {
     },
   });
   if (!restaurant) notFound();
-  if (!canEdit(user, restaurant.ownerId)) redirect("/admin");
+  if (!(await canManageRestaurant(user, restaurant.id))) redirect("/admin");
 
   const totalViews = restaurant.dishes.reduce((n, d) => n + d._count.views, 0);
   const totalAR = restaurant.dishes.reduce((n, d) => n + d._count.arViews, 0);

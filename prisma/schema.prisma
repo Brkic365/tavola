@@ -25,11 +25,26 @@ model User {
   updatedAt    DateTime     @updatedAt
 
   restaurants  Restaurant[]
+  memberships  Membership[]
 }
 
 enum UserRole {
   ADMIN
   OWNER
+}
+
+// A user invited to co-manage a restaurant they don't own.
+model Membership {
+  id           String     @id @default(cuid())
+  userId       String
+  restaurantId String
+  createdAt    DateTime   @default(now())
+
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, restaurantId])
+  @@index([restaurantId])
 }
 
 model Restaurant {
@@ -44,9 +59,10 @@ model Restaurant {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 
-  owner      User?      @relation(fields: [ownerId], references: [id], onDelete: SetNull)
-  categories Category[]
-  dishes     Dish[]
+  owner       User?        @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  memberships Membership[]
+  categories  Category[]
+  dishes      Dish[]
 
   @@index([ownerId])
 }
