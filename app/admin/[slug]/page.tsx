@@ -11,6 +11,7 @@ import {
   updateDish,
   moveDish,
   setDishAvailability,
+  duplicateDish,
   createCategory,
   updateCategory,
   moveCategory,
@@ -530,6 +531,20 @@ export default async function ManageRestaurantPage({ params }: Params) {
                           slug={restaurant.slug}
                           available={dish.available}
                         />
+                        <form action={duplicateDish}>
+                          <input type="hidden" name="id" value={dish.id} />
+                          <input
+                            type="hidden"
+                            name="slug"
+                            value={restaurant.slug}
+                          />
+                          <button
+                            type="submit"
+                            className="rounded-lg px-2.5 py-1.5 text-sm font-medium text-stone-600 hover:bg-stone-100"
+                          >
+                            Duplicate
+                          </button>
+                        </form>
                       </div>
                       <details className="group">
                         <summary className="cursor-pointer rounded-lg px-2.5 py-1.5 text-sm font-medium text-teal-700 hover:bg-teal-50">

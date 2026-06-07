@@ -520,6 +520,50 @@ export async function deleteDish(formData: FormData) {
   }
 }
 
+/** Clone a dish (with all metadata + translations) as a new draft. */
+export async function duplicateDish(formData: FormData) {
+  const id = str(formData, "id");
+  const slug = str(formData, "slug");
+  if (!id) return;
+
+  const src = await prisma.dish.findUnique({ where: { id } });
+  if (!src) return;
+  await assertCanManage(src.restaurantId);
+
+  // Strip identity/audit fields; everything else is copied verbatim.
+  const {
+    id: _id,
+    createdAt: _c,
+    updatedAt: _u,
+    sortOrder: _s,
+    name,
+    ...rest
+  } = src;
+
+  const count = await prisma.dish.count({
+    where: { restaurantId: src.restaurantId, categoryId: src.categoryId },
+  });
+
+  await prisma.dish.create({
+    data: {
+      ...rest,
+      name: `${name} (copy)`,
+      // A fresh copy starts hidden-from-spotlight + in stock; the operator can
+      // adjust before it goes live.
+      featured: false,
+      available: true,
+      sortOrder: count,
+      // Prisma needs Json null sent as DbNull, not literal null.
+      translations: (src.translations ?? Prisma.DbNull) as Prisma.InputJsonValue,
+    },
+  });
+
+  if (slug) {
+    revalidatePath(`/admin/${slug}`);
+    revalidatePath(`/r/${slug}`);
+  }
+}
+
 /** Swap a dish with its neighbour (within the same category) to reorder. */
 export async function moveDish(formData: FormData) {
   const id = str(formData, "id");
