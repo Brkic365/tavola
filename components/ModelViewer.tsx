@@ -9,17 +9,30 @@ type Props = {
   dishId: string; // used to log AR launches (analytics)
 };
 
-// The bits of the <model-viewer> element API we touch.
 type Vec3 = { x: number; y: number; z: number };
+type Hotspot = { x: number; y: number; z: number; toString(): string };
+// The bits of the <model-viewer> element API we touch.
 type ModelViewerElement = HTMLElement & {
   canActivateAR?: boolean;
   activateAR?: () => Promise<void>;
   getDimensions?: () => Vec3;
   getBoundingBoxCenter?: () => Vec3;
+  queryHotspot?: (name: string) => { canvasPosition?: Hotspot } | null;
 };
 
-// A dimension annotation pinned to a point on the model's bounding box.
-type DimHotspot = { slot: string; position: string; label: string };
+type DimLabel = { slot: string; position: string; label: string };
+type DimData = {
+  labels: DimLabel[]; // W/H/D text at each edge midpoint
+  corners: DimLabel[]; // invisible anchor points for the leader lines
+};
+
+// Each connector line runs from the shared front-bottom-right corner along one
+// axis. Indices line up with the labels (W, D, H).
+const LINES: Array<[string, string]> = [
+  ["hotspot-corner-c", "hotspot-corner-w"],
+  ["hotspot-corner-c", "hotspot-corner-d"],
+  ["hotspot-corner-c", "hotspot-corner-h"],
+];
 
 function cmLabel(metres: number): string {
   const v = Math.round(metres * 100 * 10) / 10;
@@ -27,76 +40,78 @@ function cmLabel(metres: number): string {
 }
 
 /**
- * Build W/H/D dimension hotspots from the model's REAL bounding box
- * (getDimensions/getBoundingBoxCenter are in metres). Each label is pinned to
- * the midpoint of a bounding-box edge so it reads next to the dish, and the
- * value always matches the geometry actually shown.
+ * Build W/H/D dimension annotations from the model's REAL bounding box
+ * (getDimensions/getBoundingBoxCenter are in metres), so values + positions
+ * always match the geometry actually shown. Labels sit at edge midpoints; the
+ * corner anchors drive the SVG leader lines.
  */
-function buildDimHotspots(mv: ModelViewerElement): DimHotspot[] | null {
+function buildDimData(mv: ModelViewerElement): DimData | null {
   const d = mv.getDimensions?.();
   const c = mv.getBoundingBoxCenter?.();
   if (!d || !c) return null;
   const hx = d.x / 2;
   const hy = d.y / 2;
   const hz = d.z / 2;
-  return [
-    // width: bottom-front edge
-    {
-      slot: "hotspot-dim-w",
-      position: `${c.x} ${c.y - hy} ${c.z + hz}`,
-      label: `W · ${cmLabel(d.x)} cm`,
-    },
-    // height: front-right vertical edge
-    {
-      slot: "hotspot-dim-h",
-      position: `${c.x + hx} ${c.y} ${c.z + hz}`,
-      label: `H · ${cmLabel(d.y)} cm`,
-    },
-    // depth: bottom-right edge
-    {
-      slot: "hotspot-dim-d",
-      position: `${c.x + hx} ${c.y - hy} ${c.z}`,
-      label: `D · ${cmLabel(d.z)} cm`,
-    },
-  ];
+  const p = (x: number, y: number, z: number) => `${x} ${y} ${z}`;
+
+  return {
+    labels: [
+      {
+        slot: "hotspot-dim-w",
+        position: p(c.x, c.y - hy, c.z + hz),
+        label: `W · ${cmLabel(d.x)} cm`,
+      },
+      {
+        slot: "hotspot-dim-d",
+        position: p(c.x + hx, c.y - hy, c.z),
+        label: `D · ${cmLabel(d.z)} cm`,
+      },
+      {
+        slot: "hotspot-dim-h",
+        position: p(c.x + hx, c.y, c.z + hz),
+        label: `H · ${cmLabel(d.y)} cm`,
+      },
+    ],
+    corners: [
+      // shared corner (right-bottom-front)
+      { slot: "hotspot-corner-c", position: p(c.x + hx, c.y - hy, c.z + hz), label: "" },
+      // width end (−x), depth end (−z), height end (+y)
+      { slot: "hotspot-corner-w", position: p(c.x - hx, c.y - hy, c.z + hz), label: "" },
+      { slot: "hotspot-corner-d", position: p(c.x + hx, c.y - hy, c.z - hz), label: "" },
+      { slot: "hotspot-corner-h", position: p(c.x + hx, c.y + hy, c.z + hz), label: "" },
+    ],
+  };
 }
 
 /**
  * TRUE-TO-SCALE AR — the whole point of Tavola.
  *
- * Models MUST be authored at 1 unit = 1 meter, and we pass `ar-scale="fixed"`
- * so <model-viewer> places the dish at its real-world size instead of
- * auto-fitting it to the room. That is what lets a guest judge the actual
- * portion before ordering. Do NOT switch to ar-scale="auto".
+ * Models MUST be authored at 1 unit = 1 meter, with `ar-scale="fixed"`, so
+ * <model-viewer> places the dish at its real-world size. Do NOT use "auto".
  *
- * Platform behaviour:
- *  - Android: Scene Viewer renders the GLB directly (no extra asset needed).
- *  - iOS: Quick Look needs a USDZ via `ios-src`. When a dish has no USDZ we
- *    drop "quick-look" from ar-modes, so AR isn't offered on iOS — the 3D
- *    viewer + dimensions still work (graceful degradation).
+ *  - Android: Scene Viewer renders the GLB directly.
+ *  - iOS: Quick Look needs a USDZ via `ios-src`; without one, AR isn't offered
+ *    (graceful degradation) — the 3D viewer + dimensions still work.
  *
- * We render our OWN "View in your space" button (not <model-viewer>'s
- * `slot="ar-button"`) and trigger AR via `activateAR()`. The slotted button
- * lives inside model-viewer's shadow DOM where it is hard to position reliably
- * and can inherit `pointer-events: none`; our button sits in a wrapper we
- * control, so it's positioned and clickable consistently across devices.
+ * We render our OWN AR button (not the slotted `ar-button`, which is hard to
+ * position in shadow DOM) and trigger AR via `activateAR()`.
  *
- * NOTE: AR launch (Android Scene Viewer / iOS Quick Look) requires the page +
- * model to be served over **HTTPS**. Over plain http (e.g. a LAN IP) the 3D
- * viewer works but the AR handoff is blocked by the OS.
+ * The "Dimensions" toggle overlays W/H/D labels pinned to the bounding box plus
+ * CAD-style leader lines drawn in an SVG overlay that we sync to the model's
+ * projected positions on every `camera-change`.
  *
- * TODO: USDZ auto-conversion from GLB — future microservice so every dish
- *       gets iOS AR without manual asset authoring.
+ * NOTE: AR launch requires HTTPS; over plain http the viewer works but the OS
+ * blocks the AR handoff. TODO: GLB→USDZ is generated in admin (see UsdzGenerator).
  */
 export default function ModelViewer({ src, iosSrc, alt, dishId }: Props) {
   const ref = useRef<ModelViewerElement | null>(null);
+  const lineRefs = useRef<Array<SVGLineElement | null>>([]);
   const [isIOS, setIsIOS] = useState(false);
   const [arAvailable, setArAvailable] = useState(false);
-  const [dims, setDims] = useState<DimHotspot[] | null>(null);
+  const [dimData, setDimData] = useState<DimData | null>(null);
   const [showDims, setShowDims] = useState(false);
+  const [svg, setSvg] = useState({ w: 0, h: 0 });
 
-  // The custom element registers itself as a side effect of the import. Loading
-  // it in an effect keeps it out of the SSR/server bundle (it touches window).
   useEffect(() => {
     import("@google/model-viewer");
   }, []);
@@ -105,20 +120,20 @@ export default function ModelViewer({ src, iosSrc, alt, dishId }: Props) {
     const ua = window.navigator.userAgent;
     const iOS =
       /iPad|iPhone|iPod/.test(ua) ||
-      // iPadOS 13+ reports as Mac but is touch-capable.
       (ua.includes("Macintosh") && "ontouchend" in document);
     setIsIOS(iOS);
   }, []);
 
-  // On model load: (1) reflect AR availability, (2) compute dimension hotspots
-  // from the model's real bounding box so the labels always match the geometry.
+  // On model load: reflect AR availability + compute dimension data + SVG size.
   useEffect(() => {
     const mv = ref.current;
     if (!mv) return;
     const update = () => setArAvailable(Boolean(mv.canActivateAR));
     const onLoad = () => {
       update();
-      setDims(buildDimHotspots(mv));
+      setDimData(buildDimData(mv));
+      const r = mv.getBoundingClientRect();
+      setSvg({ w: r.width, h: r.height });
     };
     mv.addEventListener("load", onLoad);
     const timers = [400, 1200, 2500].map((d) => setTimeout(update, d));
@@ -129,23 +144,64 @@ export default function ModelViewer({ src, iosSrc, alt, dishId }: Props) {
     };
   }, []);
 
-  // Count an AR launch (analytics, best-effort) then hand off to the OS.
+  // Keep the SVG overlay sized to the viewer.
+  useEffect(() => {
+    const mv = ref.current;
+    if (!mv) return;
+    const setSize = () => {
+      const r = mv.getBoundingClientRect();
+      setSvg({ w: r.width, h: r.height });
+    };
+    window.addEventListener("resize", setSize);
+    return () => window.removeEventListener("resize", setSize);
+  }, []);
+
+  // Redraw the leader lines from the model's current projected corner positions.
+  const syncLines = useCallback(() => {
+    const mv = ref.current;
+    if (!mv?.queryHotspot) return;
+    const at = (slot: string) => mv.queryHotspot?.(slot)?.canvasPosition;
+    const c = at("hotspot-corner-c");
+    LINES.forEach(([, endSlot], i) => {
+      const ln = lineRefs.current[i];
+      if (!ln) return;
+      const e = at(endSlot);
+      if (!c || !e) {
+        ln.setAttribute("opacity", "0");
+        return;
+      }
+      ln.setAttribute("x1", String(c.x));
+      ln.setAttribute("y1", String(c.y));
+      ln.setAttribute("x2", String(e.x));
+      ln.setAttribute("y2", String(e.y));
+      ln.setAttribute("opacity", "1");
+    });
+  }, []);
+
+  // While dimensions are shown, resync lines on every camera change.
+  useEffect(() => {
+    const mv = ref.current;
+    if (!mv || !showDims || !dimData) return;
+    const onCam = () => syncLines();
+    mv.addEventListener("camera-change", onCam);
+    const timers = [0, 80, 250, 600].map((d) => setTimeout(syncLines, d));
+    return () => {
+      mv.removeEventListener("camera-change", onCam);
+      timers.forEach(clearTimeout);
+    };
+  }, [showDims, dimData, syncLines]);
+
   const launchAR = useCallback(() => {
     void fetch("/api/ar-view", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ dishId }),
       keepalive: true,
-    }).catch(() => {
-      /* analytics is best-effort; never block the AR launch */
-    });
-    void ref.current?.activateAR?.().catch(() => {
-      /* user dismissed, or AR unsupported in this context */
-    });
+    }).catch(() => {});
+    void ref.current?.activateAR?.().catch(() => {});
   }, [dishId]);
 
   const hasUSDZ = Boolean(iosSrc);
-  // Only advertise quick-look when we actually have a USDZ to feed it.
   const arModes = hasUSDZ
     ? "scene-viewer quick-look webxr"
     : "scene-viewer webxr";
@@ -153,7 +209,6 @@ export default function ModelViewer({ src, iosSrc, alt, dishId }: Props) {
 
   return (
     <div className="w-full">
-      {/* our own relative wrapper is the positioning context for the AR button */}
       <div className="relative w-full">
         <model-viewer
           ref={ref}
@@ -173,9 +228,8 @@ export default function ModelViewer({ src, iosSrc, alt, dishId }: Props) {
           className="block h-[60vh] max-h-[520px] w-full rounded-2xl bg-stone-100"
           style={{ ["--poster-color" as string]: "#f5f5f4" }}
         >
-          {/* Dimension annotations pinned to the model's bounding box. */}
           {showDims &&
-            dims?.map((h) => (
+            dimData?.labels.map((h) => (
               <button
                 key={h.slot}
                 slot={h.slot}
@@ -185,10 +239,43 @@ export default function ModelViewer({ src, iosSrc, alt, dishId }: Props) {
                 {h.label}
               </button>
             ))}
+          {/* invisible anchors used only to project the leader-line endpoints */}
+          {showDims &&
+            dimData?.corners.map((h) => (
+              <div
+                key={h.slot}
+                slot={h.slot}
+                data-position={h.position}
+                className="pointer-events-none h-0 w-0 opacity-0"
+              />
+            ))}
         </model-viewer>
 
-        {/* Toggle the dimension annotations (appears once the model is loaded). */}
-        {dims && (
+        {/* CAD-style leader lines, synced to projected corner positions. */}
+        {showDims && dimData && (
+          <svg
+            className="pointer-events-none absolute inset-0 h-full w-full"
+            viewBox={`0 0 ${svg.w || 1} ${svg.h || 1}`}
+            preserveAspectRatio="none"
+            aria-hidden
+          >
+            {LINES.map((_, i) => (
+              <line
+                key={i}
+                ref={(el) => {
+                  lineRefs.current[i] = el;
+                }}
+                stroke="#0f766e"
+                strokeWidth={2}
+                strokeDasharray="5 3"
+                strokeLinecap="round"
+                opacity={0}
+              />
+            ))}
+          </svg>
+        )}
+
+        {dimData && (
           <button
             type="button"
             onClick={() => setShowDims((s) => !s)}
