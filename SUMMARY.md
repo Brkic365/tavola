@@ -31,6 +31,9 @@ Three.js.
 - **Accessible / printable** `/r/[slug]/menu` — semantic, no-JS, screen-reader
   + print friendly (the no-smartphone fallback). Skip link, focus rings, SR
   text app-wide.
+- **Social-share cards** — dynamic Open Graph images (`next/og`) for menu + dish
+  links: a branded card with the dish name, real portion chips and price.
+  _Verified by rendering the PNGs._
 
 ### Admin (auth-gated)
 - **Password auth** — signed httpOnly session cookie, `proxy.ts` gates
