@@ -40,6 +40,8 @@ tunnel.log
 
 # runtime-generated USDZ conversions (regenerated on demand in admin)
 /public/models/generated/
+# admin-uploaded assets (stored in Blob in prod)
+/public/uploads/
 
 # local SQLite database
 *.db

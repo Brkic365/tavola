@@ -3,6 +3,7 @@ import { KNOWN_DIETARY } from "@/lib/dietary";
 import { LOCALES } from "@/lib/i18n";
 import DimensionMeasurer from "@/components/admin/DimensionMeasurer";
 import UsdzGenerator from "@/components/admin/UsdzGenerator";
+import FileUpload from "@/components/admin/FileUpload";
 
 // Locales offered for translation (base content is the main name/description).
 const TRANSLATION_LOCALES = LOCALES.filter((l) => l.code !== "hr");
@@ -139,25 +140,33 @@ export default function DishFormFields({
         </div>
       </details>
 
-      <label className="col-span-2">
-        <span className={labelCls}>GLB model URL * (3D + Android AR)</span>
-        <input
-          id={`${idPrefix}-glbUrl`}
-          name="glbUrl"
-          required
-          list={`${idPrefix}-glb`}
-          defaultValue={v(dish?.glbUrl) as string}
-          className={inputCls}
-          placeholder="/models/avocado.glb"
+      <div className="col-span-2">
+        <label>
+          <span className={labelCls}>GLB model URL * (3D + Android AR)</span>
+          <input
+            id={`${idPrefix}-glbUrl`}
+            name="glbUrl"
+            required
+            list={`${idPrefix}-glb`}
+            defaultValue={v(dish?.glbUrl) as string}
+            className={inputCls}
+            placeholder="/models/avocado.glb"
+          />
+          <datalist id={`${idPrefix}-glb`}>
+            {BUNDLED_GLB.map((m) => (
+              <option key={m.url} value={m.url}>
+                {m.label}
+              </option>
+            ))}
+          </datalist>
+        </label>
+        <FileUpload
+          targetId={`${idPrefix}-glbUrl`}
+          kind="glb"
+          accept=".glb,.gltf,model/gltf-binary"
+          label="Upload a GLB file"
         />
-        <datalist id={`${idPrefix}-glb`}>
-          {BUNDLED_GLB.map((m) => (
-            <option key={m.url} value={m.url}>
-              {m.label}
-            </option>
-          ))}
-        </datalist>
-      </label>
+      </div>
 
       <div className="col-span-2">
         <label>
@@ -182,15 +191,24 @@ export default function DishFormFields({
         <UsdzGenerator idPrefix={idPrefix} />
       </div>
 
-      <label className="col-span-2">
-        <span className={labelCls}>Thumbnail URL (optional)</span>
-        <input
-          name="thumbnailUrl"
-          defaultValue={v(dish?.thumbnailUrl) as string}
-          className={inputCls}
-          placeholder="Leave blank for an auto gradient + emoji"
+      <div className="col-span-2">
+        <label>
+          <span className={labelCls}>Thumbnail URL (optional)</span>
+          <input
+            id={`${idPrefix}-thumbnailUrl`}
+            name="thumbnailUrl"
+            defaultValue={v(dish?.thumbnailUrl) as string}
+            className={inputCls}
+            placeholder="Leave blank for an auto gradient + emoji"
+          />
+        </label>
+        <FileUpload
+          targetId={`${idPrefix}-thumbnailUrl`}
+          kind="image"
+          accept="image/*"
+          label="Upload an image"
         />
-      </label>
+      </div>
 
       <fieldset className="col-span-2 grid grid-cols-4 gap-3">
         <label>

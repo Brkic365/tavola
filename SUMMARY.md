@@ -37,9 +37,10 @@ Three.js.
 - **Dish CRUD**, reorder, categories, settings, **table QR code**.
 - **📐 Measure from 3D model** — reads the GLB bounding box (`getDimensions`),
   auto-fills/validates the stated dimensions.
-- **⤓ Generate USDZ from GLB** — converts in-browser (Three.js
-  `GLTFLoader → USDZExporter`), stores to Vercel Blob (prod) or `/public`
-  (dev). _Verified: avocado → valid 2.75 MB USDZ._
+- **⤴ Upload GLB / thumbnail** + **⤓ Generate USDZ from GLB** — file upload
+  (`/api/upload`) and in-browser GLB→USDZ conversion (Three.js
+  `GLTFLoader → USDZExporter`), both stored to Vercel Blob (prod) or `/public`
+  (dev). _Verified: GLB upload 200 + served; avocado → valid 2.75 MB USDZ._
 - **📊 Analytics** — view → AR-launch funnel, per-dish AR rate, last-7-days.
 - **Translations editor** (per-locale name/description).
 
@@ -60,8 +61,9 @@ Three.js.
   the measured-vs-stated mismatch is surfaced honestly (no false "Verified"
   badge).
 - **Thumbnails** — gradient + emoji placeholders (`thumbnailUrl` supported).
-- **Asset upload** — GLB/thumbnail are URL strings; only USDZ has a real
-  upload+store pipeline. Generalise to model/photo upload (Blob/S3).
+- **Large-file uploads on Vercel** — `/api/upload` POSTs bytes through the
+  function (~4.5 MB serverless body limit). For big models, switch to
+  client-direct-to-Blob (`@vercel/blob/client` `upload()`). Works fully in dev.
 - **Auth depth** — single shared admin password; no per-restaurant
   ownership/roles. Swap in Clerk/NextAuth for multi-tenant.
 - **AR reference object** — comparator is a 2D bar chart; a to-scale plate
