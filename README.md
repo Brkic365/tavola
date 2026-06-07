@@ -50,7 +50,8 @@ npm run dev                 # http://localhost:3000
 Then open:
 
 - **Menu:** http://localhost:3000/r/tavola-demo
-- **Admin:** http://localhost:3000/admin/tavola-demo
+- **Admin:** http://localhost:3000/admin/tavola-demo — **login password:
+  `tavola`** (demo; set `ADMIN_PASSWORD` to change)
 
 ### Handy scripts
 
@@ -114,7 +115,9 @@ fresh clone works offline.
 
 ## Notes / known stubs
 
-- **No auth** on `/admin` yet (MVP) — see [`SUMMARY.md`](SUMMARY.md).
+- **Admin auth** is simple password + signed session cookie (`proxy.ts` gates
+  `/admin` + `/api/usdz`). Swap in Clerk/NextAuth + per-restaurant roles for
+  production — see [`SUMMARY.md`](SUMMARY.md).
 - **USDZ** is only present for one seeded dish; others rely on iOS graceful
   fallback. Auto-conversion GLB→USDZ is a planned microservice.
 - Menu thumbnails are auto gradient + emoji placeholders until real photography.

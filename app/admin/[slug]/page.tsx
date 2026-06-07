@@ -9,6 +9,7 @@ import {
   moveDish,
   createCategory,
   updateRestaurant,
+  logout,
 } from "@/app/admin/actions";
 import DishFormFields from "@/components/admin/DishFormFields";
 import DeleteDishButton from "@/components/admin/DeleteDishButton";
@@ -77,13 +78,23 @@ export default async function ManageRestaurantPage({ params }: Params) {
         >
           ← All restaurants
         </Link>
-        <Link
-          href={`/r/${slug}`}
-          target="_blank"
-          className="text-sm font-medium text-teal-700 hover:underline"
-        >
-          Open public menu ↗
-        </Link>
+        <div className="flex items-center gap-4 text-sm">
+          <Link
+            href={`/r/${slug}`}
+            target="_blank"
+            className="font-medium text-teal-700 hover:underline"
+          >
+            Open public menu ↗
+          </Link>
+          <form action={logout}>
+            <button
+              type="submit"
+              className="font-medium text-stone-500 hover:text-stone-800"
+            >
+              Log out
+            </button>
+          </form>
+        </div>
       </div>
 
       <h1 className="text-2xl font-bold tracking-tight text-stone-900">

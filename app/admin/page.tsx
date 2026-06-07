@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { createRestaurant } from "./actions";
+import { createRestaurant, logout } from "./actions";
 
-// TODO(auth): /admin and /admin/[slug] are UNPROTECTED for the MVP. Add Clerk
-// (or NextAuth) middleware to gate every /admin route before any real
-// deployment — do not expose admin publicly.
+// Admin is gated by middleware.ts (session cookie). This is simple password
+// auth for the MVP — swap in Clerk/NextAuth + per-restaurant roles for prod.
 
 export const metadata = { title: "Admin · Tavola" };
 
@@ -26,15 +25,20 @@ export default async function AdminPage() {
         <h1 className="text-2xl font-bold tracking-tight text-stone-900">
           Restaurant admin
         </h1>
-        <Link href="/" className="text-sm text-stone-500 hover:text-stone-800">
-          ← Home
-        </Link>
+        <div className="flex items-center gap-4 text-sm">
+          <Link href="/" className="text-stone-500 hover:text-stone-800">
+            ← Home
+          </Link>
+          <form action={logout}>
+            <button
+              type="submit"
+              className="font-medium text-stone-500 hover:text-stone-800"
+            >
+              Log out
+            </button>
+          </form>
+        </div>
       </div>
-
-      <p className="mb-8 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
-        ⚠️ No authentication yet (MVP). These admin pages are open — add Clerk /
-        NextAuth before deploying.
-      </p>
 
       <section className="grid gap-8 md:grid-cols-[1fr_1fr]">
         <div>
