@@ -10,10 +10,56 @@ type Props = {
 };
 
 // The bits of the <model-viewer> element API we touch.
+type Vec3 = { x: number; y: number; z: number };
 type ModelViewerElement = HTMLElement & {
   canActivateAR?: boolean;
   activateAR?: () => Promise<void>;
+  getDimensions?: () => Vec3;
+  getBoundingBoxCenter?: () => Vec3;
 };
+
+// A dimension annotation pinned to a point on the model's bounding box.
+type DimHotspot = { slot: string; position: string; label: string };
+
+function cmLabel(metres: number): string {
+  const v = Math.round(metres * 100 * 10) / 10;
+  return Number.isInteger(v) ? String(v) : v.toFixed(1);
+}
+
+/**
+ * Build W/H/D dimension hotspots from the model's REAL bounding box
+ * (getDimensions/getBoundingBoxCenter are in metres). Each label is pinned to
+ * the midpoint of a bounding-box edge so it reads next to the dish, and the
+ * value always matches the geometry actually shown.
+ */
+function buildDimHotspots(mv: ModelViewerElement): DimHotspot[] | null {
+  const d = mv.getDimensions?.();
+  const c = mv.getBoundingBoxCenter?.();
+  if (!d || !c) return null;
+  const hx = d.x / 2;
+  const hy = d.y / 2;
+  const hz = d.z / 2;
+  return [
+    // width: bottom-front edge
+    {
+      slot: "hotspot-dim-w",
+      position: `${c.x} ${c.y - hy} ${c.z + hz}`,
+      label: `W · ${cmLabel(d.x)} cm`,
+    },
+    // height: front-right vertical edge
+    {
+      slot: "hotspot-dim-h",
+      position: `${c.x + hx} ${c.y} ${c.z + hz}`,
+      label: `H · ${cmLabel(d.y)} cm`,
+    },
+    // depth: bottom-right edge
+    {
+      slot: "hotspot-dim-d",
+      position: `${c.x + hx} ${c.y - hy} ${c.z}`,
+      label: `D · ${cmLabel(d.z)} cm`,
+    },
+  ];
+}
 
 /**
  * TRUE-TO-SCALE AR — the whole point of Tavola.
@@ -46,6 +92,8 @@ export default function ModelViewer({ src, iosSrc, alt, dishId }: Props) {
   const ref = useRef<ModelViewerElement | null>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [arAvailable, setArAvailable] = useState(false);
+  const [dims, setDims] = useState<DimHotspot[] | null>(null);
+  const [showDims, setShowDims] = useState(false);
 
   // The custom element registers itself as a side effect of the import. Loading
   // it in an effect keeps it out of the SSR/server bundle (it touches window).
@@ -62,17 +110,21 @@ export default function ModelViewer({ src, iosSrc, alt, dishId }: Props) {
     setIsIOS(iOS);
   }, []);
 
-  // Reflect whether AR can actually be activated on this device. Updated on the
-  // model's `load` event, and polled a couple of times in case load raced us.
+  // On model load: (1) reflect AR availability, (2) compute dimension hotspots
+  // from the model's real bounding box so the labels always match the geometry.
   useEffect(() => {
     const mv = ref.current;
     if (!mv) return;
     const update = () => setArAvailable(Boolean(mv.canActivateAR));
-    mv.addEventListener("load", update);
+    const onLoad = () => {
+      update();
+      setDims(buildDimHotspots(mv));
+    };
+    mv.addEventListener("load", onLoad);
     const timers = [400, 1200, 2500].map((d) => setTimeout(update, d));
     update();
     return () => {
-      mv.removeEventListener("load", update);
+      mv.removeEventListener("load", onLoad);
       timers.forEach(clearTimeout);
     };
   }, []);
@@ -120,7 +172,36 @@ export default function ModelViewer({ src, iosSrc, alt, dishId }: Props) {
           loading="eager"
           className="block h-[60vh] max-h-[520px] w-full rounded-2xl bg-stone-100"
           style={{ ["--poster-color" as string]: "#f5f5f4" }}
-        />
+        >
+          {/* Dimension annotations pinned to the model's bounding box. */}
+          {showDims &&
+            dims?.map((h) => (
+              <button
+                key={h.slot}
+                slot={h.slot}
+                data-position={h.position}
+                className="pointer-events-none whitespace-nowrap rounded-full border border-stone-200 bg-white/95 px-2 py-0.5 text-xs font-semibold text-stone-800 shadow-md"
+              >
+                {h.label}
+              </button>
+            ))}
+        </model-viewer>
+
+        {/* Toggle the dimension annotations (appears once the model is loaded). */}
+        {dims && (
+          <button
+            type="button"
+            onClick={() => setShowDims((s) => !s)}
+            aria-pressed={showDims}
+            className={`absolute right-3 top-3 z-10 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm ring-1 transition ${
+              showDims
+                ? "bg-teal-700 text-white ring-teal-700"
+                : "bg-white/95 text-stone-700 ring-stone-200 hover:bg-white"
+            }`}
+          >
+            📐 {showDims ? "Hide sizes" : "Dimensions"}
+          </button>
+        )}
 
         {arAvailable && (
           <button
