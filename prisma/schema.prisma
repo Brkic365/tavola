@@ -1,13 +1,17 @@
 // Tavola — true-to-scale AR dish preview for restaurant menus
-// Prisma schema. Local SQLite DB (file:./dev.db) — no external credentials needed.
+// Prisma schema. PostgreSQL (works on Vercel / Neon / any Postgres).
+//   DATABASE_URL — runtime connection (use the POOLED url on serverless)
+//   DIRECT_URL   — direct (non-pooled) url used for migrations
+// For local dev, both can point at the same local Postgres (see docker-compose).
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Restaurant {

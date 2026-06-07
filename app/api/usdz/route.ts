@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import crypto from "crypto";
+import { put } from "@vercel/blob";
 
 // USDZ files are converted from GLB in the admin browser (Three.js USDZExporter)
-// and POSTed here as raw bytes. We persist them under public/models/generated so
-// they're served statically and can be set as a dish's usdzUrl (iOS Quick Look).
+// and POSTed here as raw bytes. They're persisted so they can be a dish's
+// usdzUrl (iOS Quick Look).
 //
-// NOTE: writing into /public works for local/self-hosted runs. On read-only
-// hosts (e.g. Vercel) this should target blob storage instead — TODO.
+//  - With BLOB_READ_WRITE_TOKEN set (Vercel) → Vercel Blob (works on serverless).
+//  - Otherwise (local dev) → public/models/generated on disk.
 export const runtime = "nodejs";
 
 const MAX_BYTES = 60 * 1024 * 1024; // 60 MB safety cap
@@ -33,12 +34,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "file too large" }, { status: 413 });
     }
 
+    const file = `${safeBase(name)}-${crypto.randomUUID().slice(0, 8)}.usdz`;
+
+    // Production / configured: store in Vercel Blob.
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      const blob = await put(`models/generated/${file}`, bytes, {
+        access: "public",
+        contentType: "model/vnd.usdz+zip",
+      });
+      return NextResponse.json({ url: blob.url });
+    }
+
+    // Local dev fallback: write into /public.
     const dir = path.join(process.cwd(), "public", "models", "generated");
     await mkdir(dir, { recursive: true });
-
-    const file = `${safeBase(name)}-${crypto.randomUUID().slice(0, 8)}.usdz`;
     await writeFile(path.join(dir, file), bytes);
-
     return NextResponse.json({ url: `/models/generated/${file}` });
   } catch {
     return NextResponse.json({ error: "write failed" }, { status: 500 });
