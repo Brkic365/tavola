@@ -168,10 +168,31 @@ async function main() {
     },
   };
 
+  // Per-portion calories (UK-style labelling) + dietary tags, by dish name.
+  const NUTRITION: Record<string, { calories: number; dietary: string }> = {
+    "Dalmatinski pršut i sir": { calories: 520, dietary: "gluten-free" },
+    "Crni rižot": { calories: 480, dietary: "gluten-free,pescatarian" },
+    "Hobotnica ispod peke": {
+      calories: 610,
+      dietary: "gluten-free,pescatarian",
+    },
+    "Tartufi pljukanci": { calories: 720, dietary: "vegetarian" },
+    "Miješana plata za 2": {
+      calories: 1280,
+      dietary: "gluten-free,pescatarian",
+    },
+    Rožata: { calories: 320, dietary: "vegetarian,gluten-free" },
+  };
+
   for (const d of dishes) {
     const file = d.glbUrl.split("/").pop() ?? "";
     await prisma.dish.create({
-      data: { restaurantId: restaurant.id, ...(MODEL_DIMS[file] ?? {}), ...d },
+      data: {
+        restaurantId: restaurant.id,
+        ...(MODEL_DIMS[file] ?? {}),
+        ...(NUTRITION[d.name] ?? {}),
+        ...d,
+      },
     });
   }
 

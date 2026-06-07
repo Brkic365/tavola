@@ -58,6 +58,8 @@ model Dish {
   weightG      Int?
   serves       String? // e.g. "1-2"
   allergens    String? // comma-separated list, e.g. "gluten,shellfish"
+  calories     Int? // kcal per portion (UK out-of-home calorie labelling)
+  dietary      String? // comma-separated tags, e.g. "vegetarian,gluten-free"
 
   // MEASURED bounding box of the GLB in cm (authored at 1 unit = 1 m). Captured
   // in admin via model-viewer.getDimensions(). When these agree with the stated

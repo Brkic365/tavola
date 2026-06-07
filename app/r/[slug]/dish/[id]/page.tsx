@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { brandStyle } from "@/lib/theme";
 import { formatPrice, formatDimensions, formatWeight } from "@/lib/format";
 import { parseAllergens } from "@/lib/allergens";
+import { parseDietary } from "@/lib/dietary";
 import { scaleStatus } from "@/lib/scale";
 import ModelViewer from "@/components/ModelViewer";
 import PortionPanel from "@/components/PortionPanel";
@@ -40,6 +41,7 @@ export default async function DishPage({ params }: Params) {
   const dims = formatDimensions(dish.widthCm, dish.depthCm, dish.heightCm);
   const weight = formatWeight(dish.weightG);
   const allergens = parseAllergens(dish.allergens);
+  const dietary = parseDietary(dish.dietary);
 
   // True-to-scale check: do the stated dimensions match the measured 3D model?
   const verifiedToScale =
@@ -54,6 +56,7 @@ export default async function DishPage({ params }: Params) {
     dims,
     weight,
     dish.serves ? `serves ${dish.serves}` : null,
+    dish.calories != null ? `${dish.calories} kcal` : null,
   ].filter(Boolean);
 
   return (
@@ -115,6 +118,25 @@ export default async function DishPage({ params }: Params) {
           serves={dish.serves}
           verified={verifiedToScale}
         />
+
+        {(dietary.length > 0 || dish.calories != null) && (
+          <section className="flex flex-wrap items-center gap-2">
+            {dish.calories != null && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-sm font-medium text-stone-700">
+                🔥 {dish.calories} kcal per portion
+              </span>
+            )}
+            {dietary.map((d) => (
+              <span
+                key={d.key}
+                className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-800"
+              >
+                <span aria-hidden>{d.icon}</span>
+                {d.label}
+              </span>
+            ))}
+          </section>
+        )}
 
         {allergens.length > 0 && (
           <section>

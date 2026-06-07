@@ -1,4 +1,5 @@
 import { BUNDLED_GLB, BUNDLED_USDZ } from "@/lib/bundledModels";
+import { KNOWN_DIETARY } from "@/lib/dietary";
 import DimensionMeasurer from "@/components/admin/DimensionMeasurer";
 import UsdzGenerator from "@/components/admin/UsdzGenerator";
 
@@ -15,6 +16,8 @@ type DishDefaults = {
   weightG?: number | null;
   serves?: string | null;
   allergens?: string | null;
+  calories?: number | null;
+  dietary?: string | null;
   featured?: boolean;
   categoryId?: string | null;
   modelWidthCm?: number | null;
@@ -242,6 +245,19 @@ export default function DishFormFields({
       </label>
 
       <label>
+        <span className={labelCls}>Calories (kcal / portion)</span>
+        <input
+          name="calories"
+          type="number"
+          step="1"
+          min="0"
+          defaultValue={v(dish?.calories)}
+          className={inputCls}
+          placeholder="480"
+        />
+      </label>
+
+      <label>
         <span className={labelCls}>Allergens (comma-separated)</span>
         <input
           name="allergens"
@@ -249,6 +265,24 @@ export default function DishFormFields({
           className={inputCls}
           placeholder="gluten,shellfish"
         />
+      </label>
+
+      <label>
+        <span className={labelCls}>Dietary tags (comma-separated)</span>
+        <input
+          name="dietary"
+          list={`${idPrefix}-dietary`}
+          defaultValue={v(dish?.dietary) as string}
+          className={inputCls}
+          placeholder="vegetarian,gluten-free"
+        />
+        <datalist id={`${idPrefix}-dietary`}>
+          {KNOWN_DIETARY.map((d) => (
+            <option key={d.key} value={d.key}>
+              {d.label}
+            </option>
+          ))}
+        </datalist>
       </label>
 
       <label className="col-span-2 flex items-center gap-2">

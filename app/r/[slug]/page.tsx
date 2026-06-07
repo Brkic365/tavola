@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { brandStyle } from "@/lib/theme";
-import DishCard from "@/components/DishCard";
+import MenuBrowser from "@/components/MenuBrowser";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -86,37 +86,20 @@ export default async function MenuPage({ params }: Params) {
             This menu has no dishes yet.
           </p>
         ) : (
-          <div className="space-y-12">
-            {groups.map((group) => (
-              <section key={group.key}>
-                {/* classic menu section header with side rules */}
-                <div className="mb-5 flex items-center gap-4">
-                  <span className="h-px flex-1 bg-stone-300/70" />
-                  <h2 className="font-serif text-2xl font-semibold tracking-tight text-stone-800">
-                    {group.name}
-                  </h2>
-                  <span className="h-px flex-1 bg-stone-300/70" />
-                </div>
-                <ul className="divide-y divide-stone-200/80 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-                  {group.dishes.map((dish) => (
-                    <li key={dish.id}>
-                      <DishCard
-                        slug={restaurant.slug}
-                        currency={restaurant.currency}
-                        dish={dish}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))}
-          </div>
+          <MenuBrowser
+            groups={groups}
+            slug={restaurant.slug}
+            currency={restaurant.currency}
+          />
         )}
       </main>
 
       <footer className="mx-auto w-full max-w-2xl px-5 py-8 text-center text-xs text-stone-400">
-        Powered by <span className="font-serif">Tavola</span> · true-to-scale AR
-        menus
+        <p>Adults need around 2000 kcal a day.</p>
+        <p className="mt-1">
+          Powered by <span className="font-serif">Tavola</span> · true-to-scale
+          AR menus
+        </p>
       </footer>
     </div>
   );

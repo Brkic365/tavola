@@ -170,6 +170,8 @@ function dishDataFromForm(formData: FormData) {
     weightG: int(formData, "weightG"),
     serves: str(formData, "serves"),
     allergens: str(formData, "allergens"),
+    calories: int(formData, "calories"),
+    dietary: str(formData, "dietary"),
     featured: bool(formData, "featured"),
     categoryId: str(formData, "categoryId"), // null => uncategorized
   };

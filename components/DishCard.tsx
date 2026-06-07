@@ -2,6 +2,7 @@ import Link from "next/link";
 import DishThumb from "@/components/DishThumb";
 import { formatPrice, formatDimensions, formatWeight } from "@/lib/format";
 import { parseAllergens } from "@/lib/allergens";
+import { parseDietary } from "@/lib/dietary";
 
 type DishCardProps = {
   slug: string;
@@ -18,6 +19,8 @@ type DishCardProps = {
     weightG: number | null;
     serves: string | null;
     allergens: string | null;
+    calories: number | null;
+    dietary: string | null;
     featured: boolean;
   };
 };
@@ -27,6 +30,7 @@ export default function DishCard({ slug, currency, dish }: DishCardProps) {
   const dims = formatDimensions(dish.widthCm, dish.depthCm, dish.heightCm);
   const weight = formatWeight(dish.weightG);
   const allergens = parseAllergens(dish.allergens);
+  const dietary = parseDietary(dish.dietary);
 
   return (
     <Link
@@ -67,6 +71,7 @@ export default function DishCard({ slug, currency, dish }: DishCardProps) {
           {dish.serves && <span>👥 Serves {dish.serves}</span>}
           {dims && <span>📐 {dims}</span>}
           {weight && <span>⚖️ {weight}</span>}
+          {dish.calories != null && <span>🔥 {dish.calories} kcal</span>}
           {allergens.length > 0 && (
             <span title={allergens.map((a) => a.label).join(", ")}>
               {allergens.map((a) => (
@@ -77,6 +82,20 @@ export default function DishCard({ slug, currency, dish }: DishCardProps) {
             </span>
           )}
         </div>
+
+        {dietary.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {dietary.map((d) => (
+              <span
+                key={d.key}
+                className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-800"
+              >
+                <span aria-hidden>{d.icon}</span>
+                {d.label}
+              </span>
+            ))}
+          </div>
+        )}
 
         <span className="mt-2 text-sm font-medium text-brand opacity-90 group-hover:opacity-100">
           View in AR →
