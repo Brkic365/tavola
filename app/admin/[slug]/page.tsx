@@ -158,8 +158,14 @@ export default async function ManageRestaurantPage({ params }: Params) {
           <code className="mt-2 block truncate rounded-lg bg-stone-100 px-3 py-2 text-sm text-stone-700">
             {menuUrl}
           </code>
-          <div className="mt-2">
+          <div className="mt-2 flex flex-wrap items-center gap-3">
             <CopyLinkButton url={menuUrl} />
+            <Link
+              href={`/admin/${slug}/table-card`}
+              className="text-sm font-medium text-teal-700 hover:underline"
+            >
+              🖨 Printable table card ↗
+            </Link>
           </div>
         </div>
       </section>

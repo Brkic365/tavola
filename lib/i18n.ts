@@ -51,6 +51,18 @@ const DICT: Dict = {
     de: "Menü drucken",
     it: "Stampa il menù",
   },
+  scanForMenu: {
+    en: "Scan for our menu",
+    hr: "Skenirajte naš jelovnik",
+    de: "Für unsere Speisekarte scannen",
+    it: "Scansiona il nostro menù",
+  },
+  scanHowto: {
+    en: "Point your phone camera at the code to see every dish life-size in AR.",
+    hr: "Usmjerite kameru mobitela na kod i vidite svako jelo u stvarnoj veličini u AR-u.",
+    de: "Richte deine Handykamera auf den Code, um jedes Gericht in Lebensgröße in AR zu sehen.",
+    it: "Inquadra il codice con la fotocamera del telefono per vedere ogni piatto a grandezza naturale in AR.",
+  },
   serves: { en: "Serves", hr: "Za", de: "Für", it: "Per" },
   chefsPick: {
     en: "Chef's pick",
