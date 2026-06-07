@@ -138,6 +138,18 @@ const DICT: Dict = {
     de: "passen",
     it: "corrispondono",
   },
+  searchDishes: {
+    en: "Search dishes…",
+    hr: "Pretraži jela…",
+    de: "Gerichte suchen…",
+    it: "Cerca piatti…",
+  },
+  clearSearch: {
+    en: "Clear search",
+    hr: "Očisti pretragu",
+    de: "Suche löschen",
+    it: "Cancella ricerca",
+  },
   clearFilters: {
     en: "Clear filters",
     hr: "Očisti filtere",
