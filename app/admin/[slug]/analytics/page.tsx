@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser, canEdit } from "@/lib/session";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -15,6 +16,9 @@ function pct(n: number, d: number): string {
 export default async function AnalyticsPage({ params }: Params) {
   const { slug } = await params;
 
+  const user = await getCurrentUser();
+  if (!user) redirect("/admin/login");
+
   const restaurant = await prisma.restaurant.findUnique({
     where: { slug },
     include: {
@@ -25,6 +29,7 @@ export default async function AnalyticsPage({ params }: Params) {
     },
   });
   if (!restaurant) notFound();
+  if (!canEdit(user, restaurant.ownerId)) redirect("/admin");
 
   const totalViews = restaurant.dishes.reduce((n, d) => n + d._count.views, 0);
   const totalAR = restaurant.dishes.reduce((n, d) => n + d._count.arViews, 0);

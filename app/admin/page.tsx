@@ -1,20 +1,24 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/session";
 import { createRestaurant, logout } from "./actions";
 
-// Admin is gated by middleware.ts (session cookie). This is simple password
-// auth for the MVP — swap in Clerk/NextAuth + per-restaurant roles for prod.
+// Gated by proxy.ts (session cookie). Multi-tenant: OWNERs see their own
+// restaurants, platform ADMINs see all.
 
 export const metadata = { title: "Admin · Tavola" };
-
-// Always reflect current DB state.
 export const dynamic = "force-dynamic";
 
 const inputCls =
   "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500";
 
 export default async function AdminPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/admin/login");
+
   const restaurants = await prisma.restaurant.findMany({
+    where: user.role === "ADMIN" ? undefined : { ownerId: user.id },
     orderBy: { createdAt: "asc" },
     include: { _count: { select: { dishes: true } } },
   });
@@ -26,6 +30,14 @@ export default async function AdminPage() {
           Restaurant admin
         </h1>
         <div className="flex items-center gap-4 text-sm">
+          <span className="hidden text-stone-500 sm:inline">
+            {user.email}
+            {user.role === "ADMIN" && (
+              <span className="ml-1 rounded-full bg-teal-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-teal-800">
+                admin
+              </span>
+            )}
+          </span>
           <Link href="/" className="text-stone-500 hover:text-stone-800">
             ← Home
           </Link>

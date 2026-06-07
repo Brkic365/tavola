@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
+import { hashPassword } from "../lib/auth";
 
 const prisma = new PrismaClient();
 
@@ -14,6 +15,17 @@ async function main() {
   await prisma.dish.deleteMany();
   await prisma.category.deleteMany();
   await prisma.restaurant.deleteMany();
+  await prisma.user.deleteMany();
+
+  // Demo account (platform ADMIN, so it can manage everything).
+  const owner = await prisma.user.create({
+    data: {
+      email: "demo@tavola.app",
+      name: "Demo Owner",
+      passwordHash: await hashPassword("tavola"),
+      role: "ADMIN",
+    },
+  });
 
   const restaurant = await prisma.restaurant.create({
     data: {
@@ -22,6 +34,7 @@ async function main() {
       brandColor: "#0F766E", // Adriatic teal
       currency: "EUR",
       defaultLocale: "hr", // a Croatian konoba; tourists switch via the flags
+      ownerId: owner.id,
     },
   });
 

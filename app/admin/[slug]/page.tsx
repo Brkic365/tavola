@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { headers } from "next/headers";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser, canEdit } from "@/lib/session";
 import { formatPrice } from "@/lib/format";
 import { LOCALES } from "@/lib/i18n";
 import {
@@ -30,6 +31,9 @@ const labelCls = "block text-sm font-medium text-stone-700";
 export default async function ManageRestaurantPage({ params }: Params) {
   const { slug } = await params;
 
+  const user = await getCurrentUser();
+  if (!user) redirect("/admin/login");
+
   const restaurant = await prisma.restaurant.findUnique({
     where: { slug },
     include: {
@@ -41,6 +45,8 @@ export default async function ManageRestaurantPage({ params }: Params) {
     },
   });
   if (!restaurant) notFound();
+  // Owners can only manage their own restaurants.
+  if (!canEdit(user, restaurant.ownerId)) redirect("/admin");
 
   // Build the absolute public menu URL for the QR code.
   const h = await headers();

@@ -14,6 +14,24 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// Platform user. Owners manage their own restaurants; ADMINs see everything.
+model User {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  name         String?
+  passwordHash String
+  role         UserRole     @default(OWNER)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  restaurants  Restaurant[]
+}
+
+enum UserRole {
+  ADMIN
+  OWNER
+}
+
 model Restaurant {
   id         String     @id @default(cuid())
   name       String
@@ -22,11 +40,15 @@ model Restaurant {
   brandColor String? // hex, e.g. "#0F766E" — used for light per-restaurant theming
   currency   String     @default("EUR")
   defaultLocale String? // initial menu language when the guest hasn't picked one
+  ownerId    String? // the User who owns this restaurant
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 
+  owner      User?      @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   categories Category[]
   dishes     Dish[]
+
+  @@index([ownerId])
 }
 
 model Category {

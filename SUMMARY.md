@@ -35,11 +35,14 @@ Three.js.
   links: a branded card with the dish name, real portion chips and price.
   _Verified by rendering the PNGs._
 
-### Admin (auth-gated)
-- **Password auth** — signed httpOnly session cookie, `proxy.ts` gates
-  `/admin/*` + `/api/usdz`. _Verified: redirect / 401 / wrong-pw / login /
-  logout._
-- **Dish CRUD**, reorder, categories, settings, **table QR code**.
+### Admin (multi-tenant, auth-gated)
+- **User accounts & roles** — email + PBKDF2-hashed password, signup/login,
+  signed httpOnly session (`proxy.ts` gates `/admin/*` + upload APIs).
+  **OWNER**s see/manage only their own restaurants; platform **ADMIN** sees all;
+  every mutation enforces ownership. _Verified: wrong-pw rejected; owner sees
+  only own restaurants and is redirected away from others'._
+- **Dish CRUD**, reorder; **category CRUD** (rename + translations, reorder,
+  delete → dishes fall back to Uncategorized); settings; **table QR code**.
 - **📐 Measure from 3D model** — reads the GLB bounding box (`getDimensions`),
   auto-fills/validates the stated dimensions.
 - **⤴ Upload GLB / thumbnail** + **⤓ Generate USDZ from GLB** — file upload
@@ -70,8 +73,9 @@ Three.js.
   going **browser→Blob directly** in prod via `NEXT_PUBLIC_BLOB_ENABLED`); the
   remaining gap is generating models (Meshy/Luma/Object Capture), not storing
   them.
-- **Auth depth** — single shared admin password; no per-restaurant
-  ownership/roles. Swap in Clerk/NextAuth for multi-tenant.
+- **Auth depth** — accounts have ADMIN/OWNER roles + ownership, but no
+  per-restaurant member invites or password reset yet. PBKDF2 hashing is fine;
+  a managed provider (Clerk/NextAuth) would add SSO/MFA.
 - **AR reference object** — comparator is a 2D bar chart; a to-scale plate
   _inside_ the AR scene is a future nicety.
 
@@ -79,7 +83,8 @@ Three.js.
 
 1. **Source true-to-scale food models** (photogrammetry / AI) — the remaining
    blocker to a real pilot; everything downstream already verifies scale.
-2. **Per-restaurant roles + onboarding** (Clerk/NextAuth) for multi-tenant SaaS.
+2. **Team features** — per-restaurant member invites/roles, password reset,
+   email verification (the multi-tenant base is in place).
 3. **First-party outcome study** — use the analytics funnel to measure whether
    portion clarity cuts complaints/returns (the proprietary-evidence moat — see
    [`STRATEGY.md`](STRATEGY.md)).

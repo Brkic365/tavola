@@ -9,30 +9,56 @@ import {
   SESSION_COOKIE,
   SESSION_MAX_AGE_SECONDS,
   createSessionToken,
+  hashPassword,
+  verifyPassword,
 } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/session";
 
 // ---- auth -----------------------------------------------------------------
 
-export async function login(formData: FormData) {
-  const password = String(formData.get("password") ?? "");
-  const next = String(formData.get("next") ?? "/admin");
-  const expected = process.env.ADMIN_PASSWORD ?? "tavola";
-
-  if (password !== expected) {
-    const q = new URLSearchParams({ error: "1", next });
-    redirect(`/admin/login?${q.toString()}`);
-  }
-
-  const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE, await createSessionToken(), {
+async function setSession(userId: string) {
+  (await cookies()).set(SESSION_COOKIE, await createSessionToken(userId), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: SESSION_MAX_AGE_SECONDS,
   });
+}
 
+export async function login(formData: FormData) {
+  const email = (str(formData, "email") ?? "").toLowerCase();
+  const password = String(formData.get("password") ?? "");
+  const next = String(formData.get("next") ?? "/admin");
+
+  const user = email
+    ? await prisma.user.findUnique({ where: { email } })
+    : null;
+  if (!user || !(await verifyPassword(password, user.passwordHash))) {
+    redirect(`/admin/login?${new URLSearchParams({ error: "1", next })}`);
+  }
+
+  await setSession(user.id);
   redirect(next.startsWith("/admin") ? next : "/admin");
+}
+
+export async function signup(formData: FormData) {
+  const email = (str(formData, "email") ?? "").toLowerCase();
+  const password = String(formData.get("password") ?? "");
+  const name = str(formData, "name");
+
+  if (!email || !/^\S+@\S+\.\S+$/.test(email) || password.length < 6) {
+    redirect(`/admin/signup?error=invalid`);
+  }
+  if (await prisma.user.findUnique({ where: { email } })) {
+    redirect(`/admin/signup?error=exists`);
+  }
+
+  const user = await prisma.user.create({
+    data: { email, name, passwordHash: await hashPassword(password), role: "OWNER" },
+  });
+  await setSession(user.id);
+  redirect("/admin");
 }
 
 export async function logout() {
@@ -66,6 +92,45 @@ function bool(fd: FormData, key: string): boolean {
   return v === "on" || v === "true" || v === "1";
 }
 
+// ---- authorization --------------------------------------------------------
+
+async function requireUser() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/admin/login");
+  return user;
+}
+
+/** Ensure the current user may edit the given restaurant (owner or ADMIN). */
+async function assertOwnsRestaurant(restaurantId: string | null) {
+  const user = await requireUser();
+  if (user.role === "ADMIN") return user;
+  if (!restaurantId) redirect("/admin");
+  const r = await prisma.restaurant.findUnique({
+    where: { id: restaurantId },
+    select: { ownerId: true },
+  });
+  if (!r || r.ownerId !== user.id) redirect("/admin");
+  return user;
+}
+
+async function restaurantIdOfDish(dishId: string): Promise<string | null> {
+  const d = await prisma.dish.findUnique({
+    where: { id: dishId },
+    select: { restaurantId: true },
+  });
+  return d?.restaurantId ?? null;
+}
+
+async function restaurantIdOfCategory(
+  categoryId: string,
+): Promise<string | null> {
+  const c = await prisma.category.findUnique({
+    where: { id: categoryId },
+    select: { restaurantId: true },
+  });
+  return c?.restaurantId ?? null;
+}
+
 // Map common Croatian/Slavic diacritics to ASCII for clean slugs.
 const DIACRITICS: Record<string, string> = {
   č: "c",
@@ -97,6 +162,7 @@ async function ensureUniqueSlug(base: string): Promise<string> {
 // ---- restaurant -----------------------------------------------------------
 
 export async function createRestaurant(formData: FormData) {
+  const user = await requireUser();
   const name = str(formData, "name");
   if (!name) return;
 
@@ -109,6 +175,7 @@ export async function createRestaurant(formData: FormData) {
       slug,
       brandColor: str(formData, "brandColor"),
       currency: str(formData, "currency") ?? "EUR",
+      ownerId: user.id,
     },
   });
 
@@ -120,6 +187,7 @@ export async function updateRestaurant(formData: FormData) {
   const id = str(formData, "id");
   const slug = str(formData, "slug");
   if (!id) return;
+  await assertOwnsRestaurant(id);
 
   await prisma.restaurant.update({
     where: { id },
@@ -158,6 +226,7 @@ export async function createCategory(formData: FormData) {
   const slug = str(formData, "slug");
   const name = str(formData, "name");
   if (!restaurantId || !name) return;
+  await assertOwnsRestaurant(restaurantId);
 
   const count = await prisma.category.count({ where: { restaurantId } });
   await prisma.category.create({
@@ -172,6 +241,7 @@ export async function updateCategory(formData: FormData) {
   const slug = str(formData, "slug");
   const name = str(formData, "name");
   if (!id || !name) return;
+  await assertOwnsRestaurant(await restaurantIdOfCategory(id));
 
   await prisma.category.update({
     where: { id },
@@ -185,6 +255,7 @@ export async function deleteCategory(formData: FormData) {
   const id = str(formData, "id");
   const slug = str(formData, "slug");
   if (!id) return;
+  await assertOwnsRestaurant(await restaurantIdOfCategory(id));
 
   // Dishes keep existing — their categoryId is set null (onDelete: SetNull).
   await prisma.category.delete({ where: { id } });
@@ -198,6 +269,7 @@ export async function moveCategory(formData: FormData) {
   const slug = str(formData, "slug");
   const direction = str(formData, "direction"); // "up" | "down"
   if (!id || !direction) return;
+  await assertOwnsRestaurant(await restaurantIdOfCategory(id));
 
   const cat = await prisma.category.findUnique({ where: { id } });
   if (!cat) return;
@@ -274,6 +346,7 @@ export async function createDish(formData: FormData) {
   const restaurantId = str(formData, "restaurantId");
   const slug = str(formData, "slug");
   if (!restaurantId) return;
+  await assertOwnsRestaurant(restaurantId);
 
   const data = dishDataFromForm(formData);
   if (!data.glbUrl) return; // a model is required to be useful
@@ -296,6 +369,7 @@ export async function updateDish(formData: FormData) {
   const id = str(formData, "id");
   const slug = str(formData, "slug");
   if (!id) return;
+  await assertOwnsRestaurant(await restaurantIdOfDish(id));
 
   const data = dishDataFromForm(formData);
   await prisma.dish.update({ where: { id }, data });
@@ -310,6 +384,7 @@ export async function deleteDish(formData: FormData) {
   const id = str(formData, "id");
   const slug = str(formData, "slug");
   if (!id) return;
+  await assertOwnsRestaurant(await restaurantIdOfDish(id));
 
   await prisma.dish.delete({ where: { id } });
 
@@ -325,6 +400,7 @@ export async function moveDish(formData: FormData) {
   const slug = str(formData, "slug");
   const direction = str(formData, "direction"); // "up" | "down"
   if (!id || !direction) return;
+  await assertOwnsRestaurant(await restaurantIdOfDish(id));
 
   const dish = await prisma.dish.findUnique({ where: { id } });
   if (!dish) return;

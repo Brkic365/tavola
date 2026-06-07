@@ -50,14 +50,14 @@ npm run dev                 # http://localhost:3000
 ```
 
 > On Windows PowerShell use `Copy-Item .env.example .env`. `.env` is gitignored —
-> set a strong `ADMIN_SESSION_SECRET` and `ADMIN_PASSWORD` for any real deployment.
+> set a strong `ADMIN_SESSION_SECRET` for any real deployment.
 > No Docker? Point `DATABASE_URL`/`DIRECT_URL` at any Postgres (e.g. a free Neon DB).
 
 Then open:
 
 - **Menu:** http://localhost:3000/r/tavola-demo
-- **Admin:** http://localhost:3000/admin/tavola-demo — **login password:
-  `tavola`** (demo; set `ADMIN_PASSWORD` to change)
+- **Admin:** http://localhost:3000/admin — **demo login `demo@tavola.app` /
+  `tavola`** (or create an account at `/admin/signup`)
 
 ### Handy scripts
 
@@ -87,8 +87,8 @@ The app is Vercel-ready (Postgres + Blob; `vercel.json` runs
 4. **Set env vars** (Project → Settings → Environment Variables):
    - `DATABASE_URL` → the **pooled** Postgres URL (`POSTGRES_PRISMA_URL`)
    - `DIRECT_URL` → the **non-pooled** URL (`POSTGRES_URL_NON_POOLING`)
-   - `ADMIN_PASSWORD` → your admin password
    - `ADMIN_SESSION_SECRET` → a long random string (`openssl rand -hex 32`)
+   _(admins/owners are user accounts — sign up at `/admin/signup`)_
 5. **Deploy.** The build applies migrations automatically.
 6. **Seed once** (locally, pointed at the prod DB):
    `DATABASE_URL=<prod-direct-url> DIRECT_URL=<prod-direct-url> npm run db:seed`
@@ -146,8 +146,8 @@ fresh clone works offline.
 ## Notes / known stubs
 
 - **Admin auth** is simple password + signed session cookie (`proxy.ts` gates
-  `/admin` + `/api/usdz`). Swap in Clerk/NextAuth + per-restaurant roles for
-  production — see [`SUMMARY.md`](SUMMARY.md).
+  `/admin` + upload APIs). User accounts with **ADMIN / OWNER** roles and
+  restaurant ownership; PBKDF2-hashed passwords. See [`SUMMARY.md`](SUMMARY.md).
 - **USDZ** is only present for one seeded dish; others rely on iOS graceful
   fallback. Auto-conversion GLB→USDZ is a planned microservice.
 - Menu thumbnails are auto gradient + emoji placeholders until real photography.
