@@ -143,22 +143,27 @@ Lightspeed, not a worse order-and-pay clone.
 
 ## 5. Roadmap
 
+> **Build status (this repo):** ✅ shipped · ◑ partial · ⬜ not started.
+> The entire **Now** tier and most of **Next** are shipped — see
+> [`SUMMARY.md`](SUMMARY.md). Remaining: real food models, asset-upload
+> generalisation, per-restaurant roles, the outcome study, AR reference object.
+
 ### Now — harden the wedge, make it pilotable (0–3 mo)
 | # | Feature | Why |
 |---|---|---|
-| N1 | **Model-derived & validated dimensions** — compute the GLB bounding box (cm), auto-fill W/D/H, flag stated-vs-modeled mismatches | Makes "true-to-scale" actually *true*; closes the credibility hole; core to the brand |
-| N2 | **3D content pipeline** — GLB→USDZ auto-conversion microservice + AI/photo capture (Meshy/Luma/Object Capture) + real **asset upload** (blob storage) | The operational unlock; removes the historical #1 failure mode |
-| N3 | **Dimension hotspots** on the 3D model (model-viewer annotations) + an in-viewer **scale reference** (fork/hand/standard plate) | Portion intuition even without launching AR |
-| N4 | **Auth + multi-restaurant roles** (Clerk/NextAuth) | Table stakes for real customers |
-| N5 | **Accessible fallback menu** (semantic HTML/text mode, WCAG, no-smartphone path) | Legal + adoption risk; counters QR backlash |
+| ✅ N1 | **Model-derived & validated dimensions** — compute the GLB bounding box (cm), auto-fill W/D/H, flag stated-vs-modeled mismatches | Makes "true-to-scale" actually *true*; closes the credibility hole; core to the brand |
+| ◑ N2 | **3D content pipeline** — GLB→USDZ auto-conversion ✅ + asset upload (USDZ→Blob ✅; general model/photo upload ⬜) + AI/photo capture ⬜ | The operational unlock; removes the historical #1 failure mode |
+| ✅ N3 | **Dimension hotspots** + connector lines + in-viewer **scale reference** ("Size at a glance") | Portion intuition even without launching AR |
+| ◑ N4 | **Auth** ✅ (password + session) — per-restaurant **roles** ⬜ | Table stakes for real customers |
+| ✅ N5 | **Accessible printable fallback menu** (semantic, WCAG, no-smartphone path) | Legal + adoption risk; counters QR backlash |
 
 ### Next — become a *menu*, add the value/compliance layer (3–9 mo)
 | # | Feature | Why |
 |---|---|---|
-| X1 | **Compliance bundle** — per-portion calories + full nutrition + EU/UK 14-allergen display & dietary tags/filters (veg/vegan/GF/halal), search | Transparency + compliance two-fer; sell into UK 250+ & EU |
-| X2 | **Portion comparators** — compare two dishes side-by-side; "serves N" math; value framing | Directly serves the WRAP "want portion choice/clarity" demand |
-| X3 | **First-party outcome analytics** — AR-view→order-intent funnel; pilot study measuring complaints/returns/waste | Builds the proprietary evidence = the real pitch & moat |
-| X4 | **i18n** multi-language menus | Tourist markets / the Croatian-coast wedge |
+| ✅ X1 | **Compliance bundle** — per-portion calories + EU/UK allergen display & dietary tags/filters (veg/vegan/GF/halal) + 2000-kcal statement _(full nutrition macros + search ⬜)_ | Transparency + compliance two-fer; sell into UK 250+ & EU |
+| ✅ X2 | **Portion comparator** — "Size at a glance" footprint vs everyday objects | Directly serves the WRAP "want portion choice/clarity" demand |
+| ◑ X3 | **First-party analytics** — view→AR-launch funnel ✅; the outcome study (complaints/returns) ⬜ | Builds the proprietary evidence = the real pitch & moat |
+| ✅ X4 | **i18n** multi-language menus (EN/HR/DE/IT) | Tourist markets / the Croatian-coast wedge |
 
 ### Later — defensibility & expansion (9 mo+)
 | # | Feature | Why |

@@ -1,69 +1,77 @@
 # Tavola — build summary
 
-A working, demoable MVP of a true-to-scale AR restaurant menu. Built with
-Next.js 16 (App Router, TS strict), Tailwind v4, Prisma + SQLite, and Google
-`<model-viewer>`.
+A true-to-scale AR restaurant menu. **Hero value: portion transparency** — the
+guest sees a dish's real size (life-size in AR), weight, "serves N", calories,
+allergens and dietary tags before ordering. Built with Next.js 16 (App Router,
+TS strict), Tailwind v4, Prisma + **PostgreSQL**, Google `<model-viewer>`, and
+Three.js.
 
 ## ✅ Done & verified
 
-**Verified in a real browser** (mobile viewport) against the running dev server:
+### Guest experience
+- **Public menu** `/r/[slug]` — brand-coloured header, dishes by category as an
+  elegant menu (serif headings), portion badges (serves · size · weight ·
+  calories), allergen icons + dietary badges, gradient/emoji thumbnails.
+- **Dietary + allergen filtering** — chips to require a diet or exclude an
+  allergen (client-side, live count). _Verified: Vegetarian → 2 dishes._
+- **Dish detail** — in-browser **3D + AR** via `<model-viewer>`:
+  - **True scale** (`ar-scale="fixed"`, models authored 1 unit = 1 m). Android
+    Scene Viewer; iOS Quick Look via USDZ with graceful degradation.
+  - Our own **"View in your space"** AR button (`activateAR()`) + **AR-launch
+    analytics**.
+  - **📐 Dimensions toggle** — W/H/D **hotspots** pinned to the bounding box +
+    **CAD-style connector lines** synced to the model on camera-change.
+  - **Prominent portion panel** + **"Verified to scale"** badge (only when the
+    stated size matches the measured model) + **"Size at a glance"** comparator
+    (footprint vs card / phone / hand / plate).
+- **Multi-language** 🇬🇧🇭🇷🇩🇪🇮🇹 — translated dish content, categories, UI labels,
+  and allergen/dietary nouns; flag switcher (cookie). _Verified EN/DE/HR._
+- **Accessible / printable** `/r/[slug]/menu` — semantic, no-JS, screen-reader
+  + print friendly (the no-smartphone fallback). Skip link, focus rings, SR
+  text app-wide.
 
-- **Public menu** `/r/tavola-demo` — restaurant header (brand-coloured),
-  dishes grouped by category, each card shows thumbnail, name, price, and
-  portion badges (serves / dimensions / weight) + allergen icons. → HTTP 200,
-  renders correctly.
-- **Dish detail** `/r/[slug]/dish/[id]` — in-browser **3D model loads and
-  renders** (`model-viewer` registered, `loaded: true`, `modelIsVisible:
-  true`), `ar-scale="fixed"` for true scale, `ios-src` wired to USDZ. Prominent
-  **portion panel** (size W×D×H, weight, serves + per-dimension breakdown) and a
-  caption near the viewer. Allergens listed.
-- **AR**:
-  - Android — Scene Viewer launches from the GLB (`ar-modes` includes
-    `scene-viewer`).
-  - iOS — Quick Look via `ios-src` USDZ; when absent, AR button auto-hidden +
-    explanatory note (graceful degradation).
-  - AR launch analytics: `POST /api/ar-view` → verified 200 (valid) / 404 (bad
-    id) / 400 (missing). Counts surface per-dish in admin.
-- **Admin** `/admin` (list + create restaurant) and `/admin/[slug]` (manage):
-  settings, categories, **dish CRUD**, reorder (▲▼), and a **table QR code**
-  (server-rendered PNG via `qrcode`) + copy link. → Add-dish **create verified**
-  end-to-end: new dish persisted with all fields + category, and appeared on the
-  public menu (revalidation working).
-- **Seed** — idempotent; "Konoba Tavola" (`tavola-demo`), 3 categories, 6
-  realistic Croatian-coast dishes with believable dimensions/weight/serves.
-- **Build** — `npm run build` passes clean (TypeScript strict, all 7 routes).
+### Admin (auth-gated)
+- **Password auth** — signed httpOnly session cookie, `proxy.ts` gates
+  `/admin/*` + `/api/usdz`. _Verified: redirect / 401 / wrong-pw / login /
+  logout._
+- **Dish CRUD**, reorder, categories, settings, **table QR code**.
+- **📐 Measure from 3D model** — reads the GLB bounding box (`getDimensions`),
+  auto-fills/validates the stated dimensions.
+- **⤓ Generate USDZ from GLB** — converts in-browser (Three.js
+  `GLTFLoader → USDZExporter`), stores to Vercel Blob (prod) or `/public`
+  (dev). _Verified: avocado → valid 2.75 MB USDZ._
+- **📊 Analytics** — view → AR-launch funnel, per-dish AR rate, last-7-days.
+- **Translations editor** (per-locale name/description).
 
-## 🔶 Stubbed / deferred (clearly marked in code)
+### Platform
+- **PostgreSQL** (was SQLite) — Prisma `url` + `directUrl`; single `0_init`
+  migration + incremental migrations. _Verified locally against real Postgres._
+- **Vercel-ready** — `vercel.json` (`prisma migrate deploy` on build), Vercel
+  Blob for USDZ, `docker-compose.yml` for local Postgres, `.env.example` + a
+  README deploy runbook.
+- **Seed** — Konoba Tavola, 3 categories, 6 Croatian-coast dishes with full
+  metadata, EN/DE/IT translations, and a seeded analytics funnel.
+- **Build** clean (TS strict). Pushed to GitHub (`.env` purged from history).
 
-- **Auth** — `/admin` and `/admin/[slug]` are **UNPROTECTED**. `TODO(auth)` at
-  the top of [`app/admin/page.tsx`](app/admin/page.tsx) + an on-page warning
-  banner. **Add Clerk/NextAuth before any deployment.**
-- **USDZ for iOS** — only **one** seeded dish (Dalmatinski pršut) has a USDZ;
-  the rest rely on the iOS graceful fallback. `TODO` in
-  [`components/ModelViewer.tsx`](components/ModelViewer.tsx): **GLB→USDZ
-  auto-conversion microservice**.
+## 🔶 Still stubbed / future
+
 - **3D content** — all dishes use placeholder sample GLBs (incl. the real
-  Avocado food model), not actual food. Real models via photogrammetry/AI later.
-- **Thumbnails** — auto gradient + food-emoji placeholders; `thumbnailUrl`
-  supported but unused in seed (no real food photography yet).
-- **Asset hosting** — `glbUrl`/`usdzUrl` are URL strings (admin offers the
-  bundled models via a datalist + accepts custom URLs). No file-upload pipeline
-  yet; the admin "upload" is set-URL.
+  Avocado), not actual food. Real models via photogrammetry / AI text→3D later;
+  the measured-vs-stated mismatch is surfaced honestly (no false "Verified"
+  badge).
+- **Thumbnails** — gradient + emoji placeholders (`thumbnailUrl` supported).
+- **Asset upload** — GLB/thumbnail are URL strings; only USDZ has a real
+  upload+store pipeline. Generalise to model/photo upload (Blob/S3).
+- **Auth depth** — single shared admin password; no per-restaurant
+  ownership/roles. Swap in Clerk/NextAuth for multi-tenant.
+- **AR reference object** — comparator is a 2D bar chart; a to-scale plate
+  _inside_ the AR scene is a future nicety.
 
-## ▶️ Top 3 next steps
+## ▶️ Top next steps
 
-1. **Add authentication to the admin** (Clerk or NextAuth) + per-restaurant
-   ownership/roles. This is the only blocker to a non-public deployment.
-2. **Real assets pipeline**: a GLB→USDZ auto-conversion microservice (so every
-   dish gets iOS AR), plus a proper model/thumbnail **upload** flow (e.g. S3 /
-   blob storage) replacing the URL-string fields.
-3. **Source true-to-scale food models** (photogrammetry or AI text→3D) authored
-   at 1 unit = 1 m, and add `<model-viewer>` dimension hotspots so the W/D/H are
-   annotated directly on the 3D model.
-
-## Stretch goals already included
-
-- ✅ AR-launch analytics (`ArView`) + per-dish counts in admin.
-- ✅ Allergen icons on dish cards.
-- ✅ Per-restaurant brand-colour theming (light).
-- ⬜ model-viewer dimension hotspots (left for next steps).
+1. **Source true-to-scale food models** (photogrammetry / AI) — the remaining
+   blocker to a real pilot; everything downstream already verifies scale.
+2. **Per-restaurant roles + onboarding** (Clerk/NextAuth) for multi-tenant SaaS.
+3. **First-party outcome study** — use the analytics funnel to measure whether
+   portion clarity cuts complaints/returns (the proprietary-evidence moat — see
+   [`STRATEGY.md`](STRATEGY.md)).
