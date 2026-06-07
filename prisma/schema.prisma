@@ -21,6 +21,7 @@ model Restaurant {
   logoUrl    String?
   brandColor String? // hex, e.g. "#0F766E" — used for light per-restaurant theming
   currency   String     @default("EUR")
+  defaultLocale String? // initial menu language when the guest hasn't picked one
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 

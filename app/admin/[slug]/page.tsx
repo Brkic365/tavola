@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/format";
+import { LOCALES } from "@/lib/i18n";
 import {
   createDish,
   updateDish,
@@ -176,6 +177,20 @@ export default async function ManageRestaurantPage({ params }: Params) {
                 />
               </label>
             </div>
+            <label className="block">
+              <span className={labelCls}>Default menu language</span>
+              <select
+                name="defaultLocale"
+                defaultValue={restaurant.defaultLocale ?? "en"}
+                className={inputCls}
+              >
+                {LOCALES.map((l) => (
+                  <option key={l.code} value={l.code}>
+                    {l.flag} {l.label}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button
               type="submit"
               className="rounded-lg bg-stone-800 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-900"

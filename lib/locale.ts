@@ -6,9 +6,17 @@ import {
   type Locale,
 } from "@/lib/i18n";
 
-/** Resolve the active locale from an optional override, else the cookie. */
-export async function getLocale(override?: string): Promise<Locale> {
+/**
+ * Resolve the active locale: explicit override → guest's cookie → the
+ * restaurant's default → the app default.
+ */
+export async function getLocale(
+  override?: string | null,
+  fallback?: string | null,
+): Promise<Locale> {
   if (isLocale(override)) return override;
   const c = (await cookies()).get(LOCALE_COOKIE)?.value;
-  return isLocale(c) ? c : DEFAULT_LOCALE;
+  if (isLocale(c)) return c;
+  if (isLocale(fallback)) return fallback;
+  return DEFAULT_LOCALE;
 }

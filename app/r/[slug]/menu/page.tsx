@@ -45,7 +45,7 @@ export default async function TextMenuPage({ params }: Params) {
   const restaurant = await getRestaurant(slug);
   if (!restaurant) notFound();
 
-  const locale = await getLocale();
+  const locale = await getLocale(undefined, restaurant.defaultLocale);
   const localizeDishes = (dishes: typeof restaurant.dishes) =>
     dishes.map((d) => ({ ...d, ...localizeContent(d, d.translations, locale) }));
 

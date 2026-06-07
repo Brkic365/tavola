@@ -127,6 +127,7 @@ export async function updateRestaurant(formData: FormData) {
       name: str(formData, "name") ?? undefined,
       brandColor: str(formData, "brandColor"),
       currency: str(formData, "currency") ?? "EUR",
+      defaultLocale: str(formData, "defaultLocale"),
     },
   });
 

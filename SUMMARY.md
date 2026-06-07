@@ -25,7 +25,9 @@ Three.js.
     stated size matches the measured model) + **"Size at a glance"** comparator
     (footprint vs card / phone / hand / plate).
 - **Multi-language** 🇬🇧🇭🇷🇩🇪🇮🇹 — translated dish content, categories, UI labels,
-  and allergen/dietary nouns; flag switcher (cookie). _Verified EN/DE/HR._
+  and allergen/dietary nouns; flag switcher (cookie) + **per-restaurant default
+  language** (guest choice > restaurant default > app default). _Verified
+  EN/DE/HR._
 - **Accessible / printable** `/r/[slug]/menu` — semantic, no-JS, screen-reader
   + print friendly (the no-smartphone fallback). Skip link, focus rings, SR
   text app-wide.

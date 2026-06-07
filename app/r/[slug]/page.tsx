@@ -44,7 +44,7 @@ export default async function MenuPage({ params }: Params) {
   const restaurant = await getRestaurant(slug);
   if (!restaurant) notFound();
 
-  const locale = await getLocale();
+  const locale = await getLocale(undefined, restaurant.defaultLocale);
   // Strip the raw translations JSON before it reaches the client component —
   // only the resolved name/description for the active locale is sent.
   const localizeDishes = (dishes: typeof restaurant.dishes) =>

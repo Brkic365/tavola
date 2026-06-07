@@ -21,6 +21,7 @@ async function main() {
       slug: "tavola-demo",
       brandColor: "#0F766E", // Adriatic teal
       currency: "EUR",
+      defaultLocale: "hr", // a Croatian konoba; tourists switch via the flags
     },
   });
 

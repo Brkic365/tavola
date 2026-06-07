@@ -42,7 +42,7 @@ export default async function DishPage({ params }: Params) {
   if (!dish) notFound();
 
   const { restaurant } = dish;
-  const locale = await getLocale();
+  const locale = await getLocale(undefined, restaurant.defaultLocale);
   const content = localizeContent(dish, dish.translations, locale);
   const dims = formatDimensions(dish.widthCm, dish.depthCm, dish.heightCm);
   const weight = formatWeight(dish.weightG);
