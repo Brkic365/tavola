@@ -41,11 +41,15 @@ actually is, how much it weighs, and how many it serves _before_ ordering. Fewer
 > Requires Node 20+. No accounts or API keys needed.
 
 ```bash
+cp .env.example .env        # local env (DB path + demo admin creds)
 npm install                 # installs deps (postinstall runs `prisma generate`)
 npx prisma migrate dev      # creates prisma/dev.db + applies the schema
 npm run db:seed             # seeds "Konoba Tavola" with 6 dishes
 npm run dev                 # http://localhost:3000
 ```
+
+> On Windows PowerShell use `Copy-Item .env.example .env`. `.env` is gitignored —
+> set a strong `ADMIN_SESSION_SECRET` and `ADMIN_PASSWORD` for any real deployment.
 
 Then open:
 

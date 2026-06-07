@@ -30,12 +30,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files — never commit (.env holds the admin password + session secret)
 .env*
 !.env.example
-# Committed on purpose: holds only a non-secret local SQLite path so the
-# documented setup (prisma migrate + seed + dev) works on a fresh clone.
-!.env
 
 # dev server / tunnel logs
 dev.log
