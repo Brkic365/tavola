@@ -141,6 +141,12 @@ const DICT: Dict = {
     de: "Allergene",
     it: "Allergeni",
   },
+  allergenKey: {
+    en: "Allergen & dietary key",
+    hr: "Oznake alergena i prehrane",
+    de: "Allergen- & Ernährungslegende",
+    it: "Legenda allergeni e dieta",
+  },
   dietary: { en: "Dietary", hr: "Prehrana", de: "Ernährung", it: "Dieta" },
   avoid: { en: "Avoid", hr: "Izbjegni", de: "Vermeiden", it: "Evita" },
   no: { en: "No", hr: "Bez", de: "Ohne", it: "Senza" },

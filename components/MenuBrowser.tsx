@@ -265,6 +265,44 @@ export default function MenuBrowser({
           ))}
         </div>
       )}
+
+      {(allergenOptions.length > 0 || dietaryOptions.length > 0) && (
+        <details className="mt-10 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+          <summary className="cursor-pointer text-sm font-semibold text-stone-700">
+            {t(locale, "allergenKey")}
+          </summary>
+          {dietaryOptions.length > 0 && (
+            <div className="mt-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+                {t(locale, "dietary")}
+              </p>
+              <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-stone-600">
+                {dietaryOptions.map((d) => (
+                  <li key={d.key} className="inline-flex items-center gap-1.5">
+                    <span aria-hidden>{d.icon}</span>
+                    {d.label}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {allergenOptions.length > 0 && (
+            <div className="mt-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+                {t(locale, "allergens")}
+              </p>
+              <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-stone-600">
+                {allergenOptions.map((a) => (
+                  <li key={a.key} className="inline-flex items-center gap-1.5">
+                    <span aria-hidden>{a.icon}</span>
+                    {a.label}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </details>
+      )}
     </div>
   );
 }
