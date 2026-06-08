@@ -34,15 +34,43 @@ export default async function AnalyticsPage({ params }: Params) {
   const totalViews = restaurant.dishes.reduce((n, d) => n + d._count.views, 0);
   const totalAR = restaurant.dishes.reduce((n, d) => n + d._count.arViews, 0);
 
-  const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const [views7, ar7] = await Promise.all([
-    prisma.dishView.count({
+  // 7 day-buckets (oldest → newest) in the server's local time.
+  const dayMs = 24 * 60 * 60 * 1000;
+  const now = new Date();
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const days = Array.from({ length: 7 }, (_, i) => ({
+    date: new Date(startToday.getTime() - (6 - i) * dayMs),
+    views: 0,
+    ar: 0,
+  }));
+  const since = days[0].date;
+
+  const [viewRows, arRows] = await Promise.all([
+    prisma.dishView.findMany({
       where: { dish: { restaurantId: restaurant.id }, createdAt: { gte: since } },
+      select: { createdAt: true },
     }),
-    prisma.arView.count({
+    prisma.arView.findMany({
       where: { dish: { restaurantId: restaurant.id }, createdAt: { gte: since } },
+      select: { createdAt: true },
     }),
   ]);
+
+  const bucketOf = (ts: Date) => {
+    const d = new Date(ts.getFullYear(), ts.getMonth(), ts.getDate());
+    return Math.round((d.getTime() - since.getTime()) / dayMs);
+  };
+  for (const r of viewRows) {
+    const i = bucketOf(r.createdAt);
+    if (i >= 0 && i < 7) days[i].views++;
+  }
+  for (const r of arRows) {
+    const i = bucketOf(r.createdAt);
+    if (i >= 0 && i < 7) days[i].ar++;
+  }
+  const views7 = days.reduce((n, d) => n + d.views, 0);
+  const ar7 = days.reduce((n, d) => n + d.ar, 0);
+  const maxDay = Math.max(1, ...days.map((d) => Math.max(d.views, d.ar)));
 
   // Busiest first.
   const rows = [...restaurant.dishes].sort(
@@ -76,6 +104,44 @@ export default async function AnalyticsPage({ params }: Params) {
         <Metric label="AR rate" value={pct(totalAR, totalViews)} hint="AR / views" />
         <Metric label="Dishes" value={restaurant.dishes.length} />
       </div>
+
+      {/* 7-day trend */}
+      <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
+            Last 7 days
+          </h2>
+          <div className="flex gap-3 text-xs text-stone-500">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-sm bg-teal-500" /> Views
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-sm bg-amber-500" /> AR
+            </span>
+          </div>
+        </div>
+        <div className="mt-4 flex items-end justify-between gap-2">
+          {days.map((d, i) => (
+            <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
+              <div className="flex h-24 w-full items-end justify-center gap-1">
+                <div
+                  className="w-2.5 rounded-t-sm bg-teal-500"
+                  style={{ height: `${(d.views / maxDay) * 100}%` }}
+                  title={`${d.views} views`}
+                />
+                <div
+                  className="w-2.5 rounded-t-sm bg-amber-500"
+                  style={{ height: `${(d.ar / maxDay) * 100}%` }}
+                  title={`${d.ar} AR launches`}
+                />
+              </div>
+              <span className="text-[10px] text-stone-400">
+                {d.date.toLocaleDateString("en-US", { weekday: "short" })}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* per-dish funnel */}
       <h2 className="mt-8 text-sm font-semibold uppercase tracking-wide text-stone-500">
