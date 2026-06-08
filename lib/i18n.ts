@@ -76,6 +76,12 @@ const DICT: Dict = {
     de: "Empfehlungen",
     it: "Scelte dello chef",
   },
+  moreDishes: {
+    en: "More dishes",
+    hr: "Više jela",
+    de: "Weitere Gerichte",
+    it: "Altri piatti",
+  },
   soldOut: {
     en: "Sold out",
     hr: "Rasprodano",

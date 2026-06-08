@@ -13,6 +13,7 @@ import ModelViewer from "@/components/ModelViewer";
 import PortionPanel from "@/components/PortionPanel";
 import PortionScale from "@/components/PortionScale";
 import ViewBeacon from "@/components/ViewBeacon";
+import DishThumb from "@/components/DishThumb";
 
 type Params = { params: Promise<{ slug: string; id: string }> };
 
@@ -44,6 +45,24 @@ export default async function DishPage({ params }: Params) {
   const { restaurant } = dish;
   const locale = await getLocale(undefined, restaurant.defaultLocale);
   const content = localizeContent(dish, dish.translations, locale);
+
+  // Sibling dishes (same category, in stock) to keep guests browsing.
+  const siblingRows = await prisma.dish.findMany({
+    where: {
+      restaurantId: restaurant.id,
+      categoryId: dish.categoryId,
+      available: true,
+      id: { not: dish.id },
+    },
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    take: 6,
+  });
+  const siblings = siblingRows.map((s) => ({
+    id: s.id,
+    price: s.price,
+    thumbnailUrl: s.thumbnailUrl,
+    name: localizeContent(s, s.translations, locale).name,
+  }));
   const dims = formatDimensions(dish.widthCm, dish.depthCm, dish.heightCm);
   const weight = formatWeight(dish.weightG);
   const allergens = parseAllergens(dish.allergens, locale);
@@ -175,6 +194,39 @@ export default async function DishPage({ params }: Params) {
                 </li>
               ))}
             </ul>
+          </section>
+        )}
+
+        {siblings.length > 0 && (
+          <section aria-label={t(locale, "moreDishes")}>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
+              {t(locale, "moreDishes")}
+            </h2>
+            <div className="-mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+              {siblings.map((s) => (
+                <Link
+                  key={s.id}
+                  href={`/r/${slug}/dish/${s.id}`}
+                  className="group flex w-36 shrink-0 flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:shadow-md"
+                >
+                  <div className="relative h-24 w-full overflow-hidden">
+                    <DishThumb
+                      name={s.name}
+                      seed={s.id}
+                      thumbnailUrl={s.thumbnailUrl}
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col gap-1 p-2.5">
+                    <span className="line-clamp-2 font-serif text-sm font-semibold leading-snug text-stone-900">
+                      {s.name}
+                    </span>
+                    <span className="mt-auto text-sm font-semibold text-stone-700">
+                      {formatPrice(s.price, restaurant.currency)}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </section>
         )}
       </div>
