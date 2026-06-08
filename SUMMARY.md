@@ -17,9 +17,15 @@ Three.js.
 - **Live search** — filter dishes by name + description, composing with the
   diet/allergen chips and result count. _Verified: name + description match,
   empty state, clear-restore._
+- **Sticky category quick-nav** — jump between sections on longer menus; tracks
+  the filtered groups and only appears with 2+ categories.
+- **Allergen & dietary key** — collapsible legend decoding every icon used in
+  the menu into its localized label (allergen transparency).
 - **Sold-out / "86" treatment** — out-of-stock dishes are greyed with a
   thumbnail overlay + badge on the menu, "(Sold out)" on the printable menu,
   and a banner on the dish page.
+- **Contact details** — optional address / phone / website shown in the menu
+  footer (tappable `tel:` + website links).
 - **Dish detail** — in-browser **3D + AR** via `<model-viewer>`:
   - **True scale** (`ar-scale="fixed"`, models authored 1 unit = 1 m). Android
     Scene Viewer; iOS Quick Look via USDZ with graceful degradation.
@@ -54,15 +60,19 @@ Three.js.
 - **Dish CRUD**, reorder, **duplicate** (clone all metadata + translations),
   **mark sold out (86)** with a one-tap toggle; **category CRUD** (rename +
   translations, reorder, delete → dishes fall back to Uncategorized); settings
-  (incl. **logo upload**); **table QR code**; **account page** (change name /
+  (incl. **logo upload** + **contact details**); **table QR code** +
+  **printable branded table card**; **account page** (change name /
   password); **delete restaurant** (owner) / **leave team** (member).
+- **Menu health panel** — completeness nudges (verified-to-scale, iOS-AR-ready,
+  full portion info, translated) with per-metric "which dishes need work" lists.
 - **📐 Measure from 3D model** — reads the GLB bounding box (`getDimensions`),
   auto-fills/validates the stated dimensions.
 - **⤴ Upload GLB / thumbnail** + **⤓ Generate USDZ from GLB** — file upload
   (`/api/upload`) and in-browser GLB→USDZ conversion (Three.js
   `GLTFLoader → USDZExporter`), both stored to Vercel Blob (prod) or `/public`
   (dev). _Verified: GLB upload 200 + served; avocado → valid 2.75 MB USDZ._
-- **📊 Analytics** — view → AR-launch funnel, per-dish AR rate, last-7-days.
+- **📊 Analytics** — view → AR-launch funnel, per-dish AR rate, and a **7-day
+  daily trend chart** (views vs AR launches).
 - **Translations editor** (per-locale name/description).
 
 ### Platform
