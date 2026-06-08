@@ -167,6 +167,12 @@ export default async function ManageRestaurantPage({ params }: Params) {
             >
               🖨 Printable table card ↗
             </Link>
+            <a
+              href={`/admin/${slug}/export`}
+              className="text-sm font-medium text-teal-700 hover:underline"
+            >
+              ⤓ Export menu (CSV)
+            </a>
           </div>
         </div>
       </section>
