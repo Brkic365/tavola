@@ -27,7 +27,12 @@ export type MenuDish = {
   available: boolean;
 };
 
-type Group = { key: string; name: string; dishes: MenuDish[] };
+type Group = {
+  key: string;
+  name: string;
+  description?: string | null;
+  dishes: MenuDish[];
+};
 
 /**
  * Guest-facing menu with dietary + allergen filtering. A dish must carry ALL
@@ -290,13 +295,22 @@ export default function MenuBrowser({
               id={`cat-sec-${group.key}`}
               className="scroll-mt-16"
             >
-              <div className="mb-5 flex items-center gap-4">
+              <div
+                className={`flex items-center gap-4 ${
+                  group.description ? "mb-2" : "mb-5"
+                }`}
+              >
                 <span className="h-px flex-1 bg-stone-300/70" />
                 <h2 className="font-serif text-2xl font-semibold tracking-tight text-stone-800">
                   {group.name}
                 </h2>
                 <span className="h-px flex-1 bg-stone-300/70" />
               </div>
+              {group.description && (
+                <p className="mb-5 text-center text-sm italic text-stone-500">
+                  {group.description}
+                </p>
+              )}
               <ul className="divide-y divide-stone-200/80 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
                 {group.dishes.map((dish) => (
                   <li key={dish.id}>

@@ -75,8 +75,9 @@ model Category {
   id           String     @id @default(cuid())
   restaurantId String
   name         String
+  description  String? // optional editorial line shown under the heading
   sortOrder    Int        @default(0)
-  // { [locale]: { name } } — localized category names
+  // { [locale]: { name, description } } — localized category content
   translations Json?
 
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)

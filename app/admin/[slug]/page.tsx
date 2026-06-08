@@ -318,6 +318,14 @@ export default async function ManageRestaurantPage({ params }: Params) {
                 placeholder="Predjela"
               />
             </label>
+            <label className="block">
+              <span className={labelCls}>Description (optional)</span>
+              <input
+                name="description"
+                className={inputCls}
+                placeholder="Small plates to start"
+              />
+            </label>
             <button
               type="submit"
               className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50"
@@ -335,8 +343,10 @@ export default async function ManageRestaurantPage({ params }: Params) {
             <ul className="space-y-2">
               {restaurant.categories.map((c, i) => {
                 const tr =
-                  (c.translations as Record<string, { name?: string }> | null) ??
-                  {};
+                  (c.translations as Record<
+                    string,
+                    { name?: string; description?: string }
+                  > | null) ?? {};
                 return (
                   <li
                     key={c.id}
@@ -366,19 +376,32 @@ export default async function ManageRestaurantPage({ params }: Params) {
                             Save
                           </button>
                         </div>
+                        <input
+                          name="description"
+                          defaultValue={c.description ?? ""}
+                          placeholder="Short description (optional)"
+                          className={`${inputCls} mt-0`}
+                        />
                         <details>
                           <summary className="cursor-pointer text-xs font-medium text-stone-500">
                             🌐 Translations (EN/DE/IT)
                           </summary>
-                          <div className="mt-2 grid grid-cols-3 gap-2">
+                          <div className="mt-2 space-y-2">
                             {(["en", "de", "it"] as const).map((loc) => (
-                              <input
-                                key={loc}
-                                name={`tr_${loc}_name`}
-                                defaultValue={tr[loc]?.name ?? ""}
-                                placeholder={loc.toUpperCase()}
-                                className={`${inputCls} mt-0`}
-                              />
+                              <div key={loc} className="grid grid-cols-2 gap-2">
+                                <input
+                                  name={`tr_${loc}_name`}
+                                  defaultValue={tr[loc]?.name ?? ""}
+                                  placeholder={`${loc.toUpperCase()} name`}
+                                  className={`${inputCls} mt-0`}
+                                />
+                                <input
+                                  name={`tr_${loc}_description`}
+                                  defaultValue={tr[loc]?.description ?? ""}
+                                  placeholder={`${loc.toUpperCase()} description`}
+                                  className={`${inputCls} mt-0`}
+                                />
+                              </div>
                             ))}
                           </div>
                         </details>

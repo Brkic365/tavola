@@ -321,10 +321,15 @@ export async function leaveRestaurant(formData: FormData) {
 // ---- categories -----------------------------------------------------------
 
 function categoryTranslationsFromForm(fd: FormData) {
-  const out: Record<string, { name?: string }> = {};
+  const out: Record<string, { name?: string; description?: string }> = {};
   for (const loc of ["en", "de", "it"]) {
     const name = str(fd, `tr_${loc}_name`);
-    if (name) out[loc] = { name };
+    const description = str(fd, `tr_${loc}_description`);
+    if (name || description) {
+      out[loc] = {};
+      if (name) out[loc].name = name;
+      if (description) out[loc].description = description;
+    }
   }
   return Object.keys(out).length ? out : Prisma.DbNull;
 }
@@ -345,7 +350,13 @@ export async function createCategory(formData: FormData) {
 
   const count = await prisma.category.count({ where: { restaurantId } });
   await prisma.category.create({
-    data: { restaurantId, name, sortOrder: count },
+    data: {
+      restaurantId,
+      name,
+      description: str(formData, "description"),
+      sortOrder: count,
+      translations: categoryTranslationsFromForm(formData),
+    },
   });
 
   reval(slug);
@@ -360,7 +371,11 @@ export async function updateCategory(formData: FormData) {
 
   await prisma.category.update({
     where: { id },
-    data: { name, translations: categoryTranslationsFromForm(formData) },
+    data: {
+      name,
+      description: str(formData, "description"),
+      translations: categoryTranslationsFromForm(formData),
+    },
   });
 
   reval(slug);

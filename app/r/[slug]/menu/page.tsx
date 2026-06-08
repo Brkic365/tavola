@@ -50,13 +50,28 @@ export default async function TextMenuPage({ params }: Params) {
     dishes.map((d) => ({ ...d, ...localizeContent(d, d.translations, locale) }));
 
   const groups = [
-    ...restaurant.categories.map((c) => ({
-      key: c.id,
-      name: localizeContent({ name: c.name }, c.translations, locale).name,
-      dishes: localizeDishes(c.dishes),
-    })),
+    ...restaurant.categories.map((c) => {
+      const lc = localizeContent(
+        { name: c.name, description: c.description },
+        c.translations,
+        locale,
+      );
+      return {
+        key: c.id,
+        name: lc.name,
+        description: lc.description,
+        dishes: localizeDishes(c.dishes),
+      };
+    }),
     ...(restaurant.dishes.length > 0
-      ? [{ key: "other", name: "Other", dishes: localizeDishes(restaurant.dishes) }]
+      ? [
+          {
+            key: "other",
+            name: "Other",
+            description: null,
+            dishes: localizeDishes(restaurant.dishes),
+          },
+        ]
       : []),
   ].filter((g) => g.dishes.length > 0);
 
@@ -89,10 +104,16 @@ export default async function TextMenuPage({ params }: Params) {
             <section key={group.key} aria-labelledby={`cat-${group.key}`}>
               <h2
                 id={`cat-${group.key}`}
-                className="mb-3 border-b border-stone-200 pb-1 font-serif text-xl font-semibold"
+                className="border-b border-stone-200 pb-1 font-serif text-xl font-semibold"
               >
                 {group.name}
               </h2>
+              {group.description && (
+                <p className="mb-3 mt-1 text-sm italic text-stone-500">
+                  {group.description}
+                </p>
+              )}
+              {!group.description && <div className="mb-3" />}
               <ul className="space-y-4">
                 {group.dishes.map((dish) => {
                   const dims = formatDimensions(

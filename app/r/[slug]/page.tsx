@@ -54,16 +54,25 @@ export default async function MenuPage({ params }: Params) {
     }));
 
   const groups = [
-    ...restaurant.categories.map((c) => ({
-      key: c.id,
-      name: localizeContent({ name: c.name }, c.translations, locale).name,
-      dishes: localizeDishes(c.dishes),
-    })),
+    ...restaurant.categories.map((c) => {
+      const lc = localizeContent(
+        { name: c.name, description: c.description },
+        c.translations,
+        locale,
+      );
+      return {
+        key: c.id,
+        name: lc.name,
+        description: lc.description,
+        dishes: localizeDishes(c.dishes),
+      };
+    }),
     ...(restaurant.dishes.length > 0
       ? [
           {
             key: "uncategorized",
             name: "Other",
+            description: null,
             dishes: localizeDishes(restaurant.dishes),
           },
         ]

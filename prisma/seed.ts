@@ -45,11 +45,12 @@ async function main() {
     data: {
       restaurantId: restaurant.id,
       name: "Predjela",
+      description: "Mali zalogaji za početak — idealni za dijeljenje.",
       sortOrder: 0,
       translations: {
-        en: { name: "Starters" },
-        de: { name: "Vorspeisen" },
-        it: { name: "Antipasti" },
+        en: { name: "Starters", description: "Small plates to begin — made for sharing." },
+        de: { name: "Vorspeisen", description: "Kleine Häppchen zum Teilen." },
+        it: { name: "Antipasti", description: "Piccoli piatti da condividere." },
       },
     },
   });
