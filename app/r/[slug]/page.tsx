@@ -129,6 +129,31 @@ export default async function MenuPage({ params }: Params) {
       </main>
 
       <footer className="mx-auto w-full max-w-2xl px-5 py-8 text-center text-xs text-stone-400">
+        {(restaurant.address || restaurant.phone || restaurant.website) && (
+          <div className="mb-4 flex flex-col items-center gap-1 text-sm text-stone-500">
+            {restaurant.address && <p>{restaurant.address}</p>}
+            <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+              {restaurant.phone && (
+                <a
+                  href={`tel:${restaurant.phone.replace(/\s+/g, "")}`}
+                  className="font-medium text-brand hover:underline"
+                >
+                  📞 {restaurant.phone}
+                </a>
+              )}
+              {restaurant.website && (
+                <a
+                  href={restaurant.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-brand hover:underline"
+                >
+                  🌐 {restaurant.website.replace(/^https?:\/\//, "")}
+                </a>
+              )}
+            </p>
+          </div>
+        )}
         <p>{t(locale, "kcalStatement")}</p>
         <p className="mt-1">
           Powered by <span className="font-serif">Tavola</span> · true-to-scale

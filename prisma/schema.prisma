@@ -55,6 +55,10 @@ model Restaurant {
   brandColor String? // hex, e.g. "#0F766E" — used for light per-restaurant theming
   currency   String     @default("EUR")
   defaultLocale String? // initial menu language when the guest hasn't picked one
+  // Optional contact details, shown in the public menu footer.
+  address    String?
+  phone      String?
+  website    String?
   ownerId    String? // the User who owns this restaurant
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt

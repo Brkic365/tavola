@@ -166,6 +166,17 @@ export default async function TextMenuPage({ params }: Params) {
       )}
 
       <footer className="mt-10 border-t border-stone-300 pt-4 text-center text-xs text-stone-500">
+        {(restaurant.address || restaurant.phone || restaurant.website) && (
+          <p className="mb-2 text-sm text-stone-600">
+            {[
+              restaurant.address,
+              restaurant.phone,
+              restaurant.website?.replace(/^https?:\/\//, ""),
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+        )}
         <p>{t(locale, "kcalStatement")}</p>
         <p className="mt-1">Powered by Tavola.</p>
       </footer>

@@ -114,6 +114,12 @@ function bool(fd: FormData, key: string): boolean {
   return v === "on" || v === "true" || v === "1";
 }
 
+/** Ensure a stored website has a scheme so it links correctly; null if empty. */
+function normalizeWebsite(value: string | null): string | null {
+  if (!value) return null;
+  return /^https?:\/\//i.test(value) ? value : `https://${value}`;
+}
+
 // ---- authorization --------------------------------------------------------
 
 async function requireUser() {
@@ -236,6 +242,9 @@ export async function updateRestaurant(formData: FormData) {
       currency: str(formData, "currency") ?? "EUR",
       defaultLocale: str(formData, "defaultLocale"),
       logoUrl: str(formData, "logoUrl"),
+      address: str(formData, "address"),
+      phone: str(formData, "phone"),
+      website: normalizeWebsite(str(formData, "website")),
     },
   });
 

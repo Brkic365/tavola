@@ -34,6 +34,9 @@ async function main() {
       brandColor: "#0F766E", // Adriatic teal
       currency: "EUR",
       defaultLocale: "hr", // a Croatian konoba; tourists switch via the flags
+      address: "Ulica kralja Tomislava 1, 20000 Dubrovnik",
+      phone: "+385 20 123 456",
+      website: "https://tavola.example",
       ownerId: owner.id,
     },
   });

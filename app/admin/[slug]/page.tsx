@@ -254,6 +254,41 @@ export default async function ManageRestaurantPage({ params }: Params) {
                 Save settings after uploading to apply the new logo.
               </p>
             </div>
+
+            <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-stone-400">
+              Contact (shown on the menu)
+            </p>
+            <label className="block">
+              <span className={labelCls}>Address</span>
+              <input
+                name="address"
+                defaultValue={restaurant.address ?? ""}
+                className={inputCls}
+                placeholder="Ulica 1, 20000 Dubrovnik"
+              />
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block">
+                <span className={labelCls}>Phone</span>
+                <input
+                  name="phone"
+                  type="tel"
+                  defaultValue={restaurant.phone ?? ""}
+                  className={inputCls}
+                  placeholder="+385 20 123 456"
+                />
+              </label>
+              <label className="block">
+                <span className={labelCls}>Website</span>
+                <input
+                  name="website"
+                  defaultValue={restaurant.website ?? ""}
+                  className={inputCls}
+                  placeholder="example.com"
+                />
+              </label>
+            </div>
+
             <button
               type="submit"
               className="rounded-lg bg-stone-800 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-900"
