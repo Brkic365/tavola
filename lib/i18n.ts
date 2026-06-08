@@ -70,6 +70,12 @@ const DICT: Dict = {
     de: "Empfehlung",
     it: "Scelta dello chef",
   },
+  chefsPicks: {
+    en: "Chef's picks",
+    hr: "Izbor kuhara",
+    de: "Empfehlungen",
+    it: "Scelte dello chef",
+  },
   soldOut: {
     en: "Sold out",
     hr: "Rasprodano",

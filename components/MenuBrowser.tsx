@@ -1,7 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import DishCard from "@/components/DishCard";
+import DishThumb from "@/components/DishThumb";
+import { formatPrice } from "@/lib/format";
 import { parseDietary, type DietaryInfo } from "@/lib/dietary";
 import { parseAllergens, type AllergenInfo } from "@/lib/allergens";
 import { t, type Locale } from "@/lib/i18n";
@@ -43,6 +46,12 @@ export default function MenuBrowser({
   locale: Locale;
 }) {
   const allDishes = useMemo(() => groups.flatMap((g) => g.dishes), [groups]);
+
+  // Spotlight: in-stock chef's picks, surfaced at the top when not filtering.
+  const featured = useMemo(
+    () => allDishes.filter((d) => d.featured && d.available),
+    [allDishes],
+  );
 
   const dietaryOptions = useMemo(() => {
     const map = new Map<string, DietaryInfo>();
@@ -201,6 +210,45 @@ export default function MenuBrowser({
           </div>
         )}
       </div>
+
+      {!active && featured.length > 0 && (
+        <section className="mb-8" aria-label={t(locale, "chefsPicks")}>
+          <div className="mb-3 flex items-center gap-2">
+            <span className="text-amber-500">★</span>
+            <h2 className="font-serif text-lg font-semibold tracking-tight text-stone-800">
+              {t(locale, "chefsPicks")}
+            </h2>
+          </div>
+          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:-mx-5 sm:px-5">
+            {featured.map((d) => (
+              <Link
+                key={d.id}
+                href={`/r/${slug}/dish/${d.id}`}
+                className="group flex w-40 shrink-0 flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:shadow-md"
+              >
+                <div className="relative h-24 w-full overflow-hidden">
+                  <DishThumb
+                    name={d.name}
+                    seed={d.id}
+                    thumbnailUrl={d.thumbnailUrl}
+                  />
+                  <span className="absolute bottom-1 right-1 rounded-md bg-stone-900/75 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+                    3D · AR
+                  </span>
+                </div>
+                <div className="flex flex-1 flex-col gap-1 p-2.5">
+                  <span className="line-clamp-2 font-serif text-sm font-semibold leading-snug text-stone-900">
+                    {d.name}
+                  </span>
+                  <span className="mt-auto text-sm font-semibold text-stone-700">
+                    {formatPrice(d.price, currency)}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {filteredGroups.length === 0 ? (
         <p className="rounded-xl border border-dashed border-stone-300 p-8 text-center text-stone-500">
