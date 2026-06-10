@@ -445,8 +445,22 @@ function translationsFromForm(fd: FormData) {
   return Object.keys(out).length ? out : Prisma.DbNull;
 }
 
+/** Up to 3 optional portion-size rows: variant_<i>_label/price/weightG. */
+function variantsFromForm(fd: FormData) {
+  const out: Array<{ label: string; price: number; weightG: number | null }> =
+    [];
+  for (let i = 0; i < 3; i++) {
+    const label = str(fd, `variant_${i}_label`);
+    const price = num(fd, `variant_${i}_price`);
+    if (!label || price === null || price < 0) continue;
+    out.push({ label, price, weightG: int(fd, `variant_${i}_weightG`) });
+  }
+  return out.length ? out : Prisma.DbNull;
+}
+
 function dishDataFromForm(formData: FormData) {
   return {
+    variants: variantsFromForm(formData),
     name: str(formData, "name") ?? "Untitled dish",
     description: str(formData, "description"),
     translations: translationsFromForm(formData),
@@ -579,6 +593,7 @@ export async function duplicateDish(formData: FormData) {
       sortOrder: count,
       // Prisma needs Json null sent as DbNull, not literal null.
       translations: (src.translations ?? Prisma.DbNull) as Prisma.InputJsonValue,
+      variants: (src.variants ?? Prisma.DbNull) as Prisma.InputJsonValue,
     },
   });
 

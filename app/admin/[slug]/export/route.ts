@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, canManageRestaurant } from "@/lib/session";
+import { parseVariants } from "@/lib/variants";
 
 /** RFC-4180 CSV cell: wrap in quotes and double any embedded quotes. */
 function cell(value: unknown): string {
@@ -13,6 +14,16 @@ const COLUMNS: Array<[string, (d: Dish, catName: string) => unknown]> = [
   ["Category", (_d, cat) => cat],
   ["Name", (d) => d.name],
   ["Price", (d) => d.price],
+  [
+    "Variants",
+    (d) =>
+      parseVariants(d.variants)
+        .map(
+          (v) =>
+            `${v.label} @ ${v.price}${v.weightG != null ? ` (${v.weightG}g)` : ""}`,
+        )
+        .join(" | "),
+  ],
   ["Serves", (d) => d.serves],
   ["Width (cm)", (d) => d.widthCm],
   ["Depth (cm)", (d) => d.depthCm],
@@ -45,6 +56,7 @@ type Dish = {
   glbUrl: string;
   usdzUrl: string | null;
   categoryId: string | null;
+  variants?: unknown;
 };
 
 type Params = { params: Promise<{ slug: string }> };

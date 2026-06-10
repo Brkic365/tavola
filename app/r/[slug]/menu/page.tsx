@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { formatPrice, formatDimensions, formatWeight } from "@/lib/format";
 import { parseAllergens } from "@/lib/allergens";
 import { parseDietary } from "@/lib/dietary";
+import { parseVariants, minVariantPrice } from "@/lib/variants";
 import { getLocale } from "@/lib/locale";
 import { t, localizeContent } from "@/lib/i18n";
 import PrintButton from "@/components/PrintButton";
@@ -124,6 +125,8 @@ export default async function TextMenuPage({ params }: Params) {
                   const weight = formatWeight(dish.weightG);
                   const allergens = parseAllergens(dish.allergens, locale);
                   const dietary = parseDietary(dish.dietary, locale);
+                  const variants = parseVariants(dish.variants);
+                  const fromPrice = minVariantPrice(variants);
                   const portion = [
                     dish.serves ? `${t(locale, "serves")} ${dish.serves}` : null,
                     dims,
@@ -144,7 +147,9 @@ export default async function TextMenuPage({ params }: Params) {
                             )}
                           </h3>
                           <span className="shrink-0 font-serif text-lg font-semibold tabular-nums">
-                            {formatPrice(dish.price, restaurant.currency)}
+                            {fromPrice !== null
+                              ? `${t(locale, "fromPrice")} ${formatPrice(fromPrice, restaurant.currency)}`
+                              : formatPrice(dish.price, restaurant.currency)}
                           </span>
                         </div>
                         {dish.description && (
@@ -158,6 +163,20 @@ export default async function TextMenuPage({ params }: Params) {
                         {portion.length > 0 && (
                           <p className="mt-1 text-sm text-stone-500">
                             {portion.join(" · ")}
+                          </p>
+                        )}
+                        {variants.length > 0 && (
+                          <p className="mt-1 text-sm text-stone-600">
+                            {variants
+                              .map(
+                                (v) =>
+                                  `${v.label}${
+                                    v.weightG != null
+                                      ? ` ${formatWeight(v.weightG)}`
+                                      : ""
+                                  } — ${formatPrice(v.price, restaurant.currency)}`,
+                              )
+                              .join(" · ")}
                           </p>
                         )}
                         {allergens.length > 0 && (

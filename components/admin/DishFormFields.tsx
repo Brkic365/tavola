@@ -1,6 +1,7 @@
 import { BUNDLED_GLB, BUNDLED_USDZ } from "@/lib/bundledModels";
 import { KNOWN_DIETARY } from "@/lib/dietary";
 import { LOCALES } from "@/lib/i18n";
+import { parseVariants } from "@/lib/variants";
 import DimensionMeasurer from "@/components/admin/DimensionMeasurer";
 import UsdzGenerator from "@/components/admin/UsdzGenerator";
 import FileUpload from "@/components/admin/FileUpload";
@@ -30,6 +31,7 @@ type DishDefaults = {
   modelDepthCm?: number | null;
   modelHeightCm?: number | null;
   translations?: unknown;
+  variants?: unknown;
 };
 
 type TrMap = Record<string, { name?: string; description?: string }>;
@@ -134,6 +136,53 @@ export default function DishFormFields({
                   defaultValue={tr.description ?? ""}
                   className={inputCls}
                   placeholder="Description"
+                />
+              </div>
+            );
+          })}
+        </div>
+      </details>
+
+      {/* Optional portion sizes — price shows as "from <min>" on the menu. */}
+      <details
+        className="col-span-2 rounded-xl border border-stone-200 bg-stone-50 p-3"
+        open={parseVariants(dish?.variants).length > 0}
+      >
+        <summary className="cursor-pointer text-sm font-medium text-stone-700">
+          🍽 Portion sizes (optional)
+        </summary>
+        <p className="mt-2 text-xs text-stone-500">
+          Offer small/large portions with their own price and weight. When set,
+          the menu shows “from” the lowest price.
+        </p>
+        <div className="mt-3 space-y-2">
+          {[0, 1, 2].map((i) => {
+            const v = parseVariants(dish?.variants)[i];
+            return (
+              <div key={i} className="grid grid-cols-3 gap-2">
+                <input
+                  name={`variant_${i}_label`}
+                  defaultValue={v?.label ?? ""}
+                  placeholder={i === 0 ? "Small" : i === 1 ? "Large" : "Label"}
+                  className={`${inputCls} mt-0`}
+                />
+                <input
+                  name={`variant_${i}_price`}
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  defaultValue={v ? v.price : ""}
+                  placeholder="Price"
+                  className={`${inputCls} mt-0`}
+                />
+                <input
+                  name={`variant_${i}_weightG`}
+                  type="number"
+                  step="1"
+                  min="0"
+                  defaultValue={v?.weightG ?? ""}
+                  placeholder="Weight (g)"
+                  className={`${inputCls} mt-0`}
                 />
               </div>
             );

@@ -3,6 +3,7 @@ import DishThumb from "@/components/DishThumb";
 import { formatPrice, formatDimensions, formatWeight } from "@/lib/format";
 import { parseAllergens } from "@/lib/allergens";
 import { parseDietary } from "@/lib/dietary";
+import { parseVariants, minVariantPrice } from "@/lib/variants";
 import { t, type Locale } from "@/lib/i18n";
 
 type DishCardProps = {
@@ -25,6 +26,7 @@ type DishCardProps = {
     dietary: string | null;
     featured: boolean;
     available: boolean;
+    variants?: unknown;
   };
 };
 
@@ -40,6 +42,8 @@ export default function DishCard({
   const allergens = parseAllergens(dish.allergens, locale);
   const dietary = parseDietary(dish.dietary, locale);
   const soldOut = !dish.available;
+  const variants = parseVariants(dish.variants);
+  const fromPrice = minVariantPrice(variants);
 
   return (
     <Link
@@ -80,7 +84,16 @@ export default function DishCard({
             {dish.name}
           </h3>
           <span className="shrink-0 font-serif text-lg font-semibold text-stone-900">
-            {formatPrice(dish.price, currency)}
+            {fromPrice !== null ? (
+              <>
+                <span className="mr-1 text-xs font-normal text-stone-500">
+                  {t(locale, "fromPrice")}
+                </span>
+                {formatPrice(fromPrice, currency)}
+              </>
+            ) : (
+              formatPrice(dish.price, currency)
+            )}
           </span>
         </div>
 

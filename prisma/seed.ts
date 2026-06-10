@@ -114,6 +114,11 @@ async function main() {
       serves: "1",
       allergens: "molluscs,shellfish",
       featured: true,
+      // Two portion sizes — exercises the "portion choice" path end-to-end.
+      variants: [
+        { label: "Mala porcija", price: 14, weightG: 250 },
+        { label: "Velika porcija", price: 18, weightG: 380 },
+      ],
       sortOrder: 0,
     },
     {

@@ -95,6 +95,9 @@ model Dish {
   // { [locale]: { name, description } } — localized dish content
   translations Json?
   price        Float       @default(0)
+  // Optional portion sizes: [{ label, price, weightG? }] — price shown as
+  // "from <min>" when present; serves the "portion choice" demand.
+  variants     Json?
 
   // 3D / AR assets. glbUrl drives the in-browser viewer + Android Scene Viewer.
   // usdzUrl is required for iOS Quick Look; null => iOS AR gracefully disabled.

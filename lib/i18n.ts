@@ -82,6 +82,13 @@ const DICT: Dict = {
     de: "Weitere Gerichte",
     it: "Altri piatti",
   },
+  fromPrice: { en: "from", hr: "od", de: "ab", it: "da" },
+  portionOptions: {
+    en: "Portion options",
+    hr: "Veličine porcija",
+    de: "Portionsgrößen",
+    it: "Formati di porzione",
+  },
   portionQuestion: {
     en: "Does this portion look like what you expected?",
     hr: "Izgleda li porcija kako ste očekivali?",

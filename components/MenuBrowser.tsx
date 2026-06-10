@@ -25,6 +25,7 @@ export type MenuDish = {
   dietary: string | null;
   featured: boolean;
   available: boolean;
+  variants?: unknown;
 };
 
 type Group = {

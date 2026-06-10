@@ -6,6 +6,7 @@ import { brandStyle } from "@/lib/theme";
 import { formatPrice, formatDimensions, formatWeight } from "@/lib/format";
 import { parseAllergens } from "@/lib/allergens";
 import { parseDietary } from "@/lib/dietary";
+import { parseVariants, minVariantPrice } from "@/lib/variants";
 import { scaleStatus } from "@/lib/scale";
 import { getLocale } from "@/lib/locale";
 import { t, localizeContent } from "@/lib/i18n";
@@ -68,6 +69,8 @@ export default async function DishPage({ params }: Params) {
   const weight = formatWeight(dish.weightG);
   const allergens = parseAllergens(dish.allergens, locale);
   const dietary = parseDietary(dish.dietary, locale);
+  const variants = parseVariants(dish.variants);
+  const fromPrice = minVariantPrice(variants);
 
   // True-to-scale check: do the stated dimensions match the measured 3D model?
   const verifiedToScale =
@@ -136,12 +139,52 @@ export default async function DishPage({ params }: Params) {
             )}
           </div>
           <span className="shrink-0 font-serif text-2xl font-bold text-stone-900">
-            {formatPrice(dish.price, restaurant.currency)}
+            {fromPrice !== null ? (
+              <>
+                <span className="mr-1 text-sm font-normal text-stone-500">
+                  {t(locale, "fromPrice")}
+                </span>
+                {formatPrice(fromPrice, restaurant.currency)}
+              </>
+            ) : (
+              formatPrice(dish.price, restaurant.currency)
+            )}
           </span>
         </div>
 
         {content.description && (
           <p className="leading-relaxed text-stone-600">{content.description}</p>
+        )}
+
+        {variants.length > 0 && (
+          <section
+            aria-label={t(locale, "portionOptions")}
+            className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm"
+          >
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
+              {t(locale, "portionOptions")}
+            </h2>
+            <ul className="mt-2 divide-y divide-stone-100">
+              {variants.map((v) => (
+                <li
+                  key={v.label}
+                  className="flex items-baseline justify-between gap-3 py-2"
+                >
+                  <span className="font-medium text-stone-800">{v.label}</span>
+                  <span className="flex items-baseline gap-3">
+                    {v.weightG != null && (
+                      <span className="text-sm text-stone-500">
+                        ⚖️ {formatWeight(v.weightG)}
+                      </span>
+                    )}
+                    <span className="font-serif text-lg font-semibold text-stone-900">
+                      {formatPrice(v.price, restaurant.currency)}
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
         )}
 
         <PortionPanel
