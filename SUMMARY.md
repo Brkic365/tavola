@@ -52,6 +52,9 @@ Three.js.
 - **Social-share cards** — dynamic Open Graph images (`next/og`) for menu + dish
   links: a branded card with the dish name, real portion chips and price.
   _Verified by rendering the PNGs._
+- **SEO** — schema.org JSON-LD menu markup (Restaurant → Menu → MenuItem with
+  prices, calories, diets), hourly-revalidated `sitemap.xml` and `robots.txt`
+  (admin/api disallowed).
 
 ### Admin (multi-tenant, auth-gated)
 - **User accounts & roles** — email + PBKDF2-hashed password, signup/login,
@@ -79,6 +82,9 @@ Three.js.
   (dev). _Verified: GLB upload 200 + served; avocado → valid 2.75 MB USDZ._
 - **📊 Analytics** — view → AR-launch funnel, per-dish AR rate, and a **7-day
   daily trend chart** (views vs AR launches).
+- **⤒⤓ CSV round-trip** — export the full menu and **bulk-import** it back
+  (header-driven upsert by dish name, auto-created categories, variant
+  parsing, placeholder GLB for new dishes).
 - **Translations editor** (per-locale name/description).
 
 ### Platform
