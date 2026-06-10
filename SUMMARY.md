@@ -26,6 +26,12 @@ Three.js.
   and a banner on the dish page.
 - **Contact details** — optional address / phone / website shown in the menu
   footer (tappable `tel:` + website links).
+- **Portion-size variants** — up to 3 sizes per dish with own price + weight;
+  "from €X" pricing on menu/printable and a "Portion options" panel on the
+  dish page (the WRAP "portion choice" demand).
+- **Portion-expectation feedback** — one-tap "was this what you expected?"
+  (smaller / as expected / bigger) on the dish page; per-dish breakdown +
+  "Oversells portion" flag in analytics — the outcome-study starter.
 - **Dish detail** — in-browser **3D + AR** via `<model-viewer>`:
   - **True scale** (`ar-scale="fixed"`, models authored 1 unit = 1 m). Android
     Scene Viewer; iOS Quick Look via USDZ with graceful degradation.
