@@ -49,6 +49,9 @@ Three.js.
 - **Accessible / printable** `/r/[slug]/menu` — semantic, no-JS, screen-reader
   + print friendly (the no-smartphone fallback). Skip link, focus rings, SR
   text app-wide.
+- **Light / dark mode** — cookie-persisted theme toggle (no-flash SSR) built on
+  semantic CSS variables; easier on the eyes at a dim dinner table. Scoped to
+  guest pages (admin stays light; the printable menu is forced light).
 - **Social-share cards** — dynamic Open Graph images (`next/og`) for menu + dish
   links: a branded card with the dish name, real portion chips and price.
   _Verified by rendering the PNGs._
