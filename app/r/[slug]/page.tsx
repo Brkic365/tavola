@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { brandStyle } from "@/lib/theme";
 import { getLocale } from "@/lib/locale";
+import { menuJsonLd } from "@/lib/jsonld";
 import { t, localizeContent } from "@/lib/i18n";
 import MenuBrowser from "@/components/MenuBrowser";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -81,8 +83,23 @@ export default async function MenuPage({ params }: Params) {
 
   const totalDishes = groups.reduce((n, g) => n + g.dishes.length, 0);
 
+  // Structured data for search engines (Restaurant → Menu → MenuItem).
+  const h = await headers();
+  const host = h.get("host") ?? "localhost:3000";
+  const proto =
+    h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
+  const jsonLd = menuJsonLd(
+    restaurant,
+    groups,
+    `${proto}://${host}/r/${restaurant.slug}`,
+  );
+
   return (
     <div style={brandStyle(restaurant.brandColor)} className="flex flex-1 flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd }}
+      />
       <header className="bg-brand text-white">
         <div className="mx-auto w-full max-w-2xl px-5 py-8 text-center">
           <div className="mb-4 flex justify-end">
