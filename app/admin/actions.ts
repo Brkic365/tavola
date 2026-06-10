@@ -15,6 +15,7 @@ import {
 } from "@/lib/auth";
 import { getCurrentUser } from "@/lib/session";
 import { parseCsv } from "@/lib/csv";
+import { clientKey, rateLimit, clearRateLimit } from "@/lib/ratelimit";
 
 // ---- auth -----------------------------------------------------------------
 
@@ -33,6 +34,11 @@ export async function login(formData: FormData) {
   const password = String(formData.get("password") ?? "");
   const next = String(formData.get("next") ?? "/admin");
 
+  const key = await clientKey("login");
+  if ((await rateLimit(key)).blocked) {
+    redirect(`/admin/login?${new URLSearchParams({ error: "rate", next })}`);
+  }
+
   const user = email
     ? await prisma.user.findUnique({ where: { email } })
     : null;
@@ -40,6 +46,7 @@ export async function login(formData: FormData) {
     redirect(`/admin/login?${new URLSearchParams({ error: "1", next })}`);
   }
 
+  await clearRateLimit(key); // successful login resets the throttle
   await setSession(user.id);
   redirect(next.startsWith("/admin") ? next : "/admin");
 }
@@ -48,6 +55,11 @@ export async function signup(formData: FormData) {
   const email = (str(formData, "email") ?? "").toLowerCase();
   const password = String(formData.get("password") ?? "");
   const name = str(formData, "name");
+
+  const key = await clientKey("signup");
+  if ((await rateLimit(key)).blocked) {
+    redirect(`/admin/signup?error=rate`);
+  }
 
   if (!email || !/^\S+@\S+\.\S+$/.test(email) || password.length < 6) {
     redirect(`/admin/signup?error=invalid`);
@@ -59,6 +71,7 @@ export async function signup(formData: FormData) {
   const user = await prisma.user.create({
     data: { email, name, passwordHash: await hashPassword(password), role: "OWNER" },
   });
+  await clearRateLimit(key);
   await setSession(user.id);
   redirect("/admin");
 }

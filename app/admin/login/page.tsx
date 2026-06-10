@@ -46,7 +46,9 @@ export default async function LoginPage({ searchParams }: Search) {
 
           {error && (
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
-              Incorrect email or password.
+              {error === "rate"
+                ? "Too many attempts. Please wait a few minutes and try again."
+                : "Incorrect email or password."}
             </p>
           )}
 

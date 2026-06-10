@@ -55,7 +55,9 @@ export default async function SignupPage({ searchParams }: Search) {
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
               {error === "exists"
                 ? "An account with that email already exists."
-                : "Please enter a valid email and a password of at least 6 characters."}
+                : error === "rate"
+                  ? "Too many attempts. Please wait a few minutes and try again."
+                  : "Please enter a valid email and a password of at least 6 characters."}
             </p>
           )}
 

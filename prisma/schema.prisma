@@ -33,6 +33,16 @@ enum UserRole {
   OWNER
 }
 
+// Throttle auth endpoints: one row per attempt, keyed by route+IP. Works
+// across stateless serverless instances (an in-memory limiter would not).
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  key       String // e.g. "login:1.2.3.4"
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}
+
 // A user invited to co-manage a restaurant they don't own.
 model Membership {
   id           String     @id @default(cuid())
