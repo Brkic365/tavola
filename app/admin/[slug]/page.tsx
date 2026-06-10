@@ -11,6 +11,7 @@ import {
   updateDish,
   moveDish,
   setDishAvailability,
+  setCategoryAvailability,
   duplicateDish,
   createCategory,
   updateCategory,
@@ -29,16 +30,25 @@ import FileUpload from "@/components/admin/FileUpload";
 import CopyLinkButton from "@/components/admin/CopyLinkButton";
 import MenuQR from "@/components/admin/MenuQR";
 import MenuHealth from "@/components/admin/MenuHealth";
+import DishSearch from "@/components/admin/DishSearch";
 import DishThumb from "@/components/DishThumb";
 
-type Params = { params: Promise<{ slug: string }> };
+type Params = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ q?: string }>;
+};
 
 const inputCls =
   "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500";
 const labelCls = "block text-sm font-medium text-stone-700";
 
-export default async function ManageRestaurantPage({ params }: Params) {
+export default async function ManageRestaurantPage({
+  params,
+  searchParams,
+}: Params) {
   const { slug } = await params;
+  const { q } = await searchParams;
+  const query = (q ?? "").trim().toLowerCase();
 
   const user = await getCurrentUser();
   if (!user) redirect("/admin/login");
@@ -79,16 +89,21 @@ export default async function ManageRestaurantPage({ params }: Params) {
   }));
 
   // Group dishes for display (category order, then an "Uncategorized" bucket).
+  // Admin dish-list search (by name); empty query shows everything.
+  const visibleDishes = query
+    ? restaurant.dishes.filter((d) => d.name.toLowerCase().includes(query))
+    : restaurant.dishes;
+
   const grouped = [
     ...restaurant.categories.map((c) => ({
       key: c.id,
       name: c.name,
-      dishes: restaurant.dishes.filter((d) => d.categoryId === c.id),
+      dishes: visibleDishes.filter((d) => d.categoryId === c.id),
     })),
     {
       key: "none",
       name: "Uncategorized",
-      dishes: restaurant.dishes.filter((d) => d.categoryId === null),
+      dishes: visibleDishes.filter((d) => d.categoryId === null),
     },
   ].filter((g) => g.dishes.length > 0);
 
@@ -522,16 +537,42 @@ export default async function ManageRestaurantPage({ params }: Params) {
 
       {/* ---- dish list ---- */}
       <section className="mt-8 space-y-8">
+        {restaurant.dishes.length > 0 && (
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-400">
+              Dishes ({restaurant.dishes.length})
+            </h2>
+            <DishSearch />
+          </div>
+        )}
         {grouped.length === 0 ? (
           <p className="rounded-xl border border-dashed border-stone-300 p-8 text-center text-sm text-stone-500">
-            No dishes yet — add your first one above.
+            {restaurant.dishes.length === 0
+              ? "No dishes yet — add your first one above."
+              : `No dishes match “${q}”.`}
           </p>
         ) : (
           grouped.map((group) => (
             <div key={group.key}>
-              <h2 className="mb-3 text-lg font-semibold text-stone-800">
-                {group.name}
-              </h2>
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-lg font-semibold text-stone-800">
+                  {group.name}
+                </h2>
+                <div className="flex gap-1">
+                  <BulkAvailability
+                    restaurantId={restaurant.id}
+                    slug={restaurant.slug}
+                    categoryId={group.key === "none" ? "" : group.key}
+                    available={false}
+                  />
+                  <BulkAvailability
+                    restaurantId={restaurant.id}
+                    slug={restaurant.slug}
+                    categoryId={group.key === "none" ? "" : group.key}
+                    available={true}
+                  />
+                </div>
+              </div>
               <ul className="space-y-3">
                 {group.dishes.map((dish) => (
                   <li
@@ -747,6 +788,39 @@ function AvailabilityToggle({
         }`}
       >
         {available ? "Mark sold out" : "Mark available"}
+      </button>
+    </form>
+  );
+}
+
+/** Bulk-86 / restore every dish in a category (categoryId "" = uncategorized). */
+function BulkAvailability({
+  restaurantId,
+  slug,
+  categoryId,
+  available,
+}: {
+  restaurantId: string;
+  slug: string;
+  categoryId: string;
+  available: boolean;
+}) {
+  return (
+    <form action={setCategoryAvailability}>
+      <input type="hidden" name="restaurantId" value={restaurantId} />
+      <input type="hidden" name="slug" value={slug} />
+      <input type="hidden" name="categoryId" value={categoryId} />
+      <input type="hidden" name="available" value={available ? "true" : "false"} />
+      <button
+        type="submit"
+        title={available ? "Mark every dish here available" : "Mark every dish here sold out"}
+        className={`rounded-lg border px-2 py-1 text-xs font-medium ${
+          available
+            ? "border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+            : "border-stone-200 text-stone-500 hover:bg-stone-100"
+        }`}
+      >
+        {available ? "Restore all" : "86 all"}
       </button>
     </form>
   );

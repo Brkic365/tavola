@@ -502,6 +502,26 @@ function dishDataFromForm(formData: FormData) {
   };
 }
 
+/** Bulk "86" / restore an entire category (or the uncategorized group). */
+export async function setCategoryAvailability(formData: FormData) {
+  const restaurantId = str(formData, "restaurantId");
+  const slug = str(formData, "slug");
+  const categoryId = str(formData, "categoryId"); // null => uncategorized
+  const available = bool(formData, "available");
+  if (!restaurantId) return;
+  await assertCanManage(restaurantId);
+
+  await prisma.dish.updateMany({
+    where: { restaurantId, categoryId: categoryId ?? null },
+    data: { available },
+  });
+
+  if (slug) {
+    revalidatePath(`/admin/${slug}`);
+    revalidatePath(`/r/${slug}`);
+  }
+}
+
 /** Quick "86" toggle from the dish list — flip a dish in/out of stock. */
 export async function setDishAvailability(formData: FormData) {
   const id = str(formData, "id");
