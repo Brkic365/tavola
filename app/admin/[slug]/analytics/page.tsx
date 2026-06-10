@@ -72,6 +72,31 @@ export default async function AnalyticsPage({ params }: Params) {
   const ar7 = days.reduce((n, d) => n + d.ar, 0);
   const maxDay = Math.max(1, ...days.map((d) => Math.max(d.views, d.ar)));
 
+  // Portion-expectation feedback per dish (the outcome signal).
+  const fbRows = await prisma.dishFeedback.groupBy({
+    by: ["dishId", "verdict"],
+    where: { dish: { restaurantId: restaurant.id } },
+    _count: { _all: true },
+  });
+  const fbByDish = new Map<
+    string,
+    { smaller: number; as_expected: number; bigger: number; total: number }
+  >();
+  for (const r of fbRows) {
+    const e =
+      fbByDish.get(r.dishId) ??
+      { smaller: 0, as_expected: 0, bigger: 0, total: 0 };
+    if (r.verdict === "smaller") e.smaller += r._count._all;
+    else if (r.verdict === "bigger") e.bigger += r._count._all;
+    else e.as_expected += r._count._all;
+    e.total += r._count._all;
+    fbByDish.set(r.dishId, e);
+  }
+  const fbDishes = restaurant.dishes
+    .filter((d) => fbByDish.has(d.id))
+    .map((d) => ({ name: d.name, ...fbByDish.get(d.id)! }))
+    .sort((a, b) => b.total - a.total);
+
   // Busiest first.
   const rows = [...restaurant.dishes].sort(
     (a, b) => b._count.views - a._count.views || b._count.arViews - a._count.arViews,
@@ -189,6 +214,71 @@ export default async function AnalyticsPage({ params }: Params) {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* portion-expectation feedback */}
+      <h2 className="mt-8 text-sm font-semibold uppercase tracking-wide text-stone-500">
+        Portion expectations
+      </h2>
+      <p className="mt-1 text-sm text-stone-500">
+        Guest answers to “does this portion look like what you expected?” — a
+        high “smaller” share means the dish oversells its portion.
+      </p>
+      {fbDishes.length === 0 ? (
+        <p className="mt-3 rounded-xl border border-dashed border-stone-300 p-6 text-center text-sm text-stone-500">
+          No feedback yet — guests answer with one tap on the dish page.
+        </p>
+      ) : (
+        <div className="mt-3 space-y-3">
+          {fbDishes.map((d) => {
+            const pctSmaller = Math.round((d.smaller / d.total) * 100);
+            const pctOk = Math.round((d.as_expected / d.total) * 100);
+            const pctBigger = 100 - pctSmaller - pctOk;
+            const oversell = d.total >= 3 && d.smaller / d.total >= 0.5;
+            return (
+              <div
+                key={d.name}
+                className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm"
+              >
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="font-medium text-stone-800">
+                    {d.name}
+                    {oversell && (
+                      <span className="ml-2 rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-rose-700">
+                        Oversells portion
+                      </span>
+                    )}
+                  </span>
+                  <span className="text-xs tabular-nums text-stone-500">
+                    {d.total} answers
+                  </span>
+                </div>
+                <div className="mt-2 flex h-2 w-full overflow-hidden rounded-full bg-stone-100">
+                  <div
+                    className="h-full bg-rose-400"
+                    style={{ width: `${pctSmaller}%` }}
+                    title={`Smaller: ${d.smaller}`}
+                  />
+                  <div
+                    className="h-full bg-emerald-400"
+                    style={{ width: `${pctOk}%` }}
+                    title={`As expected: ${d.as_expected}`}
+                  />
+                  <div
+                    className="h-full bg-sky-400"
+                    style={{ width: `${pctBigger}%` }}
+                    title={`Bigger: ${d.bigger}`}
+                  />
+                </div>
+                <div className="mt-1.5 flex gap-4 text-[11px] text-stone-500">
+                  <span>▼ smaller {d.smaller}</span>
+                  <span>✓ as expected {d.as_expected}</span>
+                  <span>▲ bigger {d.bigger}</span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 

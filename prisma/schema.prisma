@@ -131,6 +131,7 @@ model Dish {
   category     Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   arViews      ArView[]
   views        DishView[]
+  feedback     DishFeedback[]
 
   @@index([restaurantId])
   @@index([categoryId])
@@ -151,6 +152,19 @@ model ArView {
 model DishView {
   id        String   @id @default(cuid())
   dishId    String
+  createdAt DateTime @default(now())
+
+  dish      Dish     @relation(fields: [dishId], references: [id], onDelete: Cascade)
+
+  @@index([dishId])
+}
+
+// Guest answer to "does this portion look like what you expected?" — the
+// first-party outcome signal (which dishes' marketing oversells the portion).
+model DishFeedback {
+  id        String   @id @default(cuid())
+  dishId    String
+  verdict   String // "smaller" | "as_expected" | "bigger"
   createdAt DateTime @default(now())
 
   dish      Dish     @relation(fields: [dishId], references: [id], onDelete: Cascade)

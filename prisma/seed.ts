@@ -12,6 +12,7 @@ const M = (file: string) => `/models/${file}`;
 async function main() {
   // Idempotent: wipe and reseed so re-running gives a clean demo state.
   await prisma.arView.deleteMany();
+  await prisma.dishFeedback.deleteMany();
   await prisma.dish.deleteMany();
   await prisma.category.deleteMany();
   await prisma.restaurant.deleteMany();
@@ -360,6 +361,20 @@ async function main() {
         data: Array.from({ length: arViews }, () => ({ dishId: created.id })),
       });
     }
+
+    // A sprinkle of portion-expectation answers; the platter "oversells" (more
+    // "smaller" votes) so the analytics flag has something to show.
+    const oversells = created.name === "Miješana plata za 2";
+    const fb = oversells
+      ? [
+          ...Array.from({ length: 4 }, () => "smaller"),
+          "as_expected",
+          "bigger",
+        ]
+      : ["as_expected", "as_expected", "bigger"];
+    await prisma.dishFeedback.createMany({
+      data: fb.map((verdict) => ({ dishId: created.id, verdict })),
+    });
     idx++;
   }
 

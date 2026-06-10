@@ -13,6 +13,7 @@ import ModelViewer from "@/components/ModelViewer";
 import PortionPanel from "@/components/PortionPanel";
 import PortionScale from "@/components/PortionScale";
 import ViewBeacon from "@/components/ViewBeacon";
+import PortionFeedback from "@/components/PortionFeedback";
 import DishThumb from "@/components/DishThumb";
 
 type Params = { params: Promise<{ slug: string; id: string }> };
@@ -158,6 +159,8 @@ export default async function DishPage({ params }: Params) {
           depthCm={dish.depthCm}
           locale={locale}
         />
+
+        <PortionFeedback dishId={dish.id} locale={locale} />
 
         {(dietary.length > 0 || dish.calories != null) && (
           <section className="flex flex-wrap items-center gap-2">

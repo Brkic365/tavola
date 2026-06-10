@@ -82,6 +82,36 @@ const DICT: Dict = {
     de: "Weitere Gerichte",
     it: "Altri piatti",
   },
+  portionQuestion: {
+    en: "Does this portion look like what you expected?",
+    hr: "Izgleda li porcija kako ste očekivali?",
+    de: "Sieht die Portion aus wie erwartet?",
+    it: "La porzione è come te l'aspettavi?",
+  },
+  fbSmaller: {
+    en: "Smaller",
+    hr: "Manja",
+    de: "Kleiner",
+    it: "Più piccola",
+  },
+  fbAsExpected: {
+    en: "As expected",
+    hr: "Po očekivanju",
+    de: "Wie erwartet",
+    it: "Come previsto",
+  },
+  fbBigger: {
+    en: "Bigger",
+    hr: "Veća",
+    de: "Größer",
+    it: "Più grande",
+  },
+  fbThanks: {
+    en: "Thanks — this helps the kitchen calibrate portions.",
+    hr: "Hvala — to pomaže kuhinji u kalibraciji porcija.",
+    de: "Danke — das hilft der Küche bei den Portionen.",
+    it: "Grazie — aiuta la cucina a calibrare le porzioni.",
+  },
   soldOut: {
     en: "Sold out",
     hr: "Rasprodano",
