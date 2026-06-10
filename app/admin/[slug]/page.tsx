@@ -173,6 +173,12 @@ export default async function ManageRestaurantPage({ params }: Params) {
             >
               ⤓ Export menu (CSV)
             </a>
+            <Link
+              href={`/admin/${slug}/import`}
+              className="text-sm font-medium text-teal-700 hover:underline"
+            >
+              ⤒ Import CSV
+            </Link>
           </div>
         </div>
       </section>

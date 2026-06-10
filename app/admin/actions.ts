@@ -14,6 +14,7 @@ import {
   verifyInviteToken,
 } from "@/lib/auth";
 import { getCurrentUser } from "@/lib/session";
+import { parseCsv } from "@/lib/csv";
 
 // ---- auth -----------------------------------------------------------------
 
@@ -601,6 +602,168 @@ export async function duplicateDish(formData: FormData) {
     revalidatePath(`/admin/${slug}`);
     revalidatePath(`/r/${slug}`);
   }
+}
+
+// ---- CSV import -------------------------------------------------------------
+
+/** Reverse of the export's variant serialization: "Mala @ 14 (250g) | …". */
+function variantsFromCsv(raw: string) {
+  const out: Array<{ label: string; price: number; weightG: number | null }> =
+    [];
+  for (const part of raw.split("|")) {
+    const m = part.trim().match(/^(.+?)\s*@\s*([\d.,]+)(?:\s*\((\d+)\s*g\))?$/i);
+    if (!m) continue;
+    const price = Number(m[2].replace(",", "."));
+    if (!Number.isFinite(price) || price < 0) continue;
+    out.push({
+      label: m[1].trim(),
+      price,
+      weightG: m[3] ? parseInt(m[3], 10) : null,
+    });
+  }
+  return out;
+}
+
+/**
+ * Bulk import the menu from a CSV in the export's format. Header-driven:
+ * only columns present in the file are touched. Upserts by dish name within
+ * the restaurant; auto-creates categories by name.
+ */
+export async function importMenuCsv(formData: FormData) {
+  const restaurantId = str(formData, "restaurantId");
+  const slug = str(formData, "slug");
+  if (!restaurantId || !slug) return;
+  await assertCanManage(restaurantId);
+
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    redirect(`/admin/${slug}/import?error=nofile`);
+  }
+
+  const rows = parseCsv(await file.text());
+  if (rows.length < 2) redirect(`/admin/${slug}/import?error=empty`);
+
+  const headers = rows[0].map((h) => h.trim().toLowerCase());
+  const colOf = (name: string) => headers.indexOf(name.toLowerCase());
+  if (colOf("name") === -1) redirect(`/admin/${slug}/import?error=noname`);
+
+  // Existing categories by lowercased name; created on demand.
+  const cats = await prisma.category.findMany({ where: { restaurantId } });
+  const catByName = new Map(cats.map((c) => [c.name.toLowerCase(), c.id]));
+  let catCount = cats.length;
+
+  const numCell = (v: string | undefined) => {
+    if (!v) return null;
+    const n = Number(v.replace(",", "."));
+    return Number.isFinite(n) ? n : null;
+  };
+
+  let created = 0;
+  let updated = 0;
+  let skipped = 0;
+
+  for (const row of rows.slice(1, 501)) {
+    const cell = (name: string): string | undefined => {
+      const i = colOf(name);
+      if (i === -1) return undefined; // column absent → leave field untouched
+      return row[i]?.trim() ?? "";
+    };
+
+    const name = cell("name");
+    if (!name) {
+      skipped++;
+      continue;
+    }
+
+    // Resolve / auto-create the category.
+    let categoryId: string | null | undefined = undefined;
+    const catName = cell("category");
+    if (catName !== undefined) {
+      if (!catName || catName.toLowerCase() === "uncategorized") {
+        categoryId = null;
+      } else {
+        const key = catName.toLowerCase();
+        if (!catByName.has(key)) {
+          const c = await prisma.category.create({
+            data: { restaurantId, name: catName, sortOrder: catCount++ },
+          });
+          catByName.set(key, c.id);
+        }
+        categoryId = catByName.get(key)!;
+      }
+    }
+
+    const yesNo = (v: string | undefined) =>
+      v === undefined ? undefined : /^(yes|true|1|y)$/i.test(v);
+
+    const data: Prisma.DishUncheckedUpdateInput = {};
+    if (categoryId !== undefined) data.categoryId = categoryId;
+    const price = numCell(cell("price"));
+    if (price !== null) data.price = price;
+    if (cell("description") !== undefined)
+      data.description = cell("description") || null;
+    if (cell("serves") !== undefined) data.serves = cell("serves") || null;
+    if (cell("allergens") !== undefined)
+      data.allergens = cell("allergens") || null;
+    if (cell("dietary") !== undefined) data.dietary = cell("dietary") || null;
+    for (const [csvCol, field] of [
+      ["width (cm)", "widthCm"],
+      ["depth (cm)", "depthCm"],
+      ["height (cm)", "heightCm"],
+    ] as const) {
+      const v = cell(csvCol);
+      if (v !== undefined) data[field] = numCell(v);
+    }
+    if (cell("weight (g)") !== undefined) {
+      const w = numCell(cell("weight (g)"));
+      data.weightG = w === null ? null : Math.round(w);
+    }
+    if (cell("calories") !== undefined) {
+      const k = numCell(cell("calories"));
+      data.calories = k === null ? null : Math.round(k);
+    }
+    const avail = yesNo(cell("available"));
+    if (avail !== undefined) data.available = avail;
+    const feat = yesNo(cell("featured"));
+    if (feat !== undefined) data.featured = feat;
+    if (cell("glb url")) data.glbUrl = cell("glb url");
+    if (cell("usdz url") !== undefined) data.usdzUrl = cell("usdz url") || null;
+    if (cell("variants") !== undefined) {
+      const v = variantsFromCsv(cell("variants") ?? "");
+      data.variants = v.length ? v : Prisma.DbNull;
+    }
+
+    const existing = await prisma.dish.findFirst({
+      where: { restaurantId, name },
+      select: { id: true },
+    });
+    if (existing) {
+      await prisma.dish.update({ where: { id: existing.id }, data });
+      updated++;
+    } else {
+      const count = await prisma.dish.count({
+        where: { restaurantId, categoryId: (data.categoryId as string) ?? null },
+      });
+      await prisma.dish.create({
+        data: {
+          // A model is required; fall back to the bundled placeholder so the
+          // dish is viewable immediately and replaceable later.
+          glbUrl: "/models/avocado.glb",
+          ...data,
+          restaurantId,
+          name,
+          sortOrder: count,
+        } as Prisma.DishUncheckedCreateInput,
+      });
+      created++;
+    }
+  }
+
+  revalidatePath(`/admin/${slug}`);
+  revalidatePath(`/r/${slug}`);
+  redirect(
+    `/admin/${slug}/import?created=${created}&updated=${updated}&skipped=${skipped}`,
+  );
 }
 
 /** Swap a dish with its neighbour (within the same category) to reorder. */
