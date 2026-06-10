@@ -79,7 +79,7 @@ export default async function TextMenuPage({ params }: Params) {
   return (
     <main
       id="main-content"
-      className="mx-auto w-full max-w-2xl flex-1 px-5 py-8 text-stone-900"
+      className="theme-light mx-auto w-full max-w-2xl flex-1 bg-white px-5 py-8 text-stone-900"
     >
       {/* Controls — hidden when printing */}
       <div className="mb-6 flex items-center justify-between print:hidden">

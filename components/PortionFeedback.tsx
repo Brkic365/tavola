@@ -60,13 +60,13 @@ export default function PortionFeedback({
   return (
     <section
       aria-label={t(locale, "portionQuestion")}
-      className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
+      className="rounded-2xl border border-hair surface-2 px-4 py-3"
     >
       {voted ? (
-        <p className="text-sm text-stone-600">✓ {t(locale, "fbThanks")}</p>
+        <p className="text-sm text-soft">✓ {t(locale, "fbThanks")}</p>
       ) : (
         <>
-          <p className="text-sm font-medium text-stone-700">
+          <p className="text-sm font-medium text-soft">
             {t(locale, "portionQuestion")}
           </p>
           <div className="mt-2 flex gap-2">
@@ -75,7 +75,7 @@ export default function PortionFeedback({
                 key={o.verdict}
                 type="button"
                 onClick={() => vote(o.verdict)}
-                className="flex-1 rounded-lg border border-stone-300 bg-white px-2 py-1.5 text-sm font-medium text-stone-700 transition hover:border-teal-400 hover:bg-teal-50"
+                className="flex-1 rounded-lg border border-hair surface px-2 py-1.5 text-sm font-medium text-soft transition hover:border-teal-400 hover:bg-teal-50"
               >
                 <span aria-hidden className="mr-1 text-xs">
                   {o.icon}

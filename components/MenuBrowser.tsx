@@ -116,11 +116,11 @@ export default function MenuBrowser({
 
   return (
     <div>
-      <div className="mb-8 space-y-3 rounded-2xl border border-stone-200 bg-white p-3 shadow-sm">
+      <div className="mb-8 space-y-3 rounded-2xl border border-hair surface p-3 shadow-sm">
         <div className="relative">
           <span
             aria-hidden
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-stone-400"
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-soft"
           >
             🔍
           </span>
@@ -130,14 +130,14 @@ export default function MenuBrowser({
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t(locale, "searchDishes")}
             aria-label={t(locale, "searchDishes")}
-            className="w-full rounded-xl border border-stone-200 bg-stone-50 py-2 pl-9 pr-9 text-sm text-stone-800 placeholder:text-stone-400 focus:border-teal-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-teal-400"
+            className="w-full rounded-xl border border-hair surface-2 py-2 pl-9 pr-9 text-sm text-strong placeholder:text-soft focus:border-teal-400 focus:outline-none focus:ring-1 focus:ring-teal-400"
           />
           {query && (
             <button
               type="button"
               onClick={() => setQuery("")}
               aria-label={t(locale, "clearSearch")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full px-2 py-0.5 text-stone-400 hover:bg-stone-100 hover:text-stone-700"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full px-2 py-0.5 text-soft hover:bg-[var(--card-2)] hover:text-strong"
             >
               ✕
             </button>
@@ -148,7 +148,7 @@ export default function MenuBrowser({
           <>
             {dietaryOptions.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+              <span className="text-xs font-semibold uppercase tracking-wide text-soft">
                 {t(locale, "dietary")}
               </span>
               {dietaryOptions.map((d) => {
@@ -174,7 +174,7 @@ export default function MenuBrowser({
 
             {allergenOptions.length > 0 && (
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+                <span className="text-xs font-semibold uppercase tracking-wide text-soft">
                   {t(locale, "avoid")}
                 </span>
                 {allergenOptions.map((a) => {
@@ -188,7 +188,7 @@ export default function MenuBrowser({
                       className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ring-1 transition ${
                         on
                           ? "bg-rose-600 text-white ring-rose-600"
-                          : "bg-stone-50 text-stone-600 ring-stone-200 hover:bg-stone-100"
+                          : "surface-2 text-soft ring-[var(--hairline)] hover:bg-[var(--hairline)]"
                       }`}
                     >
                       <span aria-hidden>{a.icon}</span> {t(locale, "no")}{" "}
@@ -202,8 +202,8 @@ export default function MenuBrowser({
         )}
 
         {active && (
-          <div className="flex items-center justify-between border-t border-stone-100 pt-2 text-xs">
-            <span className="text-stone-500">
+          <div className="flex items-center justify-between border-t border-hair pt-2 text-xs">
+            <span className="text-soft">
               {total} {t(locale, "match")}
             </span>
             <button
@@ -230,7 +230,7 @@ export default function MenuBrowser({
               <Link
                 key={d.id}
                 href={`/r/${slug}/dish/${d.id}`}
-                className="group flex w-40 shrink-0 flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:shadow-md"
+                className="group flex w-40 shrink-0 flex-col overflow-hidden rounded-2xl border border-hair surface shadow-sm transition hover:shadow-md"
               >
                 <div className="relative h-24 w-full overflow-hidden">
                   <DishThumb
@@ -243,10 +243,10 @@ export default function MenuBrowser({
                   </span>
                 </div>
                 <div className="flex flex-1 flex-col gap-1 p-2.5">
-                  <span className="line-clamp-2 font-serif text-sm font-semibold leading-snug text-stone-900">
+                  <span className="line-clamp-2 font-serif text-sm font-semibold leading-snug text-strong">
                     {d.name}
                   </span>
-                  <span className="mt-auto text-sm font-semibold text-stone-700">
+                  <span className="mt-auto text-sm font-semibold text-soft">
                     {formatPrice(d.price, currency)}
                   </span>
                 </div>
@@ -257,7 +257,7 @@ export default function MenuBrowser({
       )}
 
       {filteredGroups.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-stone-300 p-8 text-center text-stone-500">
+        <p className="rounded-xl border border-dashed border-hair p-8 text-center text-soft">
           {t(locale, "noMatch")}{" "}
           <button
             type="button"
@@ -272,7 +272,7 @@ export default function MenuBrowser({
           {filteredGroups.length >= 2 && (
             <nav
               aria-label={t(locale, "menu")}
-              className="sticky top-0 z-10 -mx-4 mb-2 flex gap-2 overflow-x-auto border-b border-stone-200/70 bg-white/85 px-4 py-2.5 backdrop-blur [scrollbar-width:none] sm:-mx-5 sm:px-5"
+              className="sticky top-0 z-10 -mx-4 mb-2 flex gap-2 overflow-x-auto border-b border-hair surface px-4 py-2.5 [scrollbar-width:none] sm:-mx-5 sm:px-5"
             >
               {filteredGroups.map((group) => (
                 <button
@@ -283,7 +283,7 @@ export default function MenuBrowser({
                       .getElementById(`cat-sec-${group.key}`)
                       ?.scrollIntoView({ behavior: "smooth", block: "start" })
                   }
-                  className="shrink-0 whitespace-nowrap rounded-full bg-stone-100 px-3 py-1 text-sm font-medium text-stone-700 transition hover:bg-stone-200"
+                  className="shrink-0 whitespace-nowrap rounded-full surface-2 px-3 py-1 text-sm font-medium text-strong transition hover:bg-[var(--hairline)]"
                 >
                   {group.name}
                 </button>
@@ -301,18 +301,18 @@ export default function MenuBrowser({
                   group.description ? "mb-2" : "mb-5"
                 }`}
               >
-                <span className="h-px flex-1 bg-stone-300/70" />
+                <span className="h-px flex-1 bg-[var(--hairline)]" />
                 <h2 className="font-serif text-2xl font-semibold tracking-tight text-stone-800">
                   {group.name}
                 </h2>
-                <span className="h-px flex-1 bg-stone-300/70" />
+                <span className="h-px flex-1 bg-[var(--hairline)]" />
               </div>
               {group.description && (
-                <p className="mb-5 text-center text-sm italic text-stone-500">
+                <p className="mb-5 text-center text-sm italic text-soft">
                   {group.description}
                 </p>
               )}
-              <ul className="divide-y divide-stone-200/80 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+              <ul className="divide-y divide-[var(--hairline)] overflow-hidden rounded-2xl border border-hair surface shadow-sm">
                 {group.dishes.map((dish) => (
                   <li key={dish.id}>
                     <DishCard
@@ -330,16 +330,16 @@ export default function MenuBrowser({
       )}
 
       {(allergenOptions.length > 0 || dietaryOptions.length > 0) && (
-        <details className="mt-10 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
-          <summary className="cursor-pointer text-sm font-semibold text-stone-700">
+        <details className="mt-10 rounded-2xl border border-hair surface p-4 shadow-sm">
+          <summary className="cursor-pointer text-sm font-semibold text-strong">
             {t(locale, "allergenKey")}
           </summary>
           {dietaryOptions.length > 0 && (
             <div className="mt-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+              <p className="text-xs font-semibold uppercase tracking-wide text-soft">
                 {t(locale, "dietary")}
               </p>
-              <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-stone-600">
+              <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-soft">
                 {dietaryOptions.map((d) => (
                   <li key={d.key} className="inline-flex items-center gap-1.5">
                     <span aria-hidden>{d.icon}</span>
@@ -351,10 +351,10 @@ export default function MenuBrowser({
           )}
           {allergenOptions.length > 0 && (
             <div className="mt-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+              <p className="text-xs font-semibold uppercase tracking-wide text-soft">
                 {t(locale, "allergens")}
               </p>
-              <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-stone-600">
+              <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-soft">
                 {allergenOptions.map((a) => (
                   <li key={a.key} className="inline-flex items-center gap-1.5">
                     <span aria-hidden>{a.icon}</span>

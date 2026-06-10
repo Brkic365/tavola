@@ -99,7 +99,7 @@ export default async function DishPage({ params }: Params) {
       <TableCapture />
       <Link
         href={`/r/${slug}`}
-        className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-stone-500 hover:text-stone-800"
+        className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-soft hover:text-[var(--foreground)]"
       >
         ← {restaurant.name}
       </Link>
@@ -123,7 +123,7 @@ export default async function DishPage({ params }: Params) {
       />
 
       {captionParts.length > 0 && (
-        <p className="mt-2 text-center text-xs text-stone-500">
+        <p className="mt-2 text-center text-xs text-soft">
           {captionParts.join(" · ")}
         </p>
       )}
@@ -131,19 +131,19 @@ export default async function DishPage({ params }: Params) {
       <div className="mt-5 space-y-5">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h1 className="font-serif text-3xl font-bold tracking-tight text-stone-900">
+            <h1 className="font-serif text-3xl font-bold tracking-tight text-strong">
               {content.name}
             </h1>
             {dish.serves && (
-              <p className="mt-1 text-sm text-stone-500">
+              <p className="mt-1 text-sm text-soft">
                 {t(locale, "serves")} {dish.serves}
               </p>
             )}
           </div>
-          <span className="shrink-0 font-serif text-2xl font-bold text-stone-900">
+          <span className="shrink-0 font-serif text-2xl font-bold text-strong">
             {fromPrice !== null ? (
               <>
-                <span className="mr-1 text-sm font-normal text-stone-500">
+                <span className="mr-1 text-sm font-normal text-soft">
                   {t(locale, "fromPrice")}
                 </span>
                 {formatPrice(fromPrice, restaurant.currency)}
@@ -155,31 +155,31 @@ export default async function DishPage({ params }: Params) {
         </div>
 
         {content.description && (
-          <p className="leading-relaxed text-stone-600">{content.description}</p>
+          <p className="leading-relaxed text-soft">{content.description}</p>
         )}
 
         {variants.length > 0 && (
           <section
             aria-label={t(locale, "portionOptions")}
-            className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm"
+            className="rounded-2xl border border-hair surface p-4 shadow-sm"
           >
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-soft">
               {t(locale, "portionOptions")}
             </h2>
-            <ul className="mt-2 divide-y divide-stone-100">
+            <ul className="mt-2 divide-y divide-[var(--hairline)]">
               {variants.map((v) => (
                 <li
                   key={v.label}
                   className="flex items-baseline justify-between gap-3 py-2"
                 >
-                  <span className="font-medium text-stone-800">{v.label}</span>
+                  <span className="font-medium text-strong">{v.label}</span>
                   <span className="flex items-baseline gap-3">
                     {v.weightG != null && (
-                      <span className="text-sm text-stone-500">
+                      <span className="text-sm text-soft">
                         ⚖️ {formatWeight(v.weightG)}
                       </span>
                     )}
-                    <span className="font-serif text-lg font-semibold text-stone-900">
+                    <span className="font-serif text-lg font-semibold text-strong">
                       {formatPrice(v.price, restaurant.currency)}
                     </span>
                   </span>
@@ -210,7 +210,7 @@ export default async function DishPage({ params }: Params) {
         {(dietary.length > 0 || dish.calories != null) && (
           <section className="flex flex-wrap items-center gap-2">
             {dish.calories != null && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-sm font-medium text-stone-700">
+              <span className="inline-flex items-center gap-1.5 rounded-full surface-2 px-3 py-1 text-sm font-medium text-soft">
                 🔥 {dish.calories} {t(locale, "caloriesPerPortion")}
               </span>
             )}
@@ -228,14 +228,14 @@ export default async function DishPage({ params }: Params) {
 
         {allergens.length > 0 && (
           <section>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-soft">
               {t(locale, "allergens")}
             </h2>
             <ul className="mt-2 flex flex-wrap gap-2">
               {allergens.map((a) => (
                 <li
                   key={a.key}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-sm text-stone-700"
+                  className="inline-flex items-center gap-1.5 rounded-full surface-2 px-3 py-1 text-sm text-soft"
                 >
                   <span aria-hidden>{a.icon}</span>
                   {a.label}
@@ -247,7 +247,7 @@ export default async function DishPage({ params }: Params) {
 
         {siblings.length > 0 && (
           <section aria-label={t(locale, "moreDishes")}>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-soft">
               {t(locale, "moreDishes")}
             </h2>
             <div className="-mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
@@ -255,7 +255,7 @@ export default async function DishPage({ params }: Params) {
                 <Link
                   key={s.id}
                   href={`/r/${slug}/dish/${s.id}`}
-                  className="group flex w-36 shrink-0 flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:shadow-md"
+                  className="group flex w-36 shrink-0 flex-col overflow-hidden rounded-2xl border border-hair surface shadow-sm transition hover:shadow-md"
                 >
                   <div className="relative h-24 w-full overflow-hidden">
                     <DishThumb
@@ -265,10 +265,10 @@ export default async function DishPage({ params }: Params) {
                     />
                   </div>
                   <div className="flex flex-1 flex-col gap-1 p-2.5">
-                    <span className="line-clamp-2 font-serif text-sm font-semibold leading-snug text-stone-900">
+                    <span className="line-clamp-2 font-serif text-sm font-semibold leading-snug text-strong">
                       {s.name}
                     </span>
-                    <span className="mt-auto text-sm font-semibold text-stone-700">
+                    <span className="mt-auto text-sm font-semibold text-soft">
                       {formatPrice(s.price, restaurant.currency)}
                     </span>
                   </div>

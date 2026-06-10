@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { brandStyle } from "@/lib/theme";
@@ -10,6 +10,8 @@ import { t, localizeContent } from "@/lib/i18n";
 import MenuBrowser from "@/components/MenuBrowser";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import TableCapture from "@/components/TableCapture";
+import ThemeToggle from "@/components/ThemeToggle";
+import { THEME_COOKIE } from "@/lib/theme-mode";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -95,6 +97,9 @@ export default async function MenuPage({ params }: Params) {
     `${proto}://${host}/r/${restaurant.slug}`,
   );
 
+  const themeMode =
+    (await cookies()).get(THEME_COOKIE)?.value === "dark" ? "dark" : "light";
+
   return (
     <div style={brandStyle(restaurant.brandColor)} className="flex flex-1 flex-col">
       <script
@@ -104,7 +109,8 @@ export default async function MenuPage({ params }: Params) {
       <TableCapture />
       <header className="bg-brand text-white">
         <div className="mx-auto w-full max-w-2xl px-5 py-8 text-center">
-          <div className="mb-4 flex justify-end">
+          <div className="mb-4 flex items-center justify-end gap-2">
+            <ThemeToggle initial={themeMode} />
             <LanguageSwitcher current={locale} />
           </div>
           {restaurant.logoUrl && (
@@ -143,7 +149,7 @@ export default async function MenuPage({ params }: Params) {
         className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-5"
       >
         {groups.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-stone-300 p-8 text-center text-stone-500">
+          <p className="rounded-xl border border-dashed border-hair p-8 text-center text-soft">
             This menu has no dishes yet.
           </p>
         ) : (
@@ -156,9 +162,9 @@ export default async function MenuPage({ params }: Params) {
         )}
       </main>
 
-      <footer className="mx-auto w-full max-w-2xl px-5 py-8 text-center text-xs text-stone-400">
+      <footer className="mx-auto w-full max-w-2xl px-5 py-8 text-center text-xs text-soft">
         {(restaurant.address || restaurant.phone || restaurant.website) && (
-          <div className="mb-4 flex flex-col items-center gap-1 text-sm text-stone-500">
+          <div className="mb-4 flex flex-col items-center gap-1 text-sm text-soft">
             {restaurant.address && <p>{restaurant.address}</p>}
             <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
               {restaurant.phone && (

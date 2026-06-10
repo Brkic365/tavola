@@ -76,14 +76,14 @@ function Stat({
   hint?: string;
 }) {
   return (
-    <div className="rounded-xl bg-white px-2 py-3 text-center shadow-sm">
-      <div className="text-base font-bold leading-tight text-stone-900">
+    <div className="rounded-xl surface px-2 py-3 text-center shadow-sm">
+      <div className="text-base font-bold leading-tight text-strong">
         {value}
       </div>
-      <div className="mt-0.5 text-[11px] font-medium uppercase tracking-wide text-stone-500">
+      <div className="mt-0.5 text-[11px] font-medium uppercase tracking-wide text-soft">
         {label}
       </div>
-      {hint && <div className="text-[10px] text-stone-400">{hint}</div>}
+      {hint && <div className="text-[10px] text-soft">{hint}</div>}
     </div>
   );
 }
@@ -94,7 +94,7 @@ function Dim({ label, cm }: { label: string; cm: number | null }) {
       <dt className="text-[11px] uppercase tracking-wide text-teal-700/70">
         {label}
       </dt>
-      <dd className="text-sm font-semibold text-stone-800">
+      <dd className="text-sm font-semibold text-strong">
         {cm ? `${cm} cm` : "—"}
       </dd>
     </div>

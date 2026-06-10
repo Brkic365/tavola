@@ -50,11 +50,11 @@ export default function PortionScale({
   const maxCm = Math.max(...rows.map((r) => r.cm));
 
   return (
-    <section className="rounded-2xl border border-stone-200 bg-white p-4">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
+    <section className="rounded-2xl border border-hair surface p-4">
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-soft">
         {t(locale, "sizeAtGlance")}
       </h2>
-      <p className="mt-0.5 text-xs text-stone-400">
+      <p className="mt-0.5 text-xs text-soft">
         {t(locale, "footprintVs")} ({trim(footprint)} cm)
       </p>
 
@@ -63,13 +63,13 @@ export default function PortionScale({
           <li key={r.key} className="flex items-center gap-3">
             <span
               className={`flex w-28 shrink-0 items-center gap-1.5 text-xs ${
-                r.dish ? "font-semibold text-stone-900" : "text-stone-500"
+                r.dish ? "font-semibold text-strong" : "text-soft"
               }`}
             >
               <span aria-hidden>{r.icon}</span>
               {r.label}
             </span>
-            <span className="h-3 flex-1 overflow-hidden rounded-full bg-stone-100">
+            <span className="h-3 flex-1 overflow-hidden rounded-full surface-2">
               <span
                 className={`block h-full rounded-full ${
                   r.dish ? "bg-brand" : "bg-stone-300"
@@ -79,7 +79,7 @@ export default function PortionScale({
             </span>
             <span
               className={`w-12 shrink-0 text-right text-xs tabular-nums ${
-                r.dish ? "font-semibold text-stone-900" : "text-stone-400"
+                r.dish ? "font-semibold text-strong" : "text-soft"
               }`}
             >
               {trim(r.cm)} cm

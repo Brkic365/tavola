@@ -49,12 +49,12 @@ export default function DishCard({
     <Link
       href={`/r/${slug}/dish/${dish.id}`}
       aria-disabled={soldOut}
-      className={`group flex gap-4 px-4 py-4 transition-colors hover:bg-stone-50 ${
+      className={`group flex gap-4 px-4 py-4 transition-colors hover:bg-[var(--card-2)] ${
         soldOut ? "opacity-60" : ""
       }`}
     >
       {/* thumbnail with a small 3D/AR affordance */}
-      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl ring-1 ring-stone-200/70">
+      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl ring-1 ring-[var(--hairline)]">
         <DishThumb name={dish.name} seed={dish.id} thumbnailUrl={dish.thumbnailUrl} />
         {soldOut ? (
           <span className="absolute inset-0 flex items-center justify-center bg-stone-900/55 text-center text-[9px] font-bold uppercase leading-tight tracking-wide text-white">
@@ -80,13 +80,13 @@ export default function DishCard({
           )
         )}
         <div className="flex items-baseline justify-between gap-3">
-          <h3 className="font-serif text-lg font-semibold leading-snug text-stone-900">
+          <h3 className="font-serif text-lg font-semibold leading-snug text-strong">
             {dish.name}
           </h3>
-          <span className="shrink-0 font-serif text-lg font-semibold text-stone-900">
+          <span className="shrink-0 font-serif text-lg font-semibold text-strong">
             {fromPrice !== null ? (
               <>
-                <span className="mr-1 text-xs font-normal text-stone-500">
+                <span className="mr-1 text-xs font-normal text-soft">
                   {t(locale, "fromPrice")}
                 </span>
                 {formatPrice(fromPrice, currency)}
@@ -98,13 +98,13 @@ export default function DishCard({
         </div>
 
         {dish.description && (
-          <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-stone-500">
+          <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-soft">
             {dish.description}
           </p>
         )}
 
         {/* portion line — the Tavola differentiator, kept understated */}
-        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500">
+        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-soft">
           {dish.serves && (
             <span>
               👥 {t(locale, "serves")} {dish.serves}
