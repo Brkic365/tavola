@@ -72,6 +72,40 @@ export default async function AnalyticsPage({ params }: Params) {
   const ar7 = days.reduce((n, d) => n + d.ar, 0);
   const maxDay = Math.max(1, ...days.map((d) => Math.max(d.views, d.ar)));
 
+  // Per-table activity (from per-table QR codes, ?table=N).
+  const [tViews, tAr] = await Promise.all([
+    prisma.dishView.groupBy({
+      by: ["table"],
+      where: { dish: { restaurantId: restaurant.id }, table: { not: null } },
+      _count: { _all: true },
+    }),
+    prisma.arView.groupBy({
+      by: ["table"],
+      where: { dish: { restaurantId: restaurant.id }, table: { not: null } },
+      _count: { _all: true },
+    }),
+  ]);
+  const tableMap = new Map<string, { views: number; ar: number }>();
+  for (const r of tViews)
+    if (r.table)
+      tableMap.set(r.table, {
+        views: r._count._all,
+        ar: tableMap.get(r.table)?.ar ?? 0,
+      });
+  for (const r of tAr)
+    if (r.table)
+      tableMap.set(r.table, {
+        views: tableMap.get(r.table)?.views ?? 0,
+        ar: r._count._all,
+      });
+  const tableRows = [...tableMap.entries()]
+    .map(([table, v]) => ({ table, ...v }))
+    .sort(
+      (a, b) =>
+        Number(a.table) - Number(b.table) ||
+        a.table.localeCompare(b.table),
+    );
+
   // Portion-expectation feedback per dish (the outcome signal).
   const fbRows = await prisma.dishFeedback.groupBy({
     by: ["dishId", "verdict"],
@@ -167,6 +201,48 @@ export default async function AnalyticsPage({ params }: Params) {
           ))}
         </div>
       </section>
+
+      {/* per-table activity (only when per-table QR is in use) */}
+      {tableRows.length > 0 && (
+        <>
+          <h2 className="mt-8 text-sm font-semibold uppercase tracking-wide text-stone-500">
+            By table
+          </h2>
+          <p className="mt-1 text-sm text-stone-500">
+            Activity from per-table QR codes — busiest tables first.
+          </p>
+          <div className="mt-3 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-stone-200 text-left text-xs uppercase tracking-wide text-stone-400">
+                  <th className="px-4 py-2 font-semibold">Table</th>
+                  <th className="px-3 py-2 text-right font-semibold">Views</th>
+                  <th className="px-3 py-2 text-right font-semibold">AR</th>
+                  <th className="px-4 py-2 text-right font-semibold">AR rate</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-stone-100">
+                {tableRows.map((r) => (
+                  <tr key={r.table}>
+                    <td className="px-4 py-2.5 font-medium text-stone-800">
+                      {r.table}
+                    </td>
+                    <td className="px-3 py-2.5 text-right tabular-nums text-stone-700">
+                      {r.views}
+                    </td>
+                    <td className="px-3 py-2.5 text-right tabular-nums text-stone-700">
+                      {r.ar}
+                    </td>
+                    <td className="px-4 py-2.5 text-right tabular-nums font-medium text-teal-700">
+                      {pct(r.ar, r.views)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
 
       {/* per-dish funnel */}
       <h2 className="mt-8 text-sm font-semibold uppercase tracking-wide text-stone-500">

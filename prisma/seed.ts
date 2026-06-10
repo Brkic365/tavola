@@ -383,6 +383,29 @@ async function main() {
     idx++;
   }
 
+  // A little per-table activity so the analytics "By table" view is populated.
+  const someDishes = await prisma.dish.findMany({
+    where: { restaurantId: restaurant.id },
+    select: { id: true },
+    take: 3,
+  });
+  const tablePlan: Array<[string, number, number]> = [
+    ["1", 9, 4], // [table, views, arLaunches]
+    ["2", 6, 1],
+    ["3", 3, 2],
+  ];
+  for (let i = 0; i < tablePlan.length; i++) {
+    const [table, v, a] = tablePlan[i];
+    const dishId = someDishes[i % someDishes.length].id;
+    await prisma.dishView.createMany({
+      data: Array.from({ length: v }, () => ({ dishId, table })),
+    });
+    if (a > 0)
+      await prisma.arView.createMany({
+        data: Array.from({ length: a }, () => ({ dishId, table })),
+      });
+  }
+
   const count = await prisma.dish.count();
   console.log(
     `Seeded "${restaurant.name}" (/r/${restaurant.slug}) with ${count} dishes across 3 categories.`,

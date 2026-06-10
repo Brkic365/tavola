@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { TABLE_COOKIE, sanitizeTable } from "@/lib/table";
 
 // POST /api/ar-view  { dishId }  → records one AR launch (best-effort analytics).
 export async function POST(request: Request) {
@@ -18,7 +20,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "dish not found" }, { status: 404 });
     }
 
-    await prisma.arView.create({ data: { dishId } });
+    const table = sanitizeTable((await cookies()).get(TABLE_COOKIE)?.value);
+    await prisma.arView.create({ data: { dishId, table } });
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "bad request" }, { status: 400 });

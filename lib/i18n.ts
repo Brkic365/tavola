@@ -57,6 +57,7 @@ const DICT: Dict = {
     de: "Für unsere Speisekarte scannen",
     it: "Scansiona il nostro menù",
   },
+  table: { en: "Table", hr: "Stol", de: "Tisch", it: "Tavolo" },
   scanHowto: {
     en: "Point your phone camera at the code to see every dish life-size in AR.",
     hr: "Usmjerite kameru mobitela na kod i vidite svako jelo u stvarnoj veličini u AR-u.",

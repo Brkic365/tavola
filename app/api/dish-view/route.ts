@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { TABLE_COOKIE, sanitizeTable } from "@/lib/table";
 
 // POST /api/dish-view  { dishId }  → records one dish-detail view (top of the
 // view → AR-launch funnel). Best-effort, public (guests call it).
@@ -18,7 +20,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "dish not found" }, { status: 404 });
     }
 
-    await prisma.dishView.create({ data: { dishId } });
+    const table = sanitizeTable((await cookies()).get(TABLE_COOKIE)?.value);
+    await prisma.dishView.create({ data: { dishId, table } });
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "bad request" }, { status: 400 });

@@ -144,6 +144,7 @@ model Dish {
 model ArView {
   id        String   @id @default(cuid())
   dishId    String
+  table     String? // table identifier from a per-table QR (?table=N), if any
   createdAt DateTime @default(now())
 
   dish      Dish     @relation(fields: [dishId], references: [id], onDelete: Cascade)
@@ -155,6 +156,7 @@ model ArView {
 model DishView {
   id        String   @id @default(cuid())
   dishId    String
+  table     String? // table identifier from a per-table QR (?table=N), if any
   createdAt DateTime @default(now())
 
   dish      Dish     @relation(fields: [dishId], references: [id], onDelete: Cascade)
@@ -168,6 +170,7 @@ model DishFeedback {
   id        String   @id @default(cuid())
   dishId    String
   verdict   String // "smaller" | "as_expected" | "bigger"
+  table     String? // table identifier from a per-table QR (?table=N), if any
   createdAt DateTime @default(now())
 
   dish      Dish     @relation(fields: [dishId], references: [id], onDelete: Cascade)

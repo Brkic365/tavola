@@ -15,6 +15,7 @@ import PortionPanel from "@/components/PortionPanel";
 import PortionScale from "@/components/PortionScale";
 import ViewBeacon from "@/components/ViewBeacon";
 import PortionFeedback from "@/components/PortionFeedback";
+import TableCapture from "@/components/TableCapture";
 import DishThumb from "@/components/DishThumb";
 
 type Params = { params: Promise<{ slug: string; id: string }> };
@@ -95,6 +96,7 @@ export default async function DishPage({ params }: Params) {
       className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-4"
     >
       <ViewBeacon dishId={dish.id} />
+      <TableCapture />
       <Link
         href={`/r/${slug}`}
         className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-stone-500 hover:text-stone-800"

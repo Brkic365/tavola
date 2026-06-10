@@ -9,6 +9,7 @@ import { menuJsonLd } from "@/lib/jsonld";
 import { t, localizeContent } from "@/lib/i18n";
 import MenuBrowser from "@/components/MenuBrowser";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import TableCapture from "@/components/TableCapture";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -100,6 +101,7 @@ export default async function MenuPage({ params }: Params) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd }}
       />
+      <TableCapture />
       <header className="bg-brand text-white">
         <div className="mx-auto w-full max-w-2xl px-5 py-8 text-center">
           <div className="mb-4 flex justify-end">
