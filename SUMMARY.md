@@ -80,8 +80,11 @@ Three.js.
   (`/api/upload`) and in-browser GLB→USDZ conversion (Three.js
   `GLTFLoader → USDZExporter`), both stored to Vercel Blob (prod) or `/public`
   (dev). _Verified: GLB upload 200 + served; avocado → valid 2.75 MB USDZ._
-- **📊 Analytics** — view → AR-launch funnel, per-dish AR rate, and a **7-day
-  daily trend chart** (views vs AR launches).
+- **📊 Analytics** — view → AR-launch funnel, per-dish AR rate, a **7-day
+  daily trend chart** (views vs AR launches), and a **per-table breakdown**.
+- **Per-table QR codes** — `?table=N` captured into a cookie and attributed to
+  every analytics event; the table-card page prints a numbered grid
+  (`?tables=N`). Groundwork for ordering.
 - **⤒⤓ CSV round-trip** — export the full menu and **bulk-import** it back
   (header-driven upsert by dish name, auto-created categories, variant
   parsing, placeholder GLB for new dishes).
