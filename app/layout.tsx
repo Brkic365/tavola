@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import { Instrument_Sans, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Humanist sans for body/UI — warm, legible, pairs with Fraunces.
+const instrumentSans = Instrument_Sans({
+  variable: "--font-instrument",
   subsets: ["latin"],
 });
 
@@ -12,11 +13,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Elegant high-contrast serif for the restaurant-menu feel (headings, prices).
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+// Fraunces — a warm, high-contrast "old style" serif with optical sizing; the
+// editorial voice for headings, dish names and prices.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -40,7 +41,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
+      className={`${instrumentSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
         <a

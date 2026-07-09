@@ -1,45 +1,58 @@
 @import "tailwindcss";
 
-/* Guest menu surfaces are driven by semantic CSS variables so an opt-in dark
-   theme (better for dim restaurants) flips the whole menu by swapping the
-   palette under `.theme-dark` — no per-element dark: variants to drift. */
+/* ---------------------------------------------------------------------------
+   Tavola design tokens — "warm editorial": ivory paper, espresso ink, a
+   terracotta signature accent. Guest surfaces read these semantic variables so
+   the whole menu re-themes (light / dark) from one palette.
+   --------------------------------------------------------------------------- */
 
 :root {
-  --background: #fafaf9; /* stone-50 */
-  --foreground: #1c1917; /* stone-900 */
-  --card: #ffffff;
-  --card-2: #fafaf9; /* stone-50 — muted surface */
-  --hairline: #e7e5e4; /* stone-200 */
-  --muted: #78716c; /* stone-500 */
-  /* Per-restaurant accent; overridden inline from Restaurant.brandColor. */
-  --brand: #0f766e; /* teal-700 */
+  --background: #f7f2e9; /* warm ivory paper */
+  --foreground: #241e18; /* espresso ink */
+  --card: #fffdf8; /* warm paper white */
+  --card-2: #f0e8da; /* parchment (muted surface) */
+  --hairline: #e6dccb; /* warm hairline */
+  --muted: #7a7060; /* warm taupe */
+
+  /* Tavola signature accent (terracotta) + supporting tones. */
+  --accent: #b0563a;
+  --accent-strong: #954730;
+  --accent-soft: #f1e2d9;
+  --olive: #6e7357; /* rare tertiary — success / verified */
+
+  /* Per-restaurant menu accent; overridden inline from Restaurant.brandColor. */
+  --brand: #0f766e;
 }
 
-/* Opt-in dark palette, scoped to guest pages via the .theme-dark wrapper so the
-   admin tool stays light. */
+/* Opt-in dark palette (warm espresso), scoped to guest pages via .theme-dark. */
 .theme-dark {
-  --background: #1c1917; /* stone-900 */
-  --foreground: #f5f5f4; /* stone-100 */
-  --card: #292524; /* stone-800 */
-  --card-2: #1f1c1a;
-  --hairline: #44403c; /* stone-700 */
-  --muted: #a8a29e; /* stone-400 */
+  --background: #191410;
+  --foreground: #f2eadd;
+  --card: #221b15;
+  --card-2: #1c1611;
+  --hairline: #372e25;
+  --muted: #a99c89;
+  --accent: #cf7050;
+  --accent-strong: #e08a66;
+  --accent-soft: #2c2018;
   background: var(--background);
   color: var(--foreground);
   color-scheme: dark;
 }
 
-/* Force the light palette for surfaces that must stay light regardless of the
-   chosen theme (e.g. the printable menu, meant for white paper). */
+/* Force light (e.g. the printable menu — meant for white paper). */
 .theme-light {
-  --background: #fafaf9;
-  --foreground: #1c1917;
-  --card: #ffffff;
-  --card-2: #fafaf9;
-  --hairline: #e7e5e4;
-  --muted: #78716c;
-  background: #ffffff;
-  color: #1c1917;
+  --background: #f7f2e9;
+  --foreground: #241e18;
+  --card: #fffdf8;
+  --card-2: #f0e8da;
+  --hairline: #e6dccb;
+  --muted: #7a7060;
+  --accent: #b0563a;
+  --accent-strong: #954730;
+  --accent-soft: #f1e2d9;
+  background: #fffdf8;
+  color: #241e18;
   color-scheme: light;
 }
 
@@ -63,28 +76,49 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-2: var(--card-2);
+  --color-hairline: var(--hairline);
+  --color-muted: var(--muted);
   --color-brand: var(--brand);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-serif: var(--font-playfair), ui-serif, Georgia, "Times New Roman",
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-olive: var(--olive);
+
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, "Times New Roman",
     serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 html {
   -webkit-text-size-adjust: 100%;
 }
 
-/* Visible keyboard-focus ring for accessibility (mouse clicks unaffected). */
-:focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 2px;
-  border-radius: 3px;
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-instrument), system-ui, -apple-system, sans-serif;
+  font-synthesis-weight: none;
+}
+
+/* Fraunces looks best with optical sizing driven by the font size. */
+.font-serif {
+  font-optical-sizing: auto;
+}
+
+/* Warm text selection. */
+::selection {
+  background: var(--accent-soft);
+  color: var(--foreground);
+}
+
+/* Visible keyboard-focus ring for accessibility (mouse clicks unaffected). */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
 }
 
 /* Utility helpers tinted with the active restaurant's brand colour. */

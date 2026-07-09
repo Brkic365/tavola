@@ -1,9 +1,24 @@
 import Link from "next/link";
+import {
+  QrCode,
+  MousePointerClick,
+  ScanLine,
+  Ruler,
+  Scale,
+  Box,
+  Users,
+  Flame,
+  Leaf,
+  ArrowRight,
+  ArrowUpRight,
+} from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import Hero3D from "@/components/Hero3D";
 
 // Always reflect current DB state (restaurants change via admin).
 export const dynamic = "force-dynamic";
+
+const SECTION = "mx-auto w-full max-w-6xl px-6";
 
 export default async function Home() {
   const restaurants = await prisma.restaurant.findMany({
@@ -11,118 +26,237 @@ export default async function Home() {
     include: { _count: { select: { dishes: true } } },
   });
   const primary = restaurants[0];
+  const demoHref = primary ? `/r/${primary.slug}` : "/admin";
 
   return (
     <div className="flex flex-1 flex-col">
-      {/* nav */}
-      <nav className="sticky top-0 z-10 border-b border-stone-200/70 bg-stone-50/80 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-3">
-          <span className="font-serif text-xl font-bold tracking-tight text-stone-900">
-            Tavola
-          </span>
-          <div className="flex items-center gap-5 text-sm">
-            <a href="#how" className="hidden text-stone-600 hover:text-stone-900 sm:block">
+      {/* ---- nav ---- */}
+      <nav className="sticky top-0 z-20 border-b border-hair bg-[var(--background)]/85 backdrop-blur">
+        <div className={`${SECTION} flex items-center justify-between py-4`}>
+          <Link href="/" className="flex items-baseline gap-1.5">
+            <span className="font-serif text-2xl font-semibold tracking-tight text-strong">
+              Tavola
+            </span>
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+          </Link>
+          <div className="flex items-center gap-6 text-sm">
+            <a
+              href="#how"
+              className="hidden text-soft transition-colors hover:text-strong sm:block"
+            >
               How it works
             </a>
-            {primary && (
-              <Link
-                href={`/r/${primary.slug}`}
-                className="text-stone-600 hover:text-stone-900"
-              >
-                Live demo
-              </Link>
-            )}
+            <a
+              href="#value"
+              className="hidden text-soft transition-colors hover:text-strong sm:block"
+            >
+              Why it matters
+            </a>
             <Link
               href="/admin"
-              className="rounded-full bg-teal-700 px-4 py-1.5 font-medium text-white hover:bg-teal-800"
+              className="text-soft transition-colors hover:text-strong"
             >
-              Restaurant admin
+              For restaurants
+            </Link>
+            <Link
+              href={demoHref}
+              className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 font-medium text-white shadow-sm transition-colors hover:bg-accent-strong"
+            >
+              Live demo
+              <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
             </Link>
           </div>
         </div>
       </nav>
 
-      {/* hero */}
-      <section
-        id="main-content"
-        className="mx-auto grid w-full max-w-6xl items-center gap-10 px-5 py-12 md:grid-cols-2 md:py-20"
-      >
-        <div>
-          <div className="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-800">
-            <span>📐</span> True-to-scale AR menu
-          </div>
-          <h1 className="mt-5 font-serif text-4xl font-bold leading-[1.1] tracking-tight text-stone-900 sm:text-5xl">
-            See your dish, life-size, before you order.
-          </h1>
-          <p className="mt-5 max-w-md text-lg leading-relaxed text-stone-600">
-            Tavola turns the table QR into a menu where every dish appears in AR
-            at its <em>real</em>&nbsp;size — with true dimensions, weight, and
-            &ldquo;serves N&rdquo;. No more &ldquo;the photo looked bigger.&rdquo;
-          </p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            {primary && (
+      {/* ---- hero ---- */}
+      <section id="main-content" className={`${SECTION} pt-16 pb-14 md:pt-24`}>
+        <div className="grid items-center gap-14 md:grid-cols-[1.05fr_0.95fr]">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-accent-strong">
+              <Ruler className="h-3.5 w-3.5" strokeWidth={2} />
+              True-to-scale AR menu
+            </span>
+            <h1 className="mt-6 font-serif text-[2.75rem] font-semibold leading-[1.04] tracking-tight text-strong sm:text-6xl">
+              See every dish at its{" "}
+              <em className="italic text-accent">real</em> size — before you
+              order.
+            </h1>
+            <p className="mt-6 max-w-md text-lg leading-relaxed text-soft">
+              Guests scan the table QR, tap a dish, and it appears in AR at true
+              real-world scale — with honest dimensions, weight and
+              &ldquo;serves&nbsp;N.&rdquo; No more &ldquo;the photo looked
+              bigger.&rdquo;
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
-                href={`/r/${primary.slug}`}
-                className="rounded-full bg-teal-700 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800"
+                href={demoHref}
+                className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-strong"
               >
-                View the demo menu →
+                See the demo menu
+                <ArrowRight className="h-4 w-4" strokeWidth={2} />
               </Link>
-            )}
-            <Link
-              href="/admin"
-              className="rounded-full border border-stone-300 bg-white px-6 py-3 text-sm font-semibold text-stone-700 transition hover:border-stone-400"
-            >
-              I run a restaurant
-            </Link>
-          </div>
-        </div>
-
-        {/* live 3D showpiece */}
-        <div className="relative">
-          <div className="rounded-3xl border border-stone-200 bg-gradient-to-br from-white to-stone-100 p-2 shadow-xl shadow-stone-200/60">
-            <div className="overflow-hidden rounded-2xl bg-stone-50">
-              <Hero3D src="/models/avocado.glb" alt="A 3D avocado, rotating" />
+              <Link
+                href="/admin"
+                className="inline-flex items-center gap-2 rounded-full border border-hair surface px-6 py-3 text-sm font-semibold text-strong transition-colors hover:border-[var(--muted)]"
+              >
+                I run a restaurant
+              </Link>
             </div>
+            <p className="mt-6 text-sm text-soft">
+              No app to install · works from any phone camera.
+            </p>
           </div>
-          <p className="mt-3 text-center text-xs text-stone-400">
-            Drag to rotate · on a phone, tap &ldquo;View in your space&rdquo;
-          </p>
+
+          {/* live 3D showpiece */}
+          <div className="relative">
+            <div
+              aria-hidden
+              className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-[radial-gradient(60%_60%_at_50%_35%,var(--accent-soft),transparent)]"
+            />
+            <figure className="overflow-hidden rounded-[2rem] border border-hair surface shadow-[0_30px_60px_-25px_rgba(36,30,24,0.35)]">
+              <div className="surface-2">
+                <Hero3D src="/models/avocado.glb" alt="A 3D avocado, rotating" />
+              </div>
+              <figcaption className="flex items-center justify-between gap-3 border-t border-hair px-5 py-3.5">
+                <span className="font-serif text-sm font-medium text-strong">
+                  Shown life-size in AR
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-strong">
+                  <ScanLine className="h-3 w-3" strokeWidth={2} /> To scale
+                </span>
+              </figcaption>
+            </figure>
+            <p className="mt-3 text-center text-xs text-soft">
+              Drag to rotate · on a phone, tap &ldquo;View in your space.&rdquo;
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* how it works */}
-      <section id="how" className="border-y border-stone-200 bg-white">
-        <div className="mx-auto w-full max-w-6xl px-5 py-14">
-          <h2 className="text-center font-serif text-3xl font-bold text-stone-900">
+      {/* ---- what every dish shows (hairline strip) ---- */}
+      <div className="border-y border-hair">
+        <div
+          className={`${SECTION} flex flex-wrap items-center justify-center gap-x-8 gap-y-3 py-5 text-sm text-soft`}
+        >
+          <span className="text-xs font-semibold uppercase tracking-[0.16em] text-soft">
+            Every dish shows
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <Ruler className="h-4 w-4 text-accent" strokeWidth={1.75} />
+            Dimensions
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <Scale className="h-4 w-4 text-accent" strokeWidth={1.75} />
+            Weight
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <Users className="h-4 w-4 text-accent" strokeWidth={1.75} />
+            Serves
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <Flame className="h-4 w-4 text-accent" strokeWidth={1.75} />
+            Calories
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <Leaf className="h-4 w-4 text-accent" strokeWidth={1.75} />
+            Allergens
+          </span>
+        </div>
+      </div>
+
+      {/* ---- how it works ---- */}
+      <section id="how" className={`${SECTION} py-20`}>
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-strong">
             How it works
+          </p>
+          <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-strong">
+            From table QR to life-size, in three taps.
           </h2>
-          <div className="mt-10 grid gap-8 sm:grid-cols-3">
+        </div>
+        <ol className="mt-14 grid gap-10 sm:grid-cols-3">
+          {[
+            {
+              Icon: QrCode,
+              title: "Scan the QR",
+              body: "Each table has its own QR. Guests scan to open the menu — nothing to install.",
+            },
+            {
+              Icon: MousePointerClick,
+              title: "Tap a dish",
+              body: "Browse by category and open any dish to see it in 3D with real portion details.",
+            },
+            {
+              Icon: ScanLine,
+              title: "View it life-size",
+              body: "“View in your space” drops the dish onto the real table at true 1:1 scale.",
+            },
+          ].map((s, i) => (
+            <li key={s.title} className="relative">
+              <span className="font-serif text-5xl font-semibold text-[var(--hairline)]">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div className="mt-2 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent-strong">
+                <s.Icon className="h-5 w-5" strokeWidth={1.75} />
+              </div>
+              <h3 className="mt-4 font-serif text-xl font-semibold text-strong">
+                {s.title}
+              </h3>
+              <p className="mt-2 max-w-xs text-[15px] leading-relaxed text-soft">
+                {s.body}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* ---- value ---- */}
+      <section id="value" className="border-y border-hair surface-2">
+        <div className={`${SECTION} py-20`}>
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-strong">
+              Why it matters
+            </p>
+            <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-strong">
+              Portion transparency, not just a party trick.
+            </h2>
+            <p className="mt-4 text-lg leading-relaxed text-soft">
+              The point isn&apos;t the AR novelty — it&apos;s helping guests
+              order with confidence and cutting &ldquo;that&apos;s smaller than
+              I expected&rdquo; complaints.
+            </p>
+          </div>
+          <div className="mt-14 grid gap-5 sm:grid-cols-3">
             {[
               {
-                icon: "📱",
-                title: "Scan the QR",
-                body: "Each table has a QR. Guests scan it to open the menu — nothing to install.",
+                Icon: Ruler,
+                title: "Real dimensions",
+                body: "Width × depth × height in centimetres, shown on every dish and verified against the 3D model.",
               },
               {
-                icon: "🍽️",
-                title: "Tap a dish",
-                body: "Browse by category and open any dish to see it in 3D with real portion details.",
+                Icon: Scale,
+                title: "Weight & serves",
+                body: "Know the gram weight and how many people a plate actually feeds before it arrives.",
               },
               {
-                icon: "📐",
-                title: "View it life-size",
-                body: "“View in your space” drops the dish onto the real table at true scale.",
+                Icon: Box,
+                title: "True-to-scale AR",
+                body: "Models placed at 1:1 on your table — what you see is exactly what the kitchen sends out.",
               },
-            ].map((s, i) => (
-              <div key={s.title} className="text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-50 text-2xl">
-                  {s.icon}
+            ].map((f) => (
+              <div
+                key={f.title}
+                className="rounded-2xl border border-hair surface p-7 shadow-[0_1px_0_rgba(36,30,24,0.03)]"
+              >
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft text-accent-strong">
+                  <f.Icon className="h-6 w-6" strokeWidth={1.5} />
                 </div>
-                <h3 className="mt-4 font-serif text-xl font-semibold text-stone-900">
-                  <span className="text-teal-700">{i + 1}.</span> {s.title}
+                <h3 className="mt-5 font-serif text-xl font-semibold text-strong">
+                  {f.title}
                 </h3>
-                <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-stone-600">
-                  {s.body}
+                <p className="mt-2 text-[15px] leading-relaxed text-soft">
+                  {f.body}
                 </p>
               </div>
             ))}
@@ -130,91 +264,106 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* value */}
-      <section className="mx-auto w-full max-w-6xl px-5 py-14">
-        <h2 className="text-center font-serif text-3xl font-bold text-stone-900">
-          Portion transparency, not just a gimmick
-        </h2>
-        <p className="mx-auto mt-3 max-w-xl text-center text-stone-600">
-          The point isn&apos;t the AR novelty — it&apos;s helping guests order
-          with confidence and cutting &ldquo;that&apos;s smaller than I
-          expected&rdquo; complaints.
-        </p>
-        <div className="mt-10 grid gap-5 sm:grid-cols-3">
-          {[
-            {
-              icon: "📏",
-              title: "Real dimensions",
-              body: "Width × depth × height in centimetres, shown on every dish.",
-            },
-            {
-              icon: "⚖️",
-              title: "Weight & serves",
-              body: "Know the gram weight and how many people a plate feeds.",
-            },
-            {
-              icon: "🥑",
-              title: "True-to-scale AR",
-              body: "Models placed at 1:1 — what you see is exactly what arrives.",
-            },
-          ].map((f) => (
-            <div
-              key={f.title}
-              className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm"
-            >
-              <div className="text-3xl">{f.icon}</div>
-              <h3 className="mt-3 font-serif text-lg font-semibold text-stone-900">
-                {f.title}
-              </h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-stone-600">
-                {f.body}
-              </p>
-            </div>
-          ))}
+      {/* ---- credibility stat ---- */}
+      <section className="bg-[var(--foreground)] text-[var(--background)]">
+        <div className={`${SECTION} py-20 text-center`}>
+          <p className="mx-auto max-w-3xl font-serif text-3xl font-medium leading-snug tracking-tight sm:text-[2.5rem]">
+            <span className="text-accent">48%</span> of diners have left food
+            because the portion was too big — and half want clearer portion
+            information before they order.
+          </p>
+          <p className="mx-auto mt-6 max-w-md text-sm text-[var(--background)]/60">
+            Tavola turns that guesswork into something they can see at real
+            scale — the honest signal a photo can&apos;t give.
+          </p>
         </div>
       </section>
 
-      {/* live demo */}
-      <section className="border-t border-stone-200 bg-stone-100/60">
-        <div className="mx-auto w-full max-w-3xl px-5 py-14">
-          <h2 className="text-center font-serif text-2xl font-bold text-stone-900">
-            Try a live menu
+      {/* ---- live demo ---- */}
+      <section className={`${SECTION} py-20`}>
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-strong">
+            Try it now
+          </p>
+          <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-strong">
+            Open a live menu.
           </h2>
-          {restaurants.length === 0 ? (
-            <p className="mt-6 rounded-xl border border-dashed border-stone-300 p-6 text-center text-stone-500">
-              No restaurants yet — run{" "}
-              <code className="rounded bg-stone-200 px-1.5 py-0.5 text-sm">
-                npm run db:seed
-              </code>
-              .
-            </p>
-          ) : (
-            <ul className="mt-6 space-y-3">
-              {restaurants.map((r) => (
-                <li key={r.id}>
-                  <Link
-                    href={`/r/${r.slug}`}
-                    className="flex items-center justify-between rounded-2xl border border-stone-200 bg-white p-5 shadow-sm transition hover:border-teal-300 hover:shadow-md"
-                  >
-                    <div>
-                      <p className="font-serif text-lg font-semibold text-stone-900">
-                        {r.name}
-                      </p>
-                      <p className="text-sm text-stone-500">
-                        /r/{r.slug} · {r._count.dishes} dishes
-                      </p>
-                    </div>
-                    <span className="text-teal-700">Open menu →</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
+        </div>
+        {restaurants.length === 0 ? (
+          <p className="mx-auto mt-10 max-w-md rounded-2xl border border-dashed border-hair p-6 text-center text-soft">
+            No restaurants yet — run{" "}
+            <code className="rounded surface-2 px-1.5 py-0.5 text-sm">
+              npm run db:seed
+            </code>
+            .
+          </p>
+        ) : (
+          <ul className="mx-auto mt-10 grid max-w-3xl gap-4 sm:grid-cols-2">
+            {restaurants.map((r) => (
+              <li key={r.id}>
+                <Link
+                  href={`/r/${r.slug}`}
+                  className="group flex items-center justify-between gap-4 rounded-2xl border border-hair surface p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:shadow-md"
+                >
+                  <div>
+                    <p className="font-serif text-xl font-semibold text-strong">
+                      {r.name}
+                    </p>
+                    <p className="mt-0.5 text-sm text-soft">
+                      /r/{r.slug} · {r._count.dishes} dishes
+                    </p>
+                  </div>
+                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent-strong transition-colors group-hover:bg-accent group-hover:text-white">
+                    <ArrowUpRight className="h-5 w-5" strokeWidth={2} />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {/* ---- closing CTA ---- */}
+      <section className="border-t border-hair bg-accent-soft">
+        <div className={`${SECTION} py-16 text-center`}>
+          <h2 className="font-serif text-4xl font-semibold tracking-tight text-strong">
+            Put your menu on the table.
+          </h2>
+          <p className="mx-auto mt-3 max-w-md text-soft">
+            Set up a restaurant, add your dishes, print the table QR — guests are
+            viewing dishes to scale in minutes.
+          </p>
+          <Link
+            href="/admin"
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-strong"
+          >
+            Get started
+            <ArrowRight className="h-4 w-4" strokeWidth={2} />
+          </Link>
         </div>
       </section>
 
-      <footer className="border-t border-stone-200 py-8 text-center text-xs text-stone-400">
-        Tavola · true-to-scale AR menus · MVP demo
+      {/* ---- footer ---- */}
+      <footer className="border-t border-hair">
+        <div
+          className={`${SECTION} flex flex-col items-center justify-between gap-3 py-8 text-sm text-soft sm:flex-row`}
+        >
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-serif text-lg font-semibold text-strong">
+              Tavola
+            </span>
+            <span className="h-1 w-1 rounded-full bg-accent" />
+            <span className="ml-1.5">true-to-scale AR menus</span>
+          </div>
+          <div className="flex items-center gap-6">
+            <Link href={demoHref} className="hover:text-strong">
+              Live demo
+            </Link>
+            <Link href="/admin" className="hover:text-strong">
+              Restaurant admin
+            </Link>
+          </div>
+        </div>
       </footer>
     </div>
   );
