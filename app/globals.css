@@ -121,7 +121,8 @@ body {
   border-radius: 3px;
 }
 
-/* Utility helpers tinted with the active restaurant's brand colour. */
+/* Utility helpers tinted with the active restaurant's brand colour. Soft/strong
+   variants are derived from --brand so any brand colour stays coherent. */
 .bg-brand {
   background-color: var(--brand);
 }
@@ -133,4 +134,13 @@ body {
 }
 .ring-brand {
   --tw-ring-color: var(--brand);
+}
+.bg-brand-soft {
+  background-color: color-mix(in srgb, var(--brand) 12%, var(--card));
+}
+.border-brand-soft {
+  border-color: color-mix(in srgb, var(--brand) 30%, transparent);
+}
+.text-brand-strong {
+  color: color-mix(in srgb, var(--brand) 76%, #000);
 }

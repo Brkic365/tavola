@@ -1,44 +1,51 @@
-// Until real food photography exists, menu cards use a tasteful gradient
-// placeholder + a food emoji guessed from the dish name. Deterministic so a
-// given dish always looks the same.
+// Menu thumbnail placeholder (until real food photography exists): a food-type
+// line icon on a warm tonal tile, chosen deterministically from the dish name.
+// Cohesive with the editorial palette — no rainbow gradients, no emoji.
 
-const EMOJI_RULES: Array<[RegExp, string]> = [
-  [/rižot|rizot|risotto|riža|rice/i, "🍚"],
-  [/hobotnic|octopus|lignj|squid|kalamar/i, "🐙"],
-  [/pljukanc|pasta|njok|gnocc|tjesten/i, "🍝"],
-  [/plata|platter|miješan|mijesan|plodov|seafood|škamp|skamp|shrimp/i, "🦐"],
-  [/pršut|prsut|sir|cheese|ham|prosciutto/i, "🧀"],
-  [/rožat|rozat|custard|krema|desert|slad|cake|kolač|kolac/i, "🍮"],
-  [/dagnj|mussel|školjk|skoljk/i, "🦪"],
-  [/riba|fish|brancin|orada|tuna/i, "🐟"],
-  [/meso|steak|biftek|janjet|lamb|odojak|pork/i, "🥩"],
-  [/salat|salad|povrć|povrc|veg/i, "🥗"],
-  [/juha|soup|brodet/i, "🍲"],
-  [/pizza/i, "🍕"],
-  [/vino|wine|piće|pice|drink/i, "🍷"],
+import {
+  Soup,
+  Fish,
+  Wheat,
+  Shrimp,
+  Ham,
+  CakeSlice,
+  Shell,
+  Beef,
+  Salad,
+  Pizza,
+  Wine,
+  UtensilsCrossed,
+  type LucideIcon,
+} from "lucide-react";
+
+const ICON_RULES: Array<[RegExp, LucideIcon]> = [
+  [/rižot|rizot|risotto|riža|rice|juha|soup|brodet|grah|stew/i, Soup],
+  [/hobotnic|octopus|lignj|squid|kalamar/i, Fish],
+  [/pljukanc|pasta|njok|gnocc|tjesten|rezan/i, Wheat],
+  [/plata|platter|miješan|mijesan|plodov|seafood|škamp|skamp|shrimp|gambar/i, Shrimp],
+  [/pršut|prsut|sir|cheese|ham|prosciutto|panceta/i, Ham],
+  [/rožat|rozat|custard|krema|desert|slad|cake|kolač|kolac|torta|sladoled/i, CakeSlice],
+  [/dagnj|mussel|školjk|skoljk|ostrig|oyster|clam/i, Shell],
+  [/riba|fish|brancin|orada|tuna|losos|salmon|bakalar/i, Fish],
+  [/meso|steak|biftek|janjet|lamb|odojak|pork|piletin|chicken|teletin|veal/i, Beef],
+  [/salat|salad|povrć|povrc|veg/i, Salad],
+  [/pizza|focacc/i, Pizza],
+  [/vino|wine|piće|pice|drink|kokte|cocktail|rakij|pivo|beer/i, Wine],
 ];
 
-export function dishEmoji(name: string): string {
-  for (const [re, emoji] of EMOJI_RULES) {
-    if (re.test(name)) return emoji;
-  }
-  return "🍽️";
+export function dishIcon(name: string): LucideIcon {
+  for (const [re, Icon] of ICON_RULES) if (re.test(name)) return Icon;
+  return UtensilsCrossed;
 }
 
-const GRADIENTS = [
-  "from-amber-100 to-orange-200",
-  "from-teal-100 to-emerald-200",
-  "from-rose-100 to-pink-200",
-  "from-sky-100 to-indigo-200",
-  "from-lime-100 to-green-200",
-  "from-stone-100 to-amber-100",
-];
+// A few earthy tones that harmonise with the palette (theme-aware via vars where
+// possible; olive is a fixed mid-tone that reads on both light and dark tiles).
+const TONES = ["var(--accent)", "var(--olive)", "var(--muted)"];
 
-/** Stable gradient pick from a seed string (e.g. dish id). */
-export function dishGradient(seed: string): string {
+export function dishTone(seed: string): string {
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
     hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
   }
-  return GRADIENTS[hash % GRADIENTS.length];
+  return TONES[hash % TONES.length];
 }

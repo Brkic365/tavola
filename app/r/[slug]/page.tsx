@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { headers, cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { Ruler, FileText, Phone, Globe } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { brandStyle } from "@/lib/theme";
 import { getLocale } from "@/lib/locale";
@@ -130,15 +131,17 @@ export default async function MenuPage({ params }: Params) {
           <p className="mt-2 text-sm text-white/70">
             {totalDishes} · {t(locale, "tapHint")}
           </p>
-          <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-sm">
-            📐 {t(locale, "tagline")}
+          <p className="mt-5 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-sm">
+            <Ruler className="h-3.5 w-3.5" strokeWidth={1.75} />
+            {t(locale, "tagline")}
           </p>
-          <p className="mt-3 text-sm">
+          <p className="mt-3.5 text-sm">
             <Link
               href={`/r/${restaurant.slug}/menu`}
-              className="text-white/80 underline underline-offset-2 hover:text-white"
+              className="inline-flex items-center gap-1.5 text-white/80 underline underline-offset-2 hover:text-white"
             >
-              📄 {t(locale, "printable")}
+              <FileText className="h-3.5 w-3.5" strokeWidth={1.75} />
+              {t(locale, "printable")}
             </Link>
           </p>
         </div>
@@ -170,9 +173,10 @@ export default async function MenuPage({ params }: Params) {
               {restaurant.phone && (
                 <a
                   href={`tel:${restaurant.phone.replace(/\s+/g, "")}`}
-                  className="font-medium text-brand hover:underline"
+                  className="inline-flex items-center gap-1.5 font-medium text-brand hover:underline"
                 >
-                  📞 {restaurant.phone}
+                  <Phone className="h-3.5 w-3.5" strokeWidth={1.75} />
+                  {restaurant.phone}
                 </a>
               )}
               {restaurant.website && (
@@ -180,9 +184,10 @@ export default async function MenuPage({ params }: Params) {
                   href={restaurant.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-brand hover:underline"
+                  className="inline-flex items-center gap-1.5 font-medium text-brand hover:underline"
                 >
-                  🌐 {restaurant.website.replace(/^https?:\/\//, "")}
+                  <Globe className="h-3.5 w-3.5" strokeWidth={1.75} />
+                  {restaurant.website.replace(/^https?:\/\//, "")}
                 </a>
               )}
             </p>

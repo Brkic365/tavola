@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft, Scale, Flame } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { brandStyle } from "@/lib/theme";
 import { formatPrice, formatDimensions, formatWeight } from "@/lib/format";
 import { parseAllergens } from "@/lib/allergens";
 import { parseDietary } from "@/lib/dietary";
+import { allergenIcon, dietaryIcon } from "@/lib/glyphs";
 import { parseVariants, minVariantPrice } from "@/lib/variants";
 import { scaleStatus } from "@/lib/scale";
 import { getLocale } from "@/lib/locale";
@@ -99,9 +101,13 @@ export default async function DishPage({ params }: Params) {
       <TableCapture />
       <Link
         href={`/r/${slug}`}
-        className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-soft hover:text-[var(--foreground)]"
+        className="group mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-soft transition-colors hover:text-[var(--foreground)]"
       >
-        ← {restaurant.name}
+        <ArrowLeft
+          className="h-4 w-4 transition-transform group-hover:-translate-x-0.5"
+          strokeWidth={1.75}
+        />
+        {restaurant.name}
       </Link>
 
       {!dish.available && (
@@ -175,8 +181,9 @@ export default async function DishPage({ params }: Params) {
                   <span className="font-medium text-strong">{v.label}</span>
                   <span className="flex items-baseline gap-3">
                     {v.weightG != null && (
-                      <span className="text-sm text-soft">
-                        ⚖️ {formatWeight(v.weightG)}
+                      <span className="inline-flex items-center gap-1.5 text-sm text-soft">
+                        <Scale className="h-3.5 w-3.5" strokeWidth={1.75} />
+                        {formatWeight(v.weightG)}
                       </span>
                     )}
                     <span className="font-serif text-lg font-semibold text-strong">
@@ -211,18 +218,27 @@ export default async function DishPage({ params }: Params) {
           <section className="flex flex-wrap items-center gap-2">
             {dish.calories != null && (
               <span className="inline-flex items-center gap-1.5 rounded-full surface-2 px-3 py-1 text-sm font-medium text-soft">
-                🔥 {dish.calories} {t(locale, "caloriesPerPortion")}
+                <Flame className="h-4 w-4" strokeWidth={1.75} />
+                {dish.calories} {t(locale, "caloriesPerPortion")}
               </span>
             )}
-            {dietary.map((d) => (
-              <span
-                key={d.key}
-                className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-800"
-              >
-                <span aria-hidden>{d.icon}</span>
-                {d.label}
-              </span>
-            ))}
+            {dietary.map((d) => {
+              const Icon = dietaryIcon(d.key);
+              return (
+                <span
+                  key={d.key}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-hair surface-2 px-3 py-1 text-sm font-medium text-strong"
+                >
+                  <Icon
+                    className="h-4 w-4"
+                    strokeWidth={1.75}
+                    style={{ color: "var(--olive)" }}
+                    aria-hidden
+                  />
+                  {d.label}
+                </span>
+              );
+            })}
           </section>
         )}
 
@@ -232,15 +248,18 @@ export default async function DishPage({ params }: Params) {
               {t(locale, "allergens")}
             </h2>
             <ul className="mt-2 flex flex-wrap gap-2">
-              {allergens.map((a) => (
-                <li
-                  key={a.key}
-                  className="inline-flex items-center gap-1.5 rounded-full surface-2 px-3 py-1 text-sm text-soft"
-                >
-                  <span aria-hidden>{a.icon}</span>
-                  {a.label}
-                </li>
-              ))}
+              {allergens.map((a) => {
+                const Icon = allergenIcon(a.key);
+                return (
+                  <li
+                    key={a.key}
+                    className="inline-flex items-center gap-1.5 rounded-full surface-2 px-3 py-1 text-sm text-soft"
+                  >
+                    <Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                    {a.label}
+                  </li>
+                );
+              })}
             </ul>
           </section>
         )}

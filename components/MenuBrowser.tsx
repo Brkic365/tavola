@@ -2,11 +2,13 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { Search, X, Star } from "lucide-react";
 import DishCard from "@/components/DishCard";
 import DishThumb from "@/components/DishThumb";
 import { formatPrice } from "@/lib/format";
 import { parseDietary, type DietaryInfo } from "@/lib/dietary";
 import { parseAllergens, type AllergenInfo } from "@/lib/allergens";
+import { allergenIcon, dietaryIcon } from "@/lib/glyphs";
 import { t, type Locale } from "@/lib/i18n";
 
 export type MenuDish = {
@@ -118,28 +120,27 @@ export default function MenuBrowser({
     <div>
       <div className="mb-8 space-y-3 rounded-2xl border border-hair surface p-3 shadow-sm">
         <div className="relative">
-          <span
+          <Search
             aria-hidden
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-soft"
-          >
-            🔍
-          </span>
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-soft"
+            strokeWidth={1.75}
+          />
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t(locale, "searchDishes")}
             aria-label={t(locale, "searchDishes")}
-            className="w-full rounded-xl border border-hair surface-2 py-2 pl-9 pr-9 text-sm text-strong placeholder:text-soft focus:border-teal-400 focus:outline-none focus:ring-1 focus:ring-teal-400"
+            className="w-full rounded-xl border border-hair surface-2 py-2.5 pl-10 pr-10 text-sm text-strong placeholder:text-soft focus:border-[var(--brand)] focus:outline-none focus:ring-1 focus:ring-[var(--brand)]"
           />
           {query && (
             <button
               type="button"
               onClick={() => setQuery("")}
               aria-label={t(locale, "clearSearch")}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full px-2 py-0.5 text-soft hover:bg-[var(--card-2)] hover:text-strong"
+              className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-soft transition-colors hover:bg-[var(--card-2)] hover:text-strong"
             >
-              ✕
+              <X className="h-4 w-4" strokeWidth={2} />
             </button>
           )}
         </div>
@@ -153,19 +154,27 @@ export default function MenuBrowser({
               </span>
               {dietaryOptions.map((d) => {
                 const on = diet.has(d.key);
+                const Icon = dietaryIcon(d.key);
                 return (
                   <button
                     key={d.key}
                     type="button"
                     aria-pressed={on}
                     onClick={() => toggle(setDiet, d.key)}
-                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ring-1 transition ${
+                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ring-1 transition ${
                       on
-                        ? "bg-emerald-600 text-white ring-emerald-600"
-                        : "bg-emerald-50 text-emerald-800 ring-emerald-100 hover:bg-emerald-100"
+                        ? "text-white ring-transparent"
+                        : "surface-2 text-strong ring-[var(--hairline)] hover:bg-[var(--hairline)]"
                     }`}
+                    style={on ? { backgroundColor: "var(--olive)" } : undefined}
                   >
-                    <span aria-hidden>{d.icon}</span> {d.label}
+                    <Icon
+                      className="h-3.5 w-3.5"
+                      strokeWidth={1.75}
+                      style={on ? undefined : { color: "var(--olive)" }}
+                      aria-hidden
+                    />
+                    {d.label}
                   </button>
                 );
               })}
@@ -179,20 +188,21 @@ export default function MenuBrowser({
                 </span>
                 {allergenOptions.map((a) => {
                   const on = avoid.has(a.key);
+                  const Icon = allergenIcon(a.key);
                   return (
                     <button
                       key={a.key}
                       type="button"
                       aria-pressed={on}
                       onClick={() => toggle(setAvoid, a.key)}
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ring-1 transition ${
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ring-1 transition ${
                         on
                           ? "bg-rose-600 text-white ring-rose-600"
                           : "surface-2 text-soft ring-[var(--hairline)] hover:bg-[var(--hairline)]"
                       }`}
                     >
-                      <span aria-hidden>{a.icon}</span> {t(locale, "no")}{" "}
-                      {a.label.toLowerCase()}
+                      <Icon className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+                      {t(locale, "no")} {a.label.toLowerCase()}
                     </button>
                   );
                 })}
@@ -220,8 +230,12 @@ export default function MenuBrowser({
       {!active && featured.length > 0 && (
         <section className="mb-8" aria-label={t(locale, "chefsPicks")}>
           <div className="mb-3 flex items-center gap-2">
-            <span className="text-amber-500">★</span>
-            <h2 className="font-serif text-lg font-semibold tracking-tight text-stone-800">
+            <Star
+              className="h-4 w-4 fill-current text-brand"
+              strokeWidth={0}
+              aria-hidden
+            />
+            <h2 className="font-serif text-lg font-semibold tracking-tight text-strong">
               {t(locale, "chefsPicks")}
             </h2>
           </div>
@@ -340,12 +354,20 @@ export default function MenuBrowser({
                 {t(locale, "dietary")}
               </p>
               <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-soft">
-                {dietaryOptions.map((d) => (
-                  <li key={d.key} className="inline-flex items-center gap-1.5">
-                    <span aria-hidden>{d.icon}</span>
-                    {d.label}
-                  </li>
-                ))}
+                {dietaryOptions.map((d) => {
+                  const Icon = dietaryIcon(d.key);
+                  return (
+                    <li key={d.key} className="inline-flex items-center gap-1.5">
+                      <Icon
+                        className="h-4 w-4"
+                        strokeWidth={1.75}
+                        style={{ color: "var(--olive)" }}
+                        aria-hidden
+                      />
+                      {d.label}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
@@ -355,12 +377,15 @@ export default function MenuBrowser({
                 {t(locale, "allergens")}
               </p>
               <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-soft">
-                {allergenOptions.map((a) => (
-                  <li key={a.key} className="inline-flex items-center gap-1.5">
-                    <span aria-hidden>{a.icon}</span>
-                    {a.label}
-                  </li>
-                ))}
+                {allergenOptions.map((a) => {
+                  const Icon = allergenIcon(a.key);
+                  return (
+                    <li key={a.key} className="inline-flex items-center gap-1.5">
+                      <Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                      {a.label}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}

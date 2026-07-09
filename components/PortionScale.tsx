@@ -2,15 +2,28 @@
 // guest gets instant portion intuition without launching AR. All bars share one
 // cm scale, so relative size is obvious.
 
+import {
+  CreditCard,
+  Smartphone,
+  Hand,
+  UtensilsCrossed,
+  Ruler,
+  type LucideIcon,
+} from "lucide-react";
 import { t, type Locale } from "@/lib/i18n";
 
-type Ref = { key: string; tkey: "refCard" | "refPhone" | "refHand" | "refPlate"; icon: string; cm: number };
+type Ref = {
+  key: string;
+  tkey: "refCard" | "refPhone" | "refHand" | "refPlate";
+  Icon: LucideIcon;
+  cm: number;
+};
 
 const REFERENCES: Ref[] = [
-  { key: "card", tkey: "refCard", icon: "💳", cm: 8.5 },
-  { key: "phone", tkey: "refPhone", icon: "📱", cm: 15 },
-  { key: "hand", tkey: "refHand", icon: "🖐", cm: 18 },
-  { key: "plate", tkey: "refPlate", icon: "🍽️", cm: 27 },
+  { key: "card", tkey: "refCard", Icon: CreditCard, cm: 8.5 },
+  { key: "phone", tkey: "refPhone", Icon: Smartphone, cm: 15 },
+  { key: "hand", tkey: "refHand", Icon: Hand, cm: 18 },
+  { key: "plate", tkey: "refPlate", Icon: UtensilsCrossed, cm: 27 },
 ];
 
 function trim(n: number): string {
@@ -34,14 +47,14 @@ export default function PortionScale({
     {
       key: "dish",
       label: t(locale, "thisDish"),
-      icon: "📐",
+      Icon: Ruler,
       cm: footprint,
       dish: true,
     },
     ...REFERENCES.map((r) => ({
       key: r.key,
       label: t(locale, r.tkey),
-      icon: r.icon,
+      Icon: r.Icon,
       cm: r.cm,
       dish: false,
     })),
@@ -50,31 +63,39 @@ export default function PortionScale({
   const maxCm = Math.max(...rows.map((r) => r.cm));
 
   return (
-    <section className="rounded-2xl border border-hair surface p-4">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-soft">
+    <section className="rounded-2xl border border-hair surface p-5">
+      <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-soft">
         {t(locale, "sizeAtGlance")}
       </h2>
-      <p className="mt-0.5 text-xs text-soft">
+      <p className="mt-1 text-xs text-soft">
         {t(locale, "footprintVs")} ({trim(footprint)} cm)
       </p>
 
-      <ul className="mt-3 space-y-2">
+      <ul className="mt-4 space-y-2.5">
         {rows.map((r) => (
           <li key={r.key} className="flex items-center gap-3">
             <span
-              className={`flex w-28 shrink-0 items-center gap-1.5 text-xs ${
+              className={`flex w-28 shrink-0 items-center gap-2 text-xs ${
                 r.dish ? "font-semibold text-strong" : "text-soft"
               }`}
             >
-              <span aria-hidden>{r.icon}</span>
+              <r.Icon
+                className="h-3.5 w-3.5 shrink-0"
+                strokeWidth={1.75}
+                style={r.dish ? { color: "var(--brand)" } : undefined}
+                aria-hidden
+              />
               {r.label}
             </span>
-            <span className="h-3 flex-1 overflow-hidden rounded-full surface-2">
+            <span className="h-2.5 flex-1 overflow-hidden rounded-full surface-2">
               <span
-                className={`block h-full rounded-full ${
-                  r.dish ? "bg-brand" : "bg-stone-300"
-                }`}
-                style={{ width: `${Math.max(4, (r.cm / maxCm) * 100)}%` }}
+                className="block h-full rounded-full"
+                style={{
+                  width: `${Math.max(4, (r.cm / maxCm) * 100)}%`,
+                  backgroundColor: r.dish
+                    ? "var(--brand)"
+                    : "color-mix(in srgb, var(--foreground) 20%, transparent)",
+                }}
               />
             </span>
             <span
