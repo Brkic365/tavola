@@ -85,7 +85,7 @@ export default async function TextMenuPage({ params }: Params) {
       <div className="mb-6 flex items-center justify-between print:hidden">
         <Link
           href={`/r/${slug}`}
-          className="text-sm font-medium text-teal-700 hover:underline"
+          className="text-sm font-medium text-brand hover:underline"
         >
           ← {t(locale, "interactiveMenu")}
         </Link>

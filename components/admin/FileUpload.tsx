@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Upload } from "lucide-react";
 import { uploadAsset } from "@/lib/uploadAsset";
 
 /**
@@ -35,7 +36,7 @@ export default function FileUpload({
       const target = document.getElementById(targetId) as HTMLInputElement | null;
       if (target) target.value = url;
       setStatus("done");
-      setMsg(`✓ Uploaded`);
+      setMsg(`Uploaded`);
     } catch (err) {
       setStatus("error");
       setMsg(err instanceof Error ? err.message : "Upload failed.");
@@ -50,9 +51,12 @@ export default function FileUpload({
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={status === "uploading"}
-        className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-60"
       >
-        {status === "uploading" ? "Uploading…" : `⤴ ${label}`}
+        {status !== "uploading" && (
+          <Upload className="h-4 w-4" strokeWidth={1.75} />
+        )}
+        {status === "uploading" ? "Uploading…" : label}
       </button>
       <input
         ref={inputRef}
@@ -67,7 +71,7 @@ export default function FileUpload({
             status === "error"
               ? "text-red-600"
               : status === "done"
-                ? "text-teal-700"
+                ? "text-accent-strong"
                 : "text-stone-500"
           }`}
         >

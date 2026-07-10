@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ArrowDown, Check, ArrowUp } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, canManageRestaurant } from "@/lib/session";
 
@@ -172,7 +173,7 @@ export default async function AnalyticsPage({ params }: Params) {
           </h2>
           <div className="flex gap-3 text-xs text-stone-500">
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-sm bg-teal-500" /> Views
+              <span className="h-2 w-2 rounded-sm bg-accent" /> Views
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-sm bg-amber-500" /> AR
@@ -184,7 +185,7 @@ export default async function AnalyticsPage({ params }: Params) {
             <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
               <div className="flex h-24 w-full items-end justify-center gap-1">
                 <div
-                  className="w-2.5 rounded-t-sm bg-teal-500"
+                  className="w-2.5 rounded-t-sm bg-accent"
                   style={{ height: `${(d.views / maxDay) * 100}%` }}
                   title={`${d.views} views`}
                 />
@@ -233,7 +234,7 @@ export default async function AnalyticsPage({ params }: Params) {
                     <td className="px-3 py-2.5 text-right tabular-nums text-stone-700">
                       {r.ar}
                     </td>
-                    <td className="px-4 py-2.5 text-right tabular-nums font-medium text-teal-700">
+                    <td className="px-4 py-2.5 text-right tabular-nums font-medium text-accent-strong">
                       {pct(r.ar, r.views)}
                     </td>
                   </tr>
@@ -270,7 +271,7 @@ export default async function AnalyticsPage({ params }: Params) {
                     <div className="font-medium text-stone-800">{d.name}</div>
                     <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-stone-100">
                       <div
-                        className="h-full rounded-full bg-teal-500"
+                        className="h-full rounded-full bg-accent"
                         style={{
                           width: `${Math.round((d._count.views / maxViews) * 100)}%`,
                         }}
@@ -283,7 +284,7 @@ export default async function AnalyticsPage({ params }: Params) {
                   <td className="px-3 py-2.5 text-right tabular-nums text-stone-700">
                     {d._count.arViews}
                   </td>
-                  <td className="px-4 py-2.5 text-right tabular-nums font-medium text-teal-700">
+                  <td className="px-4 py-2.5 text-right tabular-nums font-medium text-accent-strong">
                     {pct(d._count.arViews, d._count.views)}
                   </td>
                 </tr>
@@ -348,9 +349,18 @@ export default async function AnalyticsPage({ params }: Params) {
                   />
                 </div>
                 <div className="mt-1.5 flex gap-4 text-[11px] text-stone-500">
-                  <span>▼ smaller {d.smaller}</span>
-                  <span>✓ as expected {d.as_expected}</span>
-                  <span>▲ bigger {d.bigger}</span>
+                  <span className="inline-flex items-center gap-1">
+                    <ArrowDown className="h-3 w-3" strokeWidth={2} /> smaller{" "}
+                    {d.smaller}
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <Check className="h-3 w-3" strokeWidth={2} /> as expected{" "}
+                    {d.as_expected}
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <ArrowUp className="h-3 w-3" strokeWidth={2} /> bigger{" "}
+                    {d.bigger}
+                  </span>
                 </div>
               </div>
             );

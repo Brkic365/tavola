@@ -1,6 +1,17 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
+import {
+  BarChart3,
+  Printer,
+  Download,
+  Upload,
+  Languages,
+  Users,
+  Star,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, isOwner, canManageRestaurant } from "@/lib/session";
 import { createInviteToken } from "@/lib/auth";
@@ -39,7 +50,7 @@ type Params = {
 };
 
 const inputCls =
-  "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500";
+  "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent";
 const labelCls = "block text-sm font-medium text-stone-700";
 
 export default async function ManageRestaurantPage({
@@ -124,21 +135,23 @@ export default async function ManageRestaurantPage({
         <div className="flex items-center gap-4 text-sm">
           <Link
             href={`/admin/${slug}/analytics`}
-            className="font-medium text-stone-500 hover:text-stone-800"
+            className="inline-flex items-center gap-1.5 font-medium text-stone-500 hover:text-stone-800"
           >
-            📊 Analytics
+            <BarChart3 className="h-4 w-4" strokeWidth={1.75} />
+            Analytics
           </Link>
           <Link
             href={`/r/${slug}/menu`}
             target="_blank"
-            className="font-medium text-stone-500 hover:text-stone-800"
+            className="inline-flex items-center gap-1.5 font-medium text-stone-500 hover:text-stone-800"
           >
-            Printable menu ↗
+            <Printer className="h-4 w-4" strokeWidth={1.75} />
+            Printable menu
           </Link>
           <Link
             href={`/r/${slug}`}
             target="_blank"
-            className="font-medium text-teal-700 hover:underline"
+            className="font-medium text-accent-strong hover:underline"
           >
             Open public menu ↗
           </Link>
@@ -178,21 +191,24 @@ export default async function ManageRestaurantPage({
             <CopyLinkButton url={menuUrl} />
             <Link
               href={`/admin/${slug}/table-card`}
-              className="text-sm font-medium text-teal-700 hover:underline"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-accent-strong hover:underline"
             >
-              🖨 Printable table card ↗
+              <Printer className="h-4 w-4" strokeWidth={1.75} />
+              Printable table card
             </Link>
             <a
               href={`/admin/${slug}/export`}
-              className="text-sm font-medium text-teal-700 hover:underline"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-accent-strong hover:underline"
             >
-              ⤓ Export menu (CSV)
+              <Download className="h-4 w-4" strokeWidth={1.75} />
+              Export menu (CSV)
             </a>
             <Link
               href={`/admin/${slug}/import`}
-              className="text-sm font-medium text-teal-700 hover:underline"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-accent-strong hover:underline"
             >
-              ⤒ Import CSV
+              <Upload className="h-4 w-4" strokeWidth={1.75} />
+              Import CSV
             </Link>
           </div>
         </div>
@@ -404,8 +420,9 @@ export default async function ManageRestaurantPage({
                           className={`${inputCls} mt-0`}
                         />
                         <details>
-                          <summary className="cursor-pointer text-xs font-medium text-stone-500">
-                            🌐 Translations (EN/DE/IT)
+                          <summary className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-stone-500">
+                            <Languages className="h-3.5 w-3.5" strokeWidth={1.75} />
+                            Translations (EN/DE/IT)
                           </summary>
                           <div className="mt-2 space-y-2">
                             {(["en", "de", "it"] as const).map((loc) => (
@@ -458,8 +475,9 @@ export default async function ManageRestaurantPage({
       {/* ---- team (owner only) ---- */}
       {owner && inviteUrl && (
         <details className="mt-4 rounded-2xl border border-stone-200 bg-white shadow-sm">
-          <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-stone-700">
-            👥 Team
+          <summary className="flex cursor-pointer items-center gap-2 px-4 py-3 text-sm font-semibold text-stone-700">
+            <Users className="h-4 w-4 text-stone-500" strokeWidth={1.75} />
+            Team
           </summary>
           <div className="space-y-5 border-t border-stone-100 p-4">
             <div>
@@ -485,7 +503,7 @@ export default async function ManageRestaurantPage({
                   <span className="text-stone-700">
                     {restaurant.owner?.email ?? "—"}
                   </span>
-                  <span className="rounded-full bg-teal-100 px-2 py-0.5 text-[10px] font-bold uppercase text-teal-800">
+                  <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-bold uppercase text-accent-strong">
                     owner
                   </span>
                 </li>
@@ -515,8 +533,8 @@ export default async function ManageRestaurantPage({
       )}
 
       {/* ---- add dish ---- */}
-      <details className="mt-4 rounded-2xl border border-teal-200 bg-white shadow-sm">
-        <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-teal-800">
+      <details className="mt-4 rounded-2xl border border-accent-soft bg-white shadow-sm">
+        <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-accent-strong">
           + Add a dish
         </summary>
         <form
@@ -528,7 +546,7 @@ export default async function ManageRestaurantPage({
           <DishFormFields categories={categories} idPrefix="new" />
           <button
             type="submit"
-            className="mt-4 rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800"
+            className="mt-4 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-strong"
           >
             Add dish
           </button>
@@ -599,8 +617,11 @@ export default async function ManageRestaurantPage({
                             {dish.name}
                           </p>
                           {dish.featured && (
-                            <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">
-                              ★
+                            <span
+                              className="inline-flex items-center rounded-full bg-accent-soft px-1.5 py-1 text-accent-strong"
+                              title="Chef's pick"
+                            >
+                              <Star className="h-3 w-3 fill-current" strokeWidth={0} />
                             </span>
                           )}
                           {!dish.available && (
@@ -667,7 +688,7 @@ export default async function ManageRestaurantPage({
                         </form>
                       </div>
                       <details className="group">
-                        <summary className="cursor-pointer rounded-lg px-2.5 py-1.5 text-sm font-medium text-teal-700 hover:bg-teal-50">
+                        <summary className="cursor-pointer rounded-lg px-2.5 py-1.5 text-sm font-medium text-accent-strong hover:bg-accent-soft">
                           Edit
                         </summary>
                         <form
@@ -687,7 +708,7 @@ export default async function ManageRestaurantPage({
                           />
                           <button
                             type="submit"
-                            className="mt-4 rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800"
+                            className="mt-4 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-strong"
                           >
                             Save changes
                           </button>
@@ -758,7 +779,11 @@ function ReorderButton({
         aria-label={`Move ${direction}`}
         className="px-1.5 text-stone-400 hover:text-stone-700"
       >
-        {direction === "up" ? "▲" : "▼"}
+        {direction === "up" ? (
+          <ChevronUp className="h-4 w-4" strokeWidth={2} />
+        ) : (
+          <ChevronDown className="h-4 w-4" strokeWidth={2} />
+        )}
       </button>
     </form>
   );
@@ -846,9 +871,13 @@ function CategoryMove({
         type="submit"
         disabled={disabled}
         aria-label={`Move category ${direction}`}
-        className="px-1.5 text-xs text-stone-400 hover:text-stone-700 disabled:opacity-30"
+        className="px-1.5 text-stone-400 hover:text-stone-700 disabled:opacity-30"
       >
-        {direction === "up" ? "▲" : "▼"}
+        {direction === "up" ? (
+          <ChevronUp className="h-3.5 w-3.5" strokeWidth={2} />
+        ) : (
+          <ChevronDown className="h-3.5 w-3.5" strokeWidth={2} />
+        )}
       </button>
     </form>
   );

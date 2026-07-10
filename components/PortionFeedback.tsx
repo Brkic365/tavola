@@ -1,14 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ArrowDown, Check, ArrowUp, type LucideIcon } from "lucide-react";
 import { t, type Locale } from "@/lib/i18n";
 
 type Verdict = "smaller" | "as_expected" | "bigger";
 
-const OPTIONS: Array<{ verdict: Verdict; icon: string; labelKey: "fbSmaller" | "fbAsExpected" | "fbBigger" }> = [
-  { verdict: "smaller", icon: "▼", labelKey: "fbSmaller" },
-  { verdict: "as_expected", icon: "✓", labelKey: "fbAsExpected" },
-  { verdict: "bigger", icon: "▲", labelKey: "fbBigger" },
+const OPTIONS: Array<{
+  verdict: Verdict;
+  Icon: LucideIcon;
+  labelKey: "fbSmaller" | "fbAsExpected" | "fbBigger";
+}> = [
+  { verdict: "smaller", Icon: ArrowDown, labelKey: "fbSmaller" },
+  { verdict: "as_expected", Icon: Check, labelKey: "fbAsExpected" },
+  { verdict: "bigger", Icon: ArrowUp, labelKey: "fbBigger" },
 ];
 
 /**
@@ -63,7 +68,14 @@ export default function PortionFeedback({
       className="rounded-2xl border border-hair surface-2 px-4 py-3"
     >
       {voted ? (
-        <p className="text-sm text-soft">✓ {t(locale, "fbThanks")}</p>
+        <p className="inline-flex items-center gap-1.5 text-sm text-soft">
+          <Check
+            className="h-4 w-4"
+            strokeWidth={2}
+            style={{ color: "var(--olive)" }}
+          />
+          {t(locale, "fbThanks")}
+        </p>
       ) : (
         <>
           <p className="text-sm font-medium text-soft">
@@ -75,11 +87,9 @@ export default function PortionFeedback({
                 key={o.verdict}
                 type="button"
                 onClick={() => vote(o.verdict)}
-                className="flex-1 rounded-lg border border-hair surface px-2 py-1.5 text-sm font-medium text-soft transition hover:border-teal-400 hover:bg-teal-50"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-hair surface px-2 py-2 text-sm font-medium text-soft transition hover:border-[var(--brand)] hover:bg-brand-soft hover:text-strong"
               >
-                <span aria-hidden className="mr-1 text-xs">
-                  {o.icon}
-                </span>
+                <o.Icon className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
                 {t(locale, o.labelKey)}
               </button>
             ))}

@@ -219,7 +219,7 @@ export default function MenuBrowser({
             <button
               type="button"
               onClick={clearAll}
-              className="font-medium text-teal-700 hover:underline"
+              className="font-medium text-brand hover:underline"
             >
               {t(locale, "clearFilters")}
             </button>
@@ -276,7 +276,7 @@ export default function MenuBrowser({
           <button
             type="button"
             onClick={clearAll}
-            className="font-medium text-teal-700 hover:underline"
+            className="font-medium text-brand hover:underline"
           >
             {t(locale, "clearFilters")}
           </button>

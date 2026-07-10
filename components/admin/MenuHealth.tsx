@@ -1,3 +1,4 @@
+import { Check } from "lucide-react";
 import { scaleStatus } from "@/lib/scale";
 
 type HealthDish = {
@@ -34,7 +35,7 @@ const METRICS: Metric[] = [
   {
     key: "scale",
     label: "Verified to scale",
-    hint: "Measure the 3D model (📐 in each dish) so its size matches the stated dimensions — this earns the guest-facing “Verified to scale” badge.",
+    hint: "Use “Measure from 3D model” on each dish so its size matches the stated dimensions — this earns the guest-facing “Verified to scale” badge.",
     tone: "scale",
     ok: (d) =>
       scaleStatus(
@@ -45,7 +46,7 @@ const METRICS: Metric[] = [
   {
     key: "ios",
     label: "iOS AR ready",
-    hint: "Add a USDZ (⤓ Generate from GLB) so iPhone/iPad guests can launch AR.",
+    hint: "Add a USDZ (“Generate USDZ from GLB”) so iPhone/iPad guests can launch AR.",
     tone: "default",
     ok: (d) => !!d.usdzUrl,
   },
@@ -97,7 +98,7 @@ export default function MenuHealth({ dishes }: { dishes: HealthDish[] }) {
             ? "bg-emerald-500"
             : m.tone === "scale"
               ? "bg-amber-500"
-              : "bg-teal-500";
+              : "bg-accent";
 
           return (
             <div
@@ -105,8 +106,13 @@ export default function MenuHealth({ dishes }: { dishes: HealthDish[] }) {
               className="rounded-xl border border-stone-200 bg-stone-50 p-3"
             >
               <div className="flex items-baseline justify-between gap-2">
-                <span className="text-sm font-medium text-stone-800">
-                  {complete ? "✓ " : ""}
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-stone-800">
+                  {complete && (
+                    <Check
+                      className="h-4 w-4 text-accent-strong"
+                      strokeWidth={2}
+                    />
+                  )}
                   {m.label}
                 </span>
                 <span className="text-xs font-semibold tabular-nums text-stone-500">
@@ -123,7 +129,7 @@ export default function MenuHealth({ dishes }: { dishes: HealthDish[] }) {
 
               {!complete && (
                 <details className="group mt-2">
-                  <summary className="cursor-pointer text-xs font-medium text-teal-700 hover:underline">
+                  <summary className="cursor-pointer text-xs font-medium text-accent-strong hover:underline">
                     {missing.length}{" "}
                     {missing.length === 1 ? "dish needs" : "dishes need"} this
                   </summary>

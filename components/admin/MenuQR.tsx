@@ -24,7 +24,7 @@ export default async function MenuQR({ url }: { url: string }) {
       <a
         href={dataUrl}
         download="tavola-menu-qr.png"
-        className="text-xs font-medium text-teal-700 hover:underline"
+        className="text-xs font-medium text-accent-strong hover:underline"
       >
         Download PNG
       </a>

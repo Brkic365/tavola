@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Download } from "lucide-react";
 import { uploadAsset } from "@/lib/uploadAsset";
 
 // model-viewer needs a USDZ for iOS Quick Look. Rather than authoring one by
@@ -62,7 +63,7 @@ export default function UsdzGenerator({ idPrefix }: { idPrefix: string }) {
       const usdzInput = input("usdzUrl");
       if (usdzInput) usdzInput.value = url;
       setStatus("done");
-      setMsg(`✓ Generated — iOS AR is now enabled for this dish.`);
+      setMsg(`Generated — iOS AR is now enabled for this dish.`);
     } catch (e) {
       setStatus("error");
       setMsg(e instanceof Error ? e.message : "Conversion failed.");
@@ -75,9 +76,12 @@ export default function UsdzGenerator({ idPrefix }: { idPrefix: string }) {
         type="button"
         onClick={generate}
         disabled={status === "working"}
-        className="rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-60"
       >
-        {status === "working" ? "Converting…" : "⤓ Generate USDZ from GLB"}
+        {status !== "working" && (
+          <Download className="h-4 w-4" strokeWidth={1.75} />
+        )}
+        {status === "working" ? "Converting…" : "Generate USDZ from GLB"}
       </button>
       {msg && (
         <p
@@ -85,7 +89,7 @@ export default function UsdzGenerator({ idPrefix }: { idPrefix: string }) {
             status === "error"
               ? "text-red-600"
               : status === "done"
-                ? "text-teal-700"
+                ? "text-accent-strong"
                 : "text-stone-500"
           }`}
         >

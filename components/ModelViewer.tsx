@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Ruler, Scan } from "lucide-react";
 import { t, type Locale } from "@/lib/i18n";
 
 type Props = {
@@ -288,13 +289,14 @@ export default function ModelViewer({
             type="button"
             onClick={() => setShowDims((s) => !s)}
             aria-pressed={showDims}
-            className={`absolute right-3 top-3 z-10 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm ring-1 transition ${
+            className={`absolute right-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm ring-1 transition ${
               showDims
-                ? "bg-teal-700 text-white ring-teal-700"
+                ? "bg-brand text-white ring-brand"
                 : "bg-white/95 text-stone-700 ring-stone-200 hover:bg-white"
             }`}
           >
-            📐 {showDims ? "Hide sizes" : "Dimensions"}
+            <Ruler className="h-3.5 w-3.5" strokeWidth={1.75} />
+            {showDims ? "Hide sizes" : "Dimensions"}
           </button>
         )}
 
@@ -302,9 +304,10 @@ export default function ModelViewer({
           <button
             type="button"
             onClick={launchAR}
-            className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-teal-700 px-6 py-3 text-sm font-semibold text-white shadow-lg ring-1 ring-black/5 transition active:scale-95"
+            className="absolute bottom-4 left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white shadow-lg ring-1 ring-black/5 transition active:scale-95"
           >
-            📐 {t(locale, "viewInSpace")}
+            <Scan className="h-4 w-4" strokeWidth={2} />
+            {t(locale, "viewInSpace")}
           </button>
         )}
       </div>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import QRCode from "qrcode";
+import { Ruler } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, canManageRestaurant } from "@/lib/session";
 import { brandStyle } from "@/lib/theme";
@@ -90,7 +91,7 @@ export default async function TableCardPage({ params, searchParams }: Props) {
       <div className="mb-4 flex items-center justify-between print:hidden">
         <Link
           href={`/admin/${slug}`}
-          className="text-sm font-medium text-teal-700 hover:underline"
+          className="text-sm font-medium text-accent-strong hover:underline"
         >
           ← Back to manage
         </Link>
@@ -109,7 +110,7 @@ export default async function TableCardPage({ params, searchParams }: Props) {
             max={MAX_TABLES}
             defaultValue={tableCount || ""}
             placeholder="e.g. 12"
-            className="mt-1 w-32 rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+            className="mt-1 w-32 rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           />
         </label>
         <button
@@ -175,7 +176,8 @@ export default async function TableCardPage({ params, searchParams }: Props) {
                 {t(locale, "scanHowto")}
               </p>
               <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
-                📐 {t(locale, "tagline")}
+                <Ruler className="h-3.5 w-3.5" strokeWidth={1.75} />
+                {t(locale, "tagline")}
               </p>
             </div>
 

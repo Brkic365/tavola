@@ -6,7 +6,7 @@ export const metadata = { title: "Create account · Tavola" };
 type Search = { searchParams: Promise<{ error?: string }> };
 
 const inputCls =
-  "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500";
+  "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent";
 
 export default async function SignupPage({ searchParams }: Search) {
   const { error } = await searchParams;
@@ -63,7 +63,7 @@ export default async function SignupPage({ searchParams }: Search) {
 
           <button
             type="submit"
-            className="w-full rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800"
+            className="w-full rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-strong"
           >
             Create account
           </button>
@@ -71,7 +71,7 @@ export default async function SignupPage({ searchParams }: Search) {
 
         <p className="mt-4 text-sm text-stone-500">
           Already have an account?{" "}
-          <Link href="/admin/login" className="font-medium text-teal-700 hover:underline">
+          <Link href="/admin/login" className="font-medium text-accent-strong hover:underline">
             Sign in
           </Link>
         </p>

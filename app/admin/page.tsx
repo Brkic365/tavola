@@ -11,7 +11,7 @@ export const metadata = { title: "Admin · Tavola" };
 export const dynamic = "force-dynamic";
 
 const inputCls =
-  "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500";
+  "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent";
 
 export default async function AdminPage() {
   const user = await getCurrentUser();
@@ -43,7 +43,7 @@ export default async function AdminPage() {
           <span className="hidden text-stone-500 sm:inline">
             {user.email}
             {user.role === "ADMIN" && (
-              <span className="ml-1 rounded-full bg-teal-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-teal-800">
+              <span className="ml-1 rounded-full bg-accent-soft px-1.5 py-0.5 text-[10px] font-bold uppercase text-accent-strong">
                 admin
               </span>
             )}
@@ -87,7 +87,7 @@ export default async function AdminPage() {
                 <li key={r.id}>
                   <Link
                     href={`/admin/${r.slug}`}
-                    className="flex items-center justify-between rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition hover:border-teal-300"
+                    className="flex items-center justify-between rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition hover:border-accent"
                   >
                     <div>
                       <p className="font-semibold text-stone-900">{r.name}</p>
@@ -95,7 +95,7 @@ export default async function AdminPage() {
                         /r/{r.slug} · {r._count.dishes} dishes
                       </p>
                     </div>
-                    <span className="text-teal-700">Manage →</span>
+                    <span className="text-accent-strong">Manage →</span>
                   </Link>
                 </li>
               ))}
@@ -155,7 +155,7 @@ export default async function AdminPage() {
             </div>
             <button
               type="submit"
-              className="w-full rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800"
+              className="w-full rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-strong"
             >
               Create restaurant
             </button>

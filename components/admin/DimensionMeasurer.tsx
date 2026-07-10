@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Ruler, BadgeCheck, TriangleAlert, ArrowRight } from "lucide-react";
 import { scaleStatus, type ScaleStatus } from "@/lib/scale";
 
 // model-viewer exposes getDimensions() → bounding box in metres (models are
@@ -150,17 +151,19 @@ export default function DimensionMeasurer({
         <button
           type="button"
           onClick={startMeasure}
-          className="rounded-lg border border-teal-300 bg-teal-50 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-100"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-accent-soft bg-accent-soft px-3 py-1.5 text-sm font-medium text-accent-strong hover:bg-accent-soft"
         >
-          📐 Measure from 3D model
+          <Ruler className="h-4 w-4" strokeWidth={1.75} />
+          Measure from 3D model
         </button>
         {measured && (
           <button
             type="button"
             onClick={applyToStated}
-            className="rounded-lg border border-stone-300 px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-stone-300 px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50"
           >
-            Use measured size →
+            Use measured size
+            <ArrowRight className="h-4 w-4" strokeWidth={2} />
           </button>
         )}
         {status === "loading" && (
@@ -183,14 +186,21 @@ export default function DimensionMeasurer({
             (W × D × H)
           </p>
           {scale === "verified" && (
-            <p className="font-medium text-teal-700">
-              ✓ Matches the stated size — this dish is true to scale.
+            <p className="flex items-center gap-1.5 font-medium text-accent-strong">
+              <BadgeCheck className="h-4 w-4 shrink-0" strokeWidth={2} />
+              Matches the stated size — this dish is true to scale.
             </p>
           )}
           {scale === "mismatch" && (
-            <p className="font-medium text-amber-700">
-              ⚠ Doesn&apos;t match the stated size. Tap “Use measured size”, or
-              swap in a model authored at 1 unit = 1 metre.
+            <p className="flex items-start gap-1.5 font-medium text-amber-700">
+              <TriangleAlert
+                className="mt-0.5 h-4 w-4 shrink-0"
+                strokeWidth={1.75}
+              />
+              <span>
+                Doesn&apos;t match the stated size. Tap “Use measured size”, or
+                swap in a model authored at 1 unit = 1 metre.
+              </span>
             </p>
           )}
           {scale === "unknown" && (

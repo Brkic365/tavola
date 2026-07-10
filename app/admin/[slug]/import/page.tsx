@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { Upload, CircleCheck, ArrowUpRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, canManageRestaurant } from "@/lib/session";
 import { importMenuCsv } from "@/app/admin/actions";
@@ -44,7 +45,7 @@ export default async function ImportPage({ params, searchParams }: Props) {
     <main id="main-content" className="mx-auto w-full max-w-2xl flex-1 px-5 py-8">
       <Link
         href={`/admin/${slug}`}
-        className="text-sm font-medium text-teal-700 hover:underline"
+        className="text-sm font-medium text-accent-strong hover:underline"
       >
         ← Back to manage
       </Link>
@@ -65,11 +66,17 @@ export default async function ImportPage({ params, searchParams }: Props) {
         </p>
       )}
       {created !== null && (
-        <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
-          ✓ Import complete — {created} created, {updated} updated
+        <p className="mt-4 flex flex-wrap items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+          <CircleCheck className="h-4 w-4 shrink-0" strokeWidth={2} />
+          Import complete — {created} created, {updated} updated
           {skipped > 0 ? `, ${skipped} skipped (no name)` : ""}.{" "}
-          <Link href={`/r/${slug}`} className="underline" target="_blank">
-            View the menu ↗
+          <Link
+            href={`/r/${slug}`}
+            className="inline-flex items-center gap-0.5 underline"
+            target="_blank"
+          >
+            View the menu
+            <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2} />
           </Link>
         </p>
       )}
@@ -89,14 +96,15 @@ export default async function ImportPage({ params, searchParams }: Props) {
             name="file"
             accept=".csv,text/csv"
             required
-            className="mt-2 block w-full text-sm text-stone-600 file:mr-3 file:rounded-lg file:border-0 file:bg-teal-700 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-teal-800"
+            className="mt-2 block w-full text-sm text-stone-600 file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-accent-strong"
           />
         </label>
         <button
           type="submit"
-          className="mt-4 rounded-lg bg-stone-800 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-900"
+          className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-stone-800 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-900"
         >
-          ⤒ Import
+          <Upload className="h-4 w-4" strokeWidth={1.75} />
+          Import
         </button>
       </form>
 
@@ -106,7 +114,7 @@ export default async function ImportPage({ params, searchParams }: Props) {
           Same columns as the{" "}
           <a
             href={`/admin/${slug}/export`}
-            className="font-medium text-teal-700 hover:underline"
+            className="font-medium text-accent-strong hover:underline"
           >
             CSV export
           </a>{" "}

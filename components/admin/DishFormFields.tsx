@@ -1,3 +1,4 @@
+import { Languages, UtensilsCrossed } from "lucide-react";
 import { BUNDLED_GLB, BUNDLED_USDZ } from "@/lib/bundledModels";
 import { KNOWN_DIETARY } from "@/lib/dietary";
 import { LOCALES } from "@/lib/i18n";
@@ -37,7 +38,7 @@ type DishDefaults = {
 type TrMap = Record<string, { name?: string; description?: string }>;
 
 const inputCls =
-  "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500";
+  "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent";
 const labelCls = "block text-sm font-medium text-stone-700";
 
 function v(value: string | number | null | undefined): string | number {
@@ -113,8 +114,9 @@ export default function DishFormFields({
 
       {/* Per-locale translations (the name/description above are the base). */}
       <details className="col-span-2 rounded-xl border border-stone-200 bg-stone-50 p-3">
-        <summary className="cursor-pointer text-sm font-medium text-stone-700">
-          🌐 Translations (optional)
+        <summary className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-stone-700">
+          <Languages className="h-4 w-4 text-stone-500" strokeWidth={1.75} />
+          Translations (optional)
         </summary>
         <div className="mt-3 space-y-3">
           {TRANSLATION_LOCALES.map((l) => {
@@ -148,8 +150,9 @@ export default function DishFormFields({
         className="col-span-2 rounded-xl border border-stone-200 bg-stone-50 p-3"
         open={parseVariants(dish?.variants).length > 0}
       >
-        <summary className="cursor-pointer text-sm font-medium text-stone-700">
-          🍽 Portion sizes (optional)
+        <summary className="flex cursor-pointer items-center gap-1.5 text-sm font-medium text-stone-700">
+          <UtensilsCrossed className="h-4 w-4 text-stone-500" strokeWidth={1.75} />
+          Portion sizes (optional)
         </summary>
         <p className="mt-2 text-xs text-stone-500">
           Offer small/large portions with their own price and weight. When set,
@@ -397,7 +400,7 @@ export default function DishFormFields({
           name="featured"
           type="checkbox"
           defaultChecked={dish?.featured ?? false}
-          className="h-4 w-4 rounded border-stone-300 text-teal-600 focus:ring-teal-500"
+          className="h-4 w-4 rounded border-stone-300 text-accent-strong focus:ring-accent"
         />
         <span className="text-sm font-medium text-stone-700">
           Feature this dish (Chef&apos;s pick)

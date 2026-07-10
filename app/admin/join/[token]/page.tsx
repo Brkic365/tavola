@@ -40,7 +40,7 @@ export default async function JoinPage({ params }: Params) {
             </p>
             <Link
               href="/admin"
-              className="mt-4 inline-block rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800"
+              className="mt-4 inline-block rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-strong"
             >
               Go to admin
             </Link>
@@ -59,7 +59,7 @@ export default async function JoinPage({ params }: Params) {
               <input type="hidden" name="token" value={token} />
               <button
                 type="submit"
-                className="w-full rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800"
+                className="w-full rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-strong"
               >
                 Join as manager
               </button>

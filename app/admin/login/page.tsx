@@ -6,7 +6,7 @@ export const metadata = { title: "Admin sign in · Tavola" };
 type Search = { searchParams: Promise<{ error?: string; next?: string }> };
 
 const inputCls =
-  "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500";
+  "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent";
 
 export default async function LoginPage({ searchParams }: Search) {
   const { error, next } = await searchParams;
@@ -54,7 +54,7 @@ export default async function LoginPage({ searchParams }: Search) {
 
           <button
             type="submit"
-            className="w-full rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800"
+            className="w-full rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-strong"
           >
             Sign in
           </button>
@@ -62,7 +62,7 @@ export default async function LoginPage({ searchParams }: Search) {
 
         <p className="mt-4 text-sm text-stone-500">
           New here?{" "}
-          <Link href="/admin/signup" className="font-medium text-teal-700 hover:underline">
+          <Link href="/admin/signup" className="font-medium text-accent-strong hover:underline">
             Create an account
           </Link>
         </p>
