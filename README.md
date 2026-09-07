@@ -1,6 +1,6 @@
 # Tavola 🍽️📐
 
-**True-to-scale AR dish preview for restaurant menus.**
+**True-to-scale AR dish preview for restaurant menus**
 
 A guest scans a QR code at the table, opens the menu, taps a dish, and views it
 in **AR at real-world scale** in front of them. The hero value isn't the AR
