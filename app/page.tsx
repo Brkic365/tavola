@@ -11,6 +11,12 @@ import {
   Leaf,
   ArrowRight,
   ArrowUpRight,
+  BarChart3,
+  Languages,
+  BadgeCheck,
+  Printer,
+  FileSpreadsheet,
+  ClipboardCheck,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import Hero3D from "@/components/Hero3D";
@@ -52,12 +58,12 @@ export default async function Home() {
             >
               Why it matters
             </a>
-            <Link
-              href="/admin"
+            <a
+              href="#for-restaurants"
               className="text-soft transition-colors hover:text-strong"
             >
               For restaurants
-            </Link>
+            </a>
             <Link
               href={demoHref}
               className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 font-medium text-white shadow-sm transition-colors hover:bg-accent-strong"
@@ -72,7 +78,7 @@ export default async function Home() {
       {/* ---- hero ---- */}
       <section id="main-content" className={`${SECTION} pt-16 pb-14 md:pt-24`}>
         <div className="grid items-center gap-14 md:grid-cols-[1.05fr_0.95fr]">
-          <div>
+          <div className="animate-rise">
             <span className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-accent-strong">
               <Ruler className="h-3.5 w-3.5" strokeWidth={2} />
               True-to-scale AR menu
@@ -109,7 +115,7 @@ export default async function Home() {
           </div>
 
           {/* live 3D showpiece */}
-          <div className="relative">
+          <div className="animate-rise-late relative">
             <div
               aria-hidden
               className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-[radial-gradient(60%_60%_at_50%_35%,var(--accent-soft),transparent)]"
@@ -279,8 +285,92 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* ---- for restaurants (the buyer) ---- */}
+      <section id="for-restaurants" className={`${SECTION} py-20`}>
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-strong">
+            For restaurants
+          </p>
+          <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-strong">
+            A menu tool, not just a party trick.
+          </h2>
+          <p className="mt-4 text-lg leading-relaxed text-soft">
+            Behind the guest experience is a full menu dashboard — built for a
+            busy service, not for a software manual.
+          </p>
+        </div>
+        <div className="mt-14 grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            {
+              Icon: BarChart3,
+              title: "Analytics that prove it",
+              body: "See which dishes guests view and place in AR — per table — and hear directly whether portions matched expectations.",
+            },
+            {
+              Icon: Languages,
+              title: "Four languages built in",
+              body: "English, Croatian, German and Italian out of the box, with your own default. Made for a tourist dining room.",
+            },
+            {
+              Icon: BadgeCheck,
+              title: "“Verified to scale” is earned",
+              body: "Stated dimensions are checked against the actual 3D model. The trust badge only appears when they match.",
+            },
+            {
+              Icon: Printer,
+              title: "Table cards in one click",
+              body: "Print-ready, numbered QR cards for every table — branded with your logo and colour.",
+            },
+            {
+              Icon: FileSpreadsheet,
+              title: "Your menu, in a spreadsheet",
+              body: "Export the whole menu as CSV, edit it in Excel, import it back. Sold-out, prices, sizes — all bulk-editable.",
+            },
+            {
+              Icon: ClipboardCheck,
+              title: "Menu health at a glance",
+              body: "A checklist that shows exactly which dishes still need sizes, translations or an iOS model — and how to fix them.",
+            },
+          ].map((f) => (
+            <div key={f.title} className="flex gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent-strong">
+                <f.Icon className="h-5 w-5" strokeWidth={1.75} />
+              </div>
+              <div>
+                <h3 className="font-serif text-lg font-semibold text-strong">
+                  {f.title}
+                </h3>
+                <p className="mt-1.5 text-[15px] leading-relaxed text-soft">
+                  {f.body}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mx-auto mt-14 flex max-w-2xl flex-col items-center gap-4 rounded-3xl border border-hair surface p-8 text-center shadow-sm sm:flex-row sm:text-left">
+          <div className="flex-1">
+            <h3 className="font-serif text-2xl font-semibold text-strong">
+              Pilot it free.
+            </h3>
+            <p className="mt-1.5 text-[15px] leading-relaxed text-soft">
+              We set up your first dishes, print the table cards, and run it
+              for a month. If your guests don&apos;t love it, take it off the
+              tables — nothing lost.
+            </p>
+          </div>
+          <Link
+            href="/admin"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-strong"
+          >
+            Start with your menu
+            <ArrowRight className="h-4 w-4" strokeWidth={2} />
+          </Link>
+        </div>
+      </section>
+
       {/* ---- live demo ---- */}
-      <section className={`${SECTION} py-20`}>
+      <section className="border-t border-hair surface-2">
+        <div className={`${SECTION} py-20`}>
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-strong">
             Try it now
@@ -321,6 +411,7 @@ export default async function Home() {
             ))}
           </ul>
         )}
+        </div>
       </section>
 
       {/* ---- closing CTA ---- */}

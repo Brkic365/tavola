@@ -212,8 +212,6 @@ export default async function DishPage({ params }: Params) {
           locale={locale}
         />
 
-        <PortionFeedback dishId={dish.id} locale={locale} />
-
         {(dietary.length > 0 || dish.calories != null) && (
           <section className="flex flex-wrap items-center gap-2">
             {dish.calories != null && (
@@ -263,6 +261,8 @@ export default async function DishPage({ params }: Params) {
             </ul>
           </section>
         )}
+
+        <PortionFeedback dishId={dish.id} locale={locale} />
 
         {siblings.length > 0 && (
           <section aria-label={t(locale, "moreDishes")}>

@@ -124,8 +124,8 @@ export default function DishFormFields({
               (dish?.translations as TrMap | null | undefined)?.[l.code] ?? {};
             return (
               <div key={l.code} className="grid grid-cols-2 gap-2">
-                <label className="col-span-2 text-xs font-semibold text-stone-500">
-                  {l.flag} {l.label}
+                <label className="col-span-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
+                  {l.label}
                 </label>
                 <input
                   name={`tr_${l.code}_name`}

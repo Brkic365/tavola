@@ -264,7 +264,7 @@ export default async function ManageRestaurantPage({
               >
                 {LOCALES.map((l) => (
                   <option key={l.code} value={l.code}>
-                    {l.flag} {l.label}
+                    {l.label}
                   </option>
                 ))}
               </select>

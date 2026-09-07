@@ -3,10 +3,10 @@
 // Base content (Dish.name/description) is the restaurant's own language.
 
 export const LOCALES = [
-  { code: "en", label: "English", flag: "🇬🇧" },
-  { code: "hr", label: "Hrvatski", flag: "🇭🇷" },
-  { code: "de", label: "Deutsch", flag: "🇩🇪" },
-  { code: "it", label: "Italiano", flag: "🇮🇹" },
+  { code: "en", label: "English" },
+  { code: "hr", label: "Hrvatski" },
+  { code: "de", label: "Deutsch" },
+  { code: "it", label: "Italiano" },
 ] as const;
 
 export type Locale = (typeof LOCALES)[number]["code"];
