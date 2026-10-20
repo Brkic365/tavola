@@ -19,6 +19,7 @@ import ViewBeacon from "@/components/ViewBeacon";
 import PortionFeedback from "@/components/PortionFeedback";
 import TableCapture from "@/components/TableCapture";
 import DishThumb from "@/components/DishThumb";
+import { libraryUsdz } from "@/lib/bundledModels";
 
 type Params = { params: Promise<{ slug: string; id: string }> };
 
@@ -122,7 +123,7 @@ export default async function DishPage({ params }: Params) {
       {/* 3D + AR viewer (client component). True-to-scale via ar-scale="fixed". */}
       <ModelViewer
         src={dish.glbUrl}
-        iosSrc={dish.usdzUrl}
+        iosSrc={dish.usdzUrl ?? libraryUsdz(dish.glbUrl)}
         alt={`3D model of ${content.name}`}
         dishId={dish.id}
         locale={locale}

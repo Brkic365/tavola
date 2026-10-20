@@ -14,7 +14,13 @@ export const DISH_LIBRARY = [
   ...m,
   glbUrl: `/models/dishes/${m.slug}.glb`,
   thumbnailUrl: `/models/dishes/${m.slug}.jpg`,
+  usdzUrl: `/models/dishes/${m.slug}.usdz`,
 }));
+
+/** iOS model for a library GLB, so dishes saved before the USDZ files existed still get iPhone AR. */
+export function libraryUsdz(glbUrl: string): string | null {
+  return DISH_LIBRARY.find((m) => m.glbUrl === glbUrl)?.usdzUrl ?? null;
+}
 
 // Generic sample models (not food).
 export const BUNDLED_GLB = [
@@ -26,7 +32,8 @@ export const BUNDLED_GLB = [
   { url: "/models/astronaut.glb", label: "Astronaut (has USDZ)" },
 ];
 
-// USDZ is only needed for iOS Quick Look. Only the astronaut ships one.
+// USDZ is only needed for iOS Quick Look.
 export const BUNDLED_USDZ = [
+  ...DISH_LIBRARY.map((m) => ({ url: m.usdzUrl, label: m.label })),
   { url: "/models/astronaut.usdz", label: "Astronaut" },
 ];
