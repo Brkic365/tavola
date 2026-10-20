@@ -65,9 +65,12 @@ export default function PortionPanel({
         </dl>
       )}
 
-      <p className="mt-4 text-xs leading-relaxed text-brand-strong/80">
-        {t(locale, "lifeSizeNote")}
-      </p>
+      {/* Only claim real size when the model is verified against the dish. */}
+      {verified && (
+        <p className="mt-4 text-xs leading-relaxed text-brand-strong/80">
+          {t(locale, "lifeSizeNote")}
+        </p>
+      )}
     </section>
   );
 }

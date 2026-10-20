@@ -19,12 +19,13 @@ export default async function JoinPage({ params }: Params) {
   }
 
   const inv = await verifyInviteToken(token);
-  const restaurant = inv
+  const found = inv
     ? await prisma.restaurant.findUnique({
         where: { id: inv.restaurantId },
-        select: { name: true },
+        select: { name: true, inviteVersion: true },
       })
     : null;
+  const restaurant = found?.inviteVersion === inv?.version ? found : null;
 
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-5 py-16">

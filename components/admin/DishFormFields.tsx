@@ -6,6 +6,7 @@ import { parseVariants } from "@/lib/variants";
 import DimensionMeasurer from "@/components/admin/DimensionMeasurer";
 import UsdzGenerator from "@/components/admin/UsdzGenerator";
 import FileUpload from "@/components/admin/FileUpload";
+import ModelLibrary from "@/components/admin/ModelLibrary";
 
 // Locales offered for translation (base content is the main name/description).
 const TRANSLATION_LOCALES = LOCALES.filter((l) => l.code !== "hr");
@@ -192,6 +193,8 @@ export default function DishFormFields({
           })}
         </div>
       </details>
+
+      <ModelLibrary idPrefix={idPrefix} />
 
       <div className="col-span-2">
         <label>

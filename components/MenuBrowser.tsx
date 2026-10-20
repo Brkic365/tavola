@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Search, X, Star } from "lucide-react";
+import { Search, X, Star, Plus, Check } from "lucide-react";
 import DishCard from "@/components/DishCard";
 import DishThumb from "@/components/DishThumb";
+import TablePlanner from "@/components/TablePlanner";
 import { formatPrice } from "@/lib/format";
 import { parseDietary, type DietaryInfo } from "@/lib/dietary";
 import { parseAllergens, type AllergenInfo } from "@/lib/allergens";
@@ -29,6 +30,10 @@ export type MenuDish = {
   available: boolean;
   variants?: unknown;
 };
+
+// Case- and accent-insensitive, so "rizot" finds "rižot" (đ has no decomposition).
+const fold = (s: string) =>
+  s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/gi, "d").toLowerCase();
 
 type Group = {
   key: string;
@@ -79,6 +84,35 @@ export default function MenuBrowser({
   const [avoid, setAvoid] = useState<Set<string>>(new Set());
   const [query, setQuery] = useState("");
 
+  // "My table" picks, kept per restaurant so a reload or dish visit keeps them.
+  const storeKey = `tavola_table_${slug}`;
+  const [picks, setPicks] = useState<Record<string, number>>({});
+  const [party, setParty] = useState(2);
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(storeKey) ?? "null");
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate after mount (SSR has no storage)
+      if (saved?.picks) setPicks(saved.picks);
+      if (saved?.party) setParty(saved.party);
+    } catch {}
+    setLoaded(true);
+  }, [storeKey]);
+  useEffect(() => {
+    if (!loaded) return;
+    try {
+      localStorage.setItem(storeKey, JSON.stringify({ picks, party }));
+    } catch {}
+  }, [loaded, storeKey, picks, party]);
+  function setQty(id: string, qty: number) {
+    setPicks((prev) => {
+      const next = { ...prev };
+      if (qty > 0) next[id] = qty;
+      else delete next[id];
+      return next;
+    });
+  }
+
   function toggle(setter: typeof setDiet, key: string) {
     setter((prev) => {
       const next = new Set(prev);
@@ -89,10 +123,10 @@ export default function MenuBrowser({
   }
 
   const filteredGroups = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = fold(query.trim());
     const matches = (d: MenuDish) => {
       if (q) {
-        const hay = `${d.name} ${d.description ?? ""}`.toLowerCase();
+        const hay = fold(`${d.name} ${d.description ?? ""}`);
         if (!hay.includes(q)) return false;
       }
       const dTags = new Set(parseDietary(d.dietary).map((x) => x.key));
@@ -202,7 +236,8 @@ export default function MenuBrowser({
                       }`}
                     >
                       <Icon className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
-                      {t(locale, "no")} {a.label.toLowerCase()}
+                      {/* "No dairy" only reads right in English; the "Avoid" heading covers other languages. */}
+                      {locale === "en" ? `No ${a.label.toLowerCase()}` : a.label}
                     </button>
                   );
                 })}
@@ -328,13 +363,31 @@ export default function MenuBrowser({
               )}
               <ul className="divide-y divide-[var(--hairline)] overflow-hidden rounded-2xl border border-hair surface shadow-sm">
                 {group.dishes.map((dish) => (
-                  <li key={dish.id}>
+                  <li key={dish.id} className="relative">
                     <DishCard
                       slug={slug}
                       currency={currency}
                       dish={dish}
                       locale={locale}
                     />
+                    {dish.available && (
+                      <button
+                        type="button"
+                        onClick={() => setQty(dish.id, (picks[dish.id] ?? 0) + 1)}
+                        aria-label={`${t(locale, "addToTable")}: ${dish.name}`}
+                        className="absolute bottom-4 right-5 inline-flex items-center gap-1 rounded-full surface-2 px-3 py-1 text-xs font-semibold text-strong ring-1 ring-[var(--hairline)] transition hover:bg-[var(--hairline)]"
+                      >
+                        {picks[dish.id] ? (
+                          <>
+                            <Check className="h-3.5 w-3.5 text-brand" strokeWidth={2.25} aria-hidden />
+                            <span>{picks[dish.id]} ·</span>
+                          </>
+                        ) : (
+                          <Plus className="h-3.5 w-3.5" strokeWidth={2.25} aria-hidden />
+                        )}
+                        {t(locale, "myTable")}
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -391,6 +444,18 @@ export default function MenuBrowser({
           )}
         </details>
       )}
+
+      <TablePlanner
+        dishes={allDishes}
+        picks={picks}
+        setQty={setQty}
+        party={party}
+        setParty={setParty}
+        currency={currency}
+        locale={locale}
+      />
+      {/* keep the last dishes reachable above the fixed bar */}
+      {Object.keys(picks).length > 0 && <div className="h-32" aria-hidden />}
     </div>
   );
 }

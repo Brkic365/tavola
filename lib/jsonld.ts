@@ -3,6 +3,7 @@
 
 import { parseDietary } from "@/lib/dietary";
 import { parseVariants, minVariantPrice } from "@/lib/variants";
+import { parseHours, DAY_KEYS } from "@/lib/hours";
 
 // schema.org/RestrictedDiet values we can map our dietary tags onto.
 const DIET_SCHEMA: Record<string, string> = {
@@ -37,10 +38,15 @@ export function menuJsonLd(
     address: string | null;
     phone: string | null;
     website: string | null;
+    openingHours?: unknown;
   },
   groups: JsonLdGroup[],
   menuUrl: string,
 ): string {
+  // schema.org openingHours: "Mo 12:00-23:00" per open day.
+  const hours = parseHours(restaurant.openingHours)
+    ?.map((d, i) => (d ? `${DAY_KEYS[i]} ${d.open}-${d.close}` : null))
+    .filter(Boolean);
   const data = {
     "@context": "https://schema.org",
     "@type": "Restaurant",
@@ -48,6 +54,7 @@ export function menuJsonLd(
     url: restaurant.website ?? menuUrl,
     ...(restaurant.address ? { address: restaurant.address } : {}),
     ...(restaurant.phone ? { telephone: restaurant.phone } : {}),
+    ...(hours ? { openingHours: hours } : {}),
     hasMenu: {
       "@type": "Menu",
       url: menuUrl,
