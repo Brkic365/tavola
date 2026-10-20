@@ -17,6 +17,7 @@ export default function ModelLibrary({ idPrefix }: { idPrefix: string }) {
     };
     set("glbUrl", m.glbUrl);
     set("thumbnailUrl", m.thumbnailUrl);
+    set("usdzUrl", m.usdzUrl);
     setPicked(m.slug);
   }
 
@@ -44,7 +45,7 @@ export default function ModelLibrary({ idPrefix }: { idPrefix: string }) {
       </div>
       {picked && (
         <p className="mt-2 text-xs text-stone-500">
-          Model and thumbnail filled in. Use “Measure from 3D model” below to check the stated size.
+          Model, iOS AR model and thumbnail filled in. Use “Measure from 3D model” below to check the stated size.
         </p>
       )}
     </details>
