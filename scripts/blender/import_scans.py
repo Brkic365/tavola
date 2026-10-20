@@ -1,7 +1,9 @@
 # Turn downloaded food scans (public/models/scanned/<name>/...) into web-ready,
-# true-to-scale GLBs at public/models/dishes/<slug>.glb (+ .jpg thumbnail).
+# true-to-scale GLBs at public/models/dishes/<slug>.glb (+ .jpg thumbnail, and a
+# .usdz for iOS Quick Look AR).
 #
 #   blender --background --factory-startup --python scripts/blender/import_scans.py
+#   USDZ_ONLY=1 blender ...   # just rebuild the .usdz files from the existing GLBs
 #
 # Per scan: import, level (dominant surface normal -> up), square the long side
 # to X, optionally strip the table it was scanned on, decimate, keep only the
@@ -212,11 +214,26 @@ def render_thumb(path, dims):
     bpy.ops.render.render(write_still=True)
 
 
+def export_usdz(slug):
+    """USDZ from the finished GLB so both formats are identical: metres, Y-up."""
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    bpy.ops.import_scene.gltf(filepath=os.path.join(OUT, f"{slug}.glb"))
+    bpy.ops.wm.usd_export(filepath=os.path.join(OUT, f"{slug}.usdz"), selected_objects_only=False,
+                          export_materials=True, generate_preview_surface=True, export_textures_mode="NEW",
+                          convert_orientation=True, export_global_forward_selection="NEGATIVE_Z",
+                          export_global_up_selection="Y", convert_scene_units="METERS",
+                          usdz_downscale_size="2048", triangulate_meshes=True,
+                          export_lights=False, export_cameras=False, root_prim_path=f"/{slug.replace('-', '_')}")
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     only = os.environ.get("SCANS")  # e.g. SCANS=rozata,plata-za-2 to redo a few
     for slug, rel, long_cm, table, fix in SCANS:
         if only and slug not in only.split(","):
+            continue
+        if os.environ.get("USDZ_ONLY"):
+            export_usdz(slug)
             continue
         bpy.ops.wm.read_factory_settings(use_empty=True)
         import_any(os.path.join(SCANNED, rel))
@@ -235,6 +252,7 @@ def main():
             bpy.ops.export_scene.gltf(filepath=glb, export_format="GLB", use_selection=True,
                                       export_image_format="JPEG", export_jpeg_quality=82)
         render_thumb(os.path.join(OUT, f"{slug}.jpg"), dims)
+        export_usdz(slug)
         print(f"[scan] {slug}: {dims[0]:.1f} x {dims[1]:.1f} x {dims[2]:.1f} cm, "
               f"{len(ob.data.polygons)} faces, {os.path.getsize(glb) / 1048576:.2f} MB")
 
