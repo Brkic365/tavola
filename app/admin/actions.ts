@@ -16,6 +16,7 @@ import {
 import { getCurrentUser } from "@/lib/session";
 import { parseCsv } from "@/lib/csv";
 import { hoursFromForm } from "@/lib/hours";
+import { createDemoRestaurant } from "@/lib/demoMenu";
 import { clientKey, rateLimit, clearRateLimit } from "@/lib/ratelimit";
 
 // ---- auth -----------------------------------------------------------------
@@ -254,6 +255,15 @@ export async function createRestaurant(formData: FormData) {
     },
   });
 
+  revalidatePath("/admin");
+  redirect(`/admin/${slug}`);
+}
+
+/** Add the sample Konoba Tavola menu (scanned dishes), owned by the caller. */
+export async function addDemoRestaurant() {
+  const user = await requireUser();
+  const slug = await ensureUniqueSlug("tavola-demo");
+  await createDemoRestaurant(prisma, { ownerId: user.id, slug });
   revalidatePath("/admin");
   redirect(`/admin/${slug}`);
 }

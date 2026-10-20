@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/session";
-import { createRestaurant, logout } from "./actions";
+import { addDemoRestaurant, createRestaurant, logout } from "./actions";
 
 // Gated by proxy.ts (session cookie). Multi-tenant: OWNERs see their own
 // restaurants, platform ADMINs see all.
@@ -75,11 +75,7 @@ export default async function AdminPage() {
           </h2>
           {restaurants.length === 0 ? (
             <p className="rounded-xl border border-dashed border-stone-300 p-6 text-sm text-stone-500">
-              None yet — create one, or run{" "}
-              <code className="rounded bg-stone-100 px-1.5 py-0.5">
-                npm run db:seed
-              </code>
-              .
+              None yet — create one, or start from the sample menu below.
             </p>
           ) : (
             <ul className="space-y-2">
@@ -101,6 +97,14 @@ export default async function AdminPage() {
               ))}
             </ul>
           )}
+          <form action={addDemoRestaurant} className="mt-3">
+            <button
+              type="submit"
+              className="w-full rounded-xl border border-dashed border-stone-300 p-3 text-sm font-medium text-stone-600 hover:border-accent hover:text-accent-strong"
+            >
+              + Add sample restaurant (6 scanned dishes in 3D)
+            </button>
+          </form>
         </div>
 
         <div>
