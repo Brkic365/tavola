@@ -31,6 +31,10 @@ export type MenuDish = {
   variants?: unknown;
 };
 
+// Case- and accent-insensitive, so "rizot" finds "rižot" (đ has no decomposition).
+const fold = (s: string) =>
+  s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/gi, "d").toLowerCase();
+
 type Group = {
   key: string;
   name: string;
@@ -119,10 +123,10 @@ export default function MenuBrowser({
   }
 
   const filteredGroups = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = fold(query.trim());
     const matches = (d: MenuDish) => {
       if (q) {
-        const hay = `${d.name} ${d.description ?? ""}`.toLowerCase();
+        const hay = fold(`${d.name} ${d.description ?? ""}`);
         if (!hay.includes(q)) return false;
       }
       const dTags = new Set(parseDietary(d.dietary).map((x) => x.key));
