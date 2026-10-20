@@ -3,13 +3,13 @@ import { signup } from "@/app/admin/actions";
 
 export const metadata = { title: "Create account · Tavola" };
 
-type Search = { searchParams: Promise<{ error?: string }> };
+type Search = { searchParams: Promise<{ error?: string; next?: string }> };
 
 const inputCls =
   "mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent";
 
 export default async function SignupPage({ searchParams }: Search) {
-  const { error } = await searchParams;
+  const { error, next } = await searchParams;
 
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-5 py-16">
@@ -22,6 +22,7 @@ export default async function SignupPage({ searchParams }: Search) {
         </p>
 
         <form action={signup} className="mt-5 space-y-3">
+          <input type="hidden" name="next" value={next ?? "/admin"} />
           <label className="block">
             <span className="text-sm font-medium text-stone-700">Name</span>
             <input name="name" autoComplete="name" className={inputCls} />
@@ -71,7 +72,7 @@ export default async function SignupPage({ searchParams }: Search) {
 
         <p className="mt-4 text-sm text-stone-500">
           Already have an account?{" "}
-          <Link href="/admin/login" className="font-medium text-accent-strong hover:underline">
+          <Link href={next ? `/admin/login?${new URLSearchParams({ next })}` : "/admin/login"} className="font-medium text-accent-strong hover:underline">
             Sign in
           </Link>
         </p>

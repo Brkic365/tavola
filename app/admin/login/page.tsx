@@ -62,7 +62,7 @@ export default async function LoginPage({ searchParams }: Search) {
 
         <p className="mt-4 text-sm text-stone-500">
           New here?{" "}
-          <Link href="/admin/signup" className="font-medium text-accent-strong hover:underline">
+          <Link href={next ? `/admin/signup?${new URLSearchParams({ next })}` : "/admin/signup"} className="font-medium text-accent-strong hover:underline">
             Create an account
           </Link>
         </p>

@@ -55,17 +55,20 @@ export async function signup(formData: FormData) {
   const email = (str(formData, "email") ?? "").toLowerCase();
   const password = String(formData.get("password") ?? "");
   const name = str(formData, "name");
+  const next = String(formData.get("next") ?? "/admin");
+  const back = (error: string) =>
+    `/admin/signup?${new URLSearchParams({ error, next })}`;
 
   const key = await clientKey("signup");
   if ((await rateLimit(key)).blocked) {
-    redirect(`/admin/signup?error=rate`);
+    redirect(back("rate"));
   }
 
   if (!email || !/^\S+@\S+\.\S+$/.test(email) || password.length < 6) {
-    redirect(`/admin/signup?error=invalid`);
+    redirect(back("invalid"));
   }
   if (await prisma.user.findUnique({ where: { email } })) {
-    redirect(`/admin/signup?error=exists`);
+    redirect(back("exists"));
   }
 
   const user = await prisma.user.create({
@@ -73,7 +76,8 @@ export async function signup(formData: FormData) {
   });
   await clearRateLimit(key);
   await setSession(user.id);
-  redirect("/admin");
+  // Keep an invite link (/admin/join/…) alive through account creation.
+  redirect(next.startsWith("/admin") ? next : "/admin");
 }
 
 export async function logout() {
@@ -188,6 +192,17 @@ async function restaurantIdOfCategory(
     select: { restaurantId: true },
   });
   return c?.restaurantId ?? null;
+}
+
+/** A form-supplied categoryId, kept only if it belongs to this restaurant. */
+async function ownCategoryId(
+  restaurantId: string,
+  categoryId: string | null,
+): Promise<string | null> {
+  if (!categoryId) return null;
+  return (await restaurantIdOfCategory(categoryId)) === restaurantId
+    ? categoryId
+    : null;
 }
 
 // Map common Croatian/Slavic diacritics to ASCII for clean slugs.
@@ -548,6 +563,7 @@ export async function createDish(formData: FormData) {
 
   const data = dishDataFromForm(formData);
   if (!data.glbUrl) return; // a model is required to be useful
+  data.categoryId = await ownCategoryId(restaurantId, data.categoryId);
 
   const count = await prisma.dish.count({
     where: { restaurantId, categoryId: data.categoryId },
@@ -567,9 +583,11 @@ export async function updateDish(formData: FormData) {
   const id = str(formData, "id");
   const slug = str(formData, "slug");
   if (!id) return;
-  await assertCanManage(await restaurantIdOfDish(id));
+  const restaurantId = await restaurantIdOfDish(id);
+  await assertCanManage(restaurantId);
 
   const data = dishDataFromForm(formData);
+  data.categoryId = await ownCategoryId(restaurantId!, data.categoryId);
   await prisma.dish.update({ where: { id }, data });
 
   if (slug) {
