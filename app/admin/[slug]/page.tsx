@@ -92,7 +92,7 @@ export default async function ManageRestaurantPage({
     h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
   const menuUrl = `${proto}://${host}/r/${slug}`;
   const inviteUrl = owner
-    ? `${proto}://${host}/admin/join/${await createInviteToken(restaurant.id)}`
+    ? `${proto}://${host}/admin/join/${await createInviteToken(restaurant.id, restaurant.inviteVersion)}`
     : null;
 
   const categories = restaurant.categories.map((c) => ({

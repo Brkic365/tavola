@@ -1,0 +1,1 @@
+ALTER TABLE "Restaurant" ADD COLUMN "inviteVersion" INTEGER NOT NULL DEFAULT 0;

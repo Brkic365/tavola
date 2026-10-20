@@ -232,7 +232,8 @@ export default function MenuBrowser({
                       }`}
                     >
                       <Icon className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
-                      {t(locale, "no")} {a.label.toLowerCase()}
+                      {/* "No dairy" only reads right in English; the "Avoid" heading covers other languages. */}
+                      {locale === "en" ? `No ${a.label.toLowerCase()}` : a.label}
                     </button>
                   );
                 })}

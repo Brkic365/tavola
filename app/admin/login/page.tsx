@@ -62,14 +62,16 @@ export default async function LoginPage({ searchParams }: Search) {
 
         <p className="mt-4 text-sm text-stone-500">
           New here?{" "}
-          <Link href="/admin/signup" className="font-medium text-accent-strong hover:underline">
+          <Link href={next ? `/admin/signup?${new URLSearchParams({ next })}` : "/admin/signup"} className="font-medium text-accent-strong hover:underline">
             Create an account
           </Link>
         </p>
-        <p className="mt-2 text-xs text-stone-400">
-          Demo login: <code className="rounded bg-stone-100 px-1">demo@tavola.app</code>{" "}
-          / <code className="rounded bg-stone-100 px-1">tavola</code>
-        </p>
+        {process.env.NODE_ENV !== "production" && (
+          <p className="mt-2 text-xs text-stone-400">
+            Demo login: <code className="rounded bg-stone-100 px-1">demo@tavola.app</code>{" "}
+            / <code className="rounded bg-stone-100 px-1">tavola</code>
+          </p>
+        )}
       </div>
     </main>
   );

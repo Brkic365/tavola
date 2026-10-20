@@ -16,7 +16,12 @@ function utf8(s: string): BufferSource {
 }
 
 function secret(): string {
-  return process.env.ADMIN_SESSION_SECRET ?? "dev-insecure-secret-change-me";
+  const s = process.env.ADMIN_SESSION_SECRET;
+  if (s) return s;
+  // Fail closed: a known fallback would let anyone forge sessions + invites.
+  if (process.env.NODE_ENV === "production")
+    throw new Error("ADMIN_SESSION_SECRET must be set in production");
+  return "dev-insecure-secret-change-me";
 }
 
 function toHex(buf: ArrayBuffer | Uint8Array): string {
@@ -78,24 +83,32 @@ export async function verifySessionToken(
 
 const INVITE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** Signed, expiring token that grants membership of a restaurant. */
-export async function createInviteToken(restaurantId: string): Promise<string> {
+/**
+ * Signed, expiring token that grants membership of a restaurant. Carries the
+ * restaurant's inviteVersion: bumping it (on member removal) kills old links.
+ */
+export async function createInviteToken(
+  restaurantId: string,
+  version: number,
+): Promise<string> {
   const exp = Date.now() + INVITE_MAX_AGE_MS;
-  const payload = `inv.${restaurantId}.${exp}`;
+  const payload = `inv.${restaurantId}.${version}.${exp}`;
   return `${payload}.${await sign(payload)}`;
 }
 
 export async function verifyInviteToken(
   token: string | undefined | null,
-): Promise<{ restaurantId: string } | null> {
+): Promise<{ restaurantId: string; version: number } | null> {
   if (!token) return null;
   const parts = token.split(".");
-  if (parts.length !== 4 || parts[0] !== "inv") return null;
-  const [, restaurantId, expStr, sig] = parts;
+  if (parts.length !== 5 || parts[0] !== "inv") return null;
+  const [, restaurantId, verStr, expStr, sig] = parts;
   const exp = Number(expStr);
-  if (!restaurantId || !Number.isFinite(exp) || exp < Date.now()) return null;
-  const expected = await sign(`inv.${restaurantId}.${expStr}`);
-  return timingSafeEqual(sig, expected) ? { restaurantId } : null;
+  const version = Number(verStr);
+  if (!restaurantId || !Number.isInteger(version) || !Number.isFinite(exp) || exp < Date.now())
+    return null;
+  const expected = await sign(`inv.${restaurantId}.${verStr}.${expStr}`);
+  return timingSafeEqual(sig, expected) ? { restaurantId, version } : null;
 }
 
 // ---- password hashing -----------------------------------------------------
