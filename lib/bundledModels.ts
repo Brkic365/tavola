@@ -1,8 +1,24 @@
-// Placeholder 3D assets shipped under /public/models. Offered as suggestions in
-// the admin model pickers so a dish can be wired up without hosting anything.
-// Real food models (authored at 1 unit = 1 meter) replace these later.
+// 3D assets shipped under /public/models. Offered in the admin model pickers so
+// a dish can be wired up without hosting anything.
 
+// True-to-scale food models (1 unit = 1 m), built by scripts/blender/make_dishes.py.
+// Each ships a matching .jpg thumbnail next to the .glb.
+export const DISH_LIBRARY = [
+  { slug: "prsut-sir", label: "Pršut & cheese board" },
+  { slug: "crni-rizot", label: "Black risotto" },
+  { slug: "hobotnica-peka", label: "Octopus peka" },
+  { slug: "pljukanci-tartufi", label: "Truffle pljukanci" },
+  { slug: "plata-za-2", label: "Seafood platter for 2" },
+  { slug: "rozata", label: "Rožata" },
+].map((m) => ({
+  ...m,
+  glbUrl: `/models/dishes/${m.slug}.glb`,
+  thumbnailUrl: `/models/dishes/${m.slug}.jpg`,
+}));
+
+// Generic sample models (not food).
 export const BUNDLED_GLB = [
+  ...DISH_LIBRARY.map((m) => ({ url: m.glbUrl, label: m.label })),
   { url: "/models/avocado.glb", label: "Avocado (food)" },
   { url: "/models/boombox.glb", label: "BoomBox" },
   { url: "/models/waterbottle.glb", label: "Water Bottle" },
