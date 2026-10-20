@@ -57,3 +57,6 @@ prisma/*.db-journal
 next-env.d.ts
 
 /app/generated/prisma
+
+# raw 3D scan downloads (~275 MB) — processed GLBs live in public/models/dishes
+/public/models/scanned/
