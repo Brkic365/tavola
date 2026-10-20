@@ -229,6 +229,9 @@ export default function ModelViewer({
           ar-scale="fixed"
           ar-placement="floor"
           camera-controls
+          // Keep the camera above the table: no orbiting under the plate.
+          camera-orbit="0deg 60deg auto"
+          max-camera-orbit="auto 80deg auto"
           auto-rotate
           shadow-intensity="1"
           exposure="1"

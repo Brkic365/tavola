@@ -122,7 +122,7 @@ export default async function Home() {
             />
             <figure className="overflow-hidden rounded-[2rem] border border-hair surface shadow-[0_30px_60px_-25px_rgba(36,30,24,0.35)]">
               <div className="surface-2">
-                <Hero3D src="/models/avocado.glb" alt="A 3D avocado, rotating" />
+                <Hero3D src="/models/dishes/hobotnica-peka.glb" alt="A 3D octopus peka dish, rotating" />
               </div>
               <figcaption className="flex items-center justify-between gap-3 border-t border-hair px-5 py-3.5">
                 <span className="font-serif text-sm font-medium text-strong">
