@@ -17,6 +17,11 @@ export const DISH_LIBRARY = [
   usdzUrl: `/models/dishes/${m.slug}.usdz`,
 }));
 
+/** iOS model for a library GLB, so dishes saved before the USDZ files existed still get iPhone AR. */
+export function libraryUsdz(glbUrl: string): string | null {
+  return DISH_LIBRARY.find((m) => m.glbUrl === glbUrl)?.usdzUrl ?? null;
+}
+
 // Generic sample models (not food).
 export const BUNDLED_GLB = [
   ...DISH_LIBRARY.map((m) => ({ url: m.glbUrl, label: m.label })),
