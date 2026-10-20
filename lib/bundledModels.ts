@@ -1,8 +1,8 @@
 // 3D assets shipped under /public/models. Offered in the admin model pickers so
 // a dish can be wired up without hosting anything.
 
-// True-to-scale food models (1 unit = 1 m), built by scripts/blender/make_dishes.py.
-// Each ships a matching .jpg thumbnail next to the .glb.
+// Scanned food models (1 unit = 1 m), prepared by scripts/blender/import_scans.py;
+// see public/models/dishes/CREDITS.md. Each ships a .jpg thumbnail next to the .glb.
 export const DISH_LIBRARY = [
   { slug: "prsut-sir", label: "Pršut & cheese board" },
   { slug: "crni-rizot", label: "Black risotto" },
