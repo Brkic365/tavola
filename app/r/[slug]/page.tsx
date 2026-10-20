@@ -7,6 +7,8 @@ import { prisma } from "@/lib/prisma";
 import { brandStyle } from "@/lib/theme";
 import { getLocale } from "@/lib/locale";
 import { menuJsonLd } from "@/lib/jsonld";
+import { parseHours } from "@/lib/hours";
+import OpeningHours from "@/components/OpeningHours";
 import { t, localizeContent } from "@/lib/i18n";
 import MenuBrowser from "@/components/MenuBrowser";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -97,6 +99,8 @@ export default async function MenuPage({ params }: Params) {
     groups,
     `${proto}://${host}/r/${restaurant.slug}`,
   );
+
+  const hours = parseHours(restaurant.openingHours);
 
   const themeMode =
     (await cookies()).get(THEME_COOKIE)?.value === "dark" ? "dark" : "light";
@@ -193,6 +197,7 @@ export default async function MenuPage({ params }: Params) {
             </p>
           </div>
         )}
+        {hours && <OpeningHours days={hours} locale={locale} />}
         <p>{t(locale, "kcalStatement")}</p>
         <p className="mt-1">
           Powered by <span className="font-serif">Tavola</span> · true-to-scale

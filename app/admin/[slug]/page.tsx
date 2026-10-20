@@ -17,6 +17,7 @@ import { getCurrentUser, isOwner, canManageRestaurant } from "@/lib/session";
 import { createInviteToken } from "@/lib/auth";
 import { formatPrice } from "@/lib/format";
 import { LOCALES } from "@/lib/i18n";
+import { DAY_KEYS, parseHours } from "@/lib/hours";
 import {
   createDish,
   updateDish,
@@ -330,6 +331,22 @@ export default async function ManageRestaurantPage({
                   placeholder="example.com"
                 />
               </label>
+            </div>
+
+            <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-stone-400">
+              Opening hours (leave a day empty if closed)
+            </p>
+            <div className="space-y-1.5">
+              {DAY_KEYS.map((day, i) => {
+                const h = parseHours(restaurant.openingHours)?.[i];
+                return (
+                  <div key={day} className="grid grid-cols-[2.5rem_1fr_1fr] items-center gap-2">
+                    <span className="text-sm text-stone-600">{day}</span>
+                    <input type="time" name={`open_${i}`} defaultValue={h?.open ?? ""} aria-label={`${day} opens`} className={inputCls} />
+                    <input type="time" name={`close_${i}`} defaultValue={h?.close ?? ""} aria-label={`${day} closes`} className={inputCls} />
+                  </div>
+                );
+              })}
             </div>
 
             <button

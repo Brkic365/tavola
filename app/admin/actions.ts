@@ -15,6 +15,7 @@ import {
 } from "@/lib/auth";
 import { getCurrentUser } from "@/lib/session";
 import { parseCsv } from "@/lib/csv";
+import { hoursFromForm } from "@/lib/hours";
 import { clientKey, rateLimit, clearRateLimit } from "@/lib/ratelimit";
 
 // ---- auth -----------------------------------------------------------------
@@ -190,6 +191,17 @@ async function restaurantIdOfCategory(
   return c?.restaurantId ?? null;
 }
 
+/** A form-supplied categoryId, kept only if it belongs to this restaurant. */
+async function ownCategoryId(
+  restaurantId: string,
+  categoryId: string | null,
+): Promise<string | null> {
+  if (!categoryId) return null;
+  return (await restaurantIdOfCategory(categoryId)) === restaurantId
+    ? categoryId
+    : null;
+}
+
 // Map common Croatian/Slavic diacritics to ASCII for clean slugs.
 const DIACRITICS: Record<string, string> = {
   č: "c",
@@ -259,6 +271,7 @@ export async function updateRestaurant(formData: FormData) {
       address: str(formData, "address"),
       phone: str(formData, "phone"),
       website: normalizeWebsite(str(formData, "website")),
+      openingHours: hoursFromForm(formData) ?? Prisma.DbNull,
     },
   });
 
@@ -548,6 +561,7 @@ export async function createDish(formData: FormData) {
 
   const data = dishDataFromForm(formData);
   if (!data.glbUrl) return; // a model is required to be useful
+  data.categoryId = await ownCategoryId(restaurantId, data.categoryId);
 
   const count = await prisma.dish.count({
     where: { restaurantId, categoryId: data.categoryId },
@@ -567,9 +581,11 @@ export async function updateDish(formData: FormData) {
   const id = str(formData, "id");
   const slug = str(formData, "slug");
   if (!id) return;
-  await assertCanManage(await restaurantIdOfDish(id));
+  const restaurantId = await restaurantIdOfDish(id);
+  await assertCanManage(restaurantId);
 
   const data = dishDataFromForm(formData);
+  data.categoryId = await ownCategoryId(restaurantId!, data.categoryId);
   await prisma.dish.update({ where: { id }, data });
 
   if (slug) {

@@ -254,6 +254,10 @@ const DICT: Dict = {
     de: "Smartphone",
     it: "Smartphone",
   },
+  openingHours: { en: "Opening hours", hr: "Radno vrijeme", de: "Öffnungszeiten", it: "Orari" },
+  openNow: { en: "Open now", hr: "Sada otvoreno", de: "Jetzt geöffnet", it: "Aperto ora" },
+  closedNow: { en: "Closed now", hr: "Sada zatvoreno", de: "Jetzt geschlossen", it: "Chiuso ora" },
+  closed: { en: "Closed", hr: "Zatvoreno", de: "Geschlossen", it: "Chiuso" },
   myTable: { en: "My table", hr: "Moj stol", de: "Mein Tisch", it: "Il mio tavolo" },
   addToTable: {
     en: "Add to my table",
