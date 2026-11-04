@@ -138,7 +138,7 @@ export default async function TableCardPage({ params, searchParams }: Props) {
         {cards.map((c) => (
           <article
             key={c.key}
-            className="mx-auto w-full max-w-sm break-inside-avoid overflow-hidden rounded-3xl border border-stone-200 bg-white text-center shadow-sm print:border-stone-300 print:shadow-none"
+            className="mx-auto w-full max-w-sm break-inside-avoid overflow-hidden rounded-3xl border border-stone-200 bg-white text-center print:border-stone-300 print:shadow-none"
           >
             <div className="bg-brand px-6 py-5 text-white">
               {restaurant.logoUrl && (

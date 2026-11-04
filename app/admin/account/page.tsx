@@ -24,7 +24,7 @@ export default async function AccountPage({ searchParams }: Search) {
       className="mx-auto w-full max-w-md flex-1 px-5 py-10"
     >
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight text-stone-900">
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-stone-900">
           Account
         </h1>
         <Link href="/admin" className="text-sm text-stone-500 hover:text-stone-800">
@@ -53,7 +53,7 @@ export default async function AccountPage({ searchParams }: Search) {
 
       <form
         action={updateAccount}
-        className="space-y-4 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm"
+        className="space-y-4 rounded-xl border border-stone-200 bg-white p-5"
       >
         <label className="block">
           <span className={labelCls}>Name</span>
@@ -66,7 +66,7 @@ export default async function AccountPage({ searchParams }: Search) {
         </label>
 
         <div className="border-t border-stone-100 pt-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+          <p className="text-sm font-bold text-stone-400">
             Change password
           </p>
           <label className="mt-2 block">
@@ -94,7 +94,7 @@ export default async function AccountPage({ searchParams }: Search) {
 
         <button
           type="submit"
-          className="w-full rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-strong"
+          className="w-full rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-700"
         >
           Save changes
         </button>

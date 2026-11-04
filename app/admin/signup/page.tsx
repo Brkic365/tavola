@@ -13,8 +13,8 @@ export default async function SignupPage({ searchParams }: Search) {
 
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-5 py-16">
-      <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h1 className="font-display text-2xl font-bold text-stone-900">
+      <div className="rounded-xl border border-stone-200 bg-white p-6">
+        <h1 className="font-display text-3xl font-extrabold text-stone-900">
           Create your account
         </h1>
         <p className="mt-1 text-sm text-stone-500">
@@ -64,7 +64,7 @@ export default async function SignupPage({ searchParams }: Search) {
 
           <button
             type="submit"
-            className="w-full rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-strong"
+            className="w-full rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-700"
           >
             Create account
           </button>

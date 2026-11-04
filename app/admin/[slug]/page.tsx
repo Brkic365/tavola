@@ -167,7 +167,7 @@ export default async function ManageRestaurantPage({
         </div>
       </div>
 
-      <h1 className="text-2xl font-bold tracking-tight text-stone-900">
+      <h1 className="font-display text-3xl font-extrabold tracking-tight text-stone-900">
         {restaurant.name}
       </h1>
       <p className="mt-1 text-sm text-stone-500">
@@ -176,7 +176,7 @@ export default async function ManageRestaurantPage({
       </p>
 
       {/* ---- QR + share ---- */}
-      <section className="mt-6 flex flex-col gap-4 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
+      <section className="mt-6 flex flex-col gap-4 rounded-xl border border-stone-200 bg-white p-4 sm:flex-row sm:items-center">
         <MenuQR url={menuUrl} />
         <div className="min-w-0 flex-1">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
@@ -218,7 +218,7 @@ export default async function ManageRestaurantPage({
       <MenuHealth dishes={restaurant.dishes} />
 
       {/* ---- restaurant settings ---- */}
-      <details className="mt-4 rounded-2xl border border-stone-200 bg-white shadow-sm">
+      <details className="mt-4 rounded-xl border border-stone-200 bg-white">
         <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-stone-700">
           Restaurant settings & categories
         </summary>
@@ -226,7 +226,7 @@ export default async function ManageRestaurantPage({
           <form action={updateRestaurant} className="space-y-3">
             <input type="hidden" name="id" value={restaurant.id} />
             <input type="hidden" name="slug" value={restaurant.slug} />
-            <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+            <p className="text-sm font-bold text-stone-400">
               Settings
             </p>
             <label className="block">
@@ -299,7 +299,7 @@ export default async function ManageRestaurantPage({
               </p>
             </div>
 
-            <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-stone-400">
+            <p className="pt-1 text-sm font-bold text-stone-400">
               Contact (shown on the menu)
             </p>
             <label className="block">
@@ -333,7 +333,7 @@ export default async function ManageRestaurantPage({
               </label>
             </div>
 
-            <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-stone-400">
+            <p className="pt-1 text-sm font-bold text-stone-400">
               Opening hours (leave a day empty if closed)
             </p>
             <div className="space-y-1.5">
@@ -360,7 +360,7 @@ export default async function ManageRestaurantPage({
           <form action={createCategory} className="space-y-3">
             <input type="hidden" name="restaurantId" value={restaurant.id} />
             <input type="hidden" name="slug" value={restaurant.slug} />
-            <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+            <p className="text-sm font-bold text-stone-400">
               Add category
             </p>
             <label className="block">
@@ -391,7 +391,7 @@ export default async function ManageRestaurantPage({
 
         {restaurant.categories.length > 0 && (
           <div className="border-t border-stone-100 p-4">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-400">
+            <p className="mb-2 text-sm font-bold text-stone-400">
               Categories
             </p>
             <ul className="space-y-2">
@@ -491,14 +491,14 @@ export default async function ManageRestaurantPage({
 
       {/* ---- team (owner only) ---- */}
       {owner && inviteUrl && (
-        <details className="mt-4 rounded-2xl border border-stone-200 bg-white shadow-sm">
+        <details className="mt-4 rounded-xl border border-stone-200 bg-white">
           <summary className="flex cursor-pointer items-center gap-2 px-4 py-3 text-sm font-semibold text-stone-700">
             <Users className="h-4 w-4 text-stone-500" strokeWidth={1.75} />
             Team
           </summary>
           <div className="space-y-5 border-t border-stone-100 p-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+              <p className="text-sm font-bold text-stone-400">
                 Invite link
               </p>
               <p className="mt-1 text-sm text-stone-500">
@@ -512,7 +512,7 @@ export default async function ManageRestaurantPage({
               </div>
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">
+              <p className="text-sm font-bold text-stone-400">
                 Members
               </p>
               <ul className="mt-2 space-y-1.5 text-sm">
@@ -550,7 +550,7 @@ export default async function ManageRestaurantPage({
       )}
 
       {/* ---- add dish ---- */}
-      <details className="mt-4 rounded-2xl border border-accent-soft bg-white shadow-sm">
+      <details className="mt-4 rounded-xl border border-accent-soft bg-white">
         <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-accent-strong">
           + Add a dish
         </summary>
@@ -563,7 +563,7 @@ export default async function ManageRestaurantPage({
           <DishFormFields categories={categories} idPrefix="new" />
           <button
             type="submit"
-            className="mt-4 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-strong"
+            className="mt-4 rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-700"
           >
             Add dish
           </button>
@@ -612,7 +612,7 @@ export default async function ManageRestaurantPage({
                 {group.dishes.map((dish) => (
                   <li
                     key={dish.id}
-                    className="rounded-2xl border border-stone-200 bg-white p-3 shadow-sm"
+                    className="rounded-xl border border-stone-200 bg-white p-3"
                   >
                     <div className="flex items-center gap-3">
                       <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg">
@@ -725,7 +725,7 @@ export default async function ManageRestaurantPage({
                           />
                           <button
                             type="submit"
-                            className="mt-4 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-strong"
+                            className="mt-4 rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-700"
                           >
                             Save changes
                           </button>
@@ -743,7 +743,7 @@ export default async function ManageRestaurantPage({
       {/* Danger zone (owner) / Leave team (member) */}
       <section className="mt-12 border-t border-stone-200 pt-6">
         {owner ? (
-          <div className="rounded-2xl border border-red-200 bg-red-50/40 p-5">
+          <div className="rounded-xl border border-red-200 bg-red-50/40 p-5">
             <h2 className="text-lg font-semibold text-red-800">Danger zone</h2>
             <p className="mt-1 max-w-xl text-sm text-stone-600">
               Permanently delete this restaurant and everything in it — dishes,
@@ -758,7 +758,7 @@ export default async function ManageRestaurantPage({
             </div>
           </div>
         ) : (
-          <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
+          <div className="rounded-xl border border-stone-200 bg-stone-50 p-5">
             <h2 className="text-lg font-semibold text-stone-800">Leave team</h2>
             <p className="mt-1 max-w-xl text-sm text-stone-600">
               Remove yourself from this restaurant&apos;s team. You&apos;ll lose

@@ -50,7 +50,7 @@ export default async function ImportPage({ params, searchParams }: Props) {
         ← Back to manage
       </Link>
 
-      <h1 className="mt-4 text-2xl font-bold tracking-tight text-stone-900">
+      <h1 className="mt-4 font-display text-3xl font-extrabold tracking-tight text-stone-900">
         Import menu from CSV
       </h1>
       <p className="mt-1 text-sm text-stone-500">
@@ -83,7 +83,7 @@ export default async function ImportPage({ params, searchParams }: Props) {
 
       <form
         action={importMenuCsv}
-        className="mt-6 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm"
+        className="mt-6 rounded-xl border border-stone-200 bg-white p-5"
       >
         <input type="hidden" name="restaurantId" value={restaurant.id} />
         <input type="hidden" name="slug" value={slug} />
@@ -96,7 +96,7 @@ export default async function ImportPage({ params, searchParams }: Props) {
             name="file"
             accept=".csv,text/csv"
             required
-            className="mt-2 block w-full text-sm text-stone-600 file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-accent-strong"
+            className="mt-2 block w-full text-sm text-stone-600 file:mr-3 file:rounded-lg file:border-0 file:bg-stone-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-accent-strong"
           />
         </label>
         <button
@@ -108,7 +108,7 @@ export default async function ImportPage({ params, searchParams }: Props) {
         </button>
       </form>
 
-      <div className="mt-6 rounded-2xl border border-stone-200 bg-stone-50 p-5 text-sm text-stone-600">
+      <div className="mt-6 rounded-xl border border-stone-200 bg-stone-50 p-5 text-sm text-stone-600">
         <h2 className="font-semibold text-stone-800">Format</h2>
         <p className="mt-2">
           Same columns as the{" "}

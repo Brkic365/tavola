@@ -80,7 +80,7 @@ export default function MenuHealth({ dishes }: { dishes: HealthDish[] }) {
   if (n === 0) return null;
 
   return (
-    <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+    <section className="mt-6 rounded-xl border border-stone-200 bg-white p-4">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
         Menu health
       </h2>
@@ -98,7 +98,7 @@ export default function MenuHealth({ dishes }: { dishes: HealthDish[] }) {
             ? "bg-emerald-500"
             : m.tone === "scale"
               ? "bg-amber-500"
-              : "bg-accent";
+              : "bg-stone-900";
 
           return (
             <div
