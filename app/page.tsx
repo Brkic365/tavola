@@ -184,7 +184,7 @@ export default async function Home() {
             </div>
           </div>
 
-          <span className="absolute left-[42%] top-[40%] z-20 rounded-full bg-[#0f766e] px-3 py-1.5 text-sm font-bold text-white shadow-lg">
+          <span className="absolute left-[40%] top-[24%] z-20 rounded-full bg-[#0f766e] px-3 py-1.5 text-sm font-bold text-white shadow-lg">
             tap →
           </span>
 
@@ -203,7 +203,7 @@ export default async function Home() {
                 Real size
               </span>
               {heroWidth > 0 && (
-                <span className="absolute left-1/2 top-[69%] -translate-x-1/2 rounded-full bg-white px-2.5 py-0.5 font-display text-xs font-extrabold">
+                <span className="absolute left-1/2 top-[77%] -translate-x-1/2 rounded-full bg-white px-2.5 py-0.5 font-display text-xs font-extrabold">
                   {heroWidth} cm wide
                 </span>
               )}

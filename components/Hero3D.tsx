@@ -19,7 +19,7 @@ export default function Hero3D({ src, alt }: { src: string; alt: string }) {
       alt={alt}
       // Matches the camera the table photo was rendered with (50cm above the
       // table, tilted 40deg down), so the dish sits on the photo convincingly.
-      camera-orbit="0deg 50deg 1.02m"
+      camera-orbit="0deg 50deg 0.66m"
       max-camera-orbit="auto auto 3m"
       camera-target="0m 0m 0m"
       field-of-view="24deg"
