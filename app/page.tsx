@@ -193,7 +193,7 @@ export default async function Home() {
               className="relative aspect-[9/18.5] overflow-hidden rounded-[26px] bg-cover bg-center"
               style={{ backgroundImage: "url(/landing/ar-table.jpg)" }}
             >
-              <div className="absolute inset-x-0 bottom-[14%] top-[22%]">
+              <div className="absolute inset-0">
                 <Hero3D src={heroGlb} alt={`3D scan of ${heroName}`} />
               </div>
               <span className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/45 text-white">
@@ -203,7 +203,7 @@ export default async function Home() {
                 Real size
               </span>
               {heroWidth > 0 && (
-                <span className="absolute left-1/2 top-[71%] -translate-x-1/2 rounded-full bg-white px-2.5 py-0.5 font-display text-xs font-extrabold">
+                <span className="absolute left-1/2 top-[69%] -translate-x-1/2 rounded-full bg-white px-2.5 py-0.5 font-display text-xs font-extrabold">
                   {heroWidth} cm wide
                 </span>
               )}

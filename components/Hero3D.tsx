@@ -17,18 +17,25 @@ export default function Hero3D({ src, alt }: { src: string; alt: string }) {
     <model-viewer
       src={src}
       alt={alt}
-      camera-orbit="20deg 58deg auto"
-      field-of-view="26deg"
+      // Matches the camera the table photo was rendered with (50cm above the
+      // table, tilted 40deg down), so the dish sits on the photo convincingly.
+      camera-orbit="0deg 50deg 1.02m"
+      max-camera-orbit="auto auto 3m"
+      camera-target="0m 0m 0m"
+      field-of-view="24deg"
+      min-field-of-view="10deg"
       auto-rotate
       auto-rotate-delay="0"
-      rotation-per-second="10deg"
+      rotation-per-second="8deg"
+      environment-image="/landing/restaurant-env.jpg"
       interaction-prompt="none"
       disable-zoom
       disable-pan
       disable-tap
-      shadow-intensity="1.4"
-      shadow-softness="0.6"
-      exposure="1.05"
+      shadow-intensity="1.8"
+      shadow-softness="0.45"
+      exposure="1.9"
+      tone-mapping="neutral"
       loading="eager"
       className="block h-full w-full"
       style={{
