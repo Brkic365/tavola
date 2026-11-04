@@ -14,7 +14,7 @@ export default async function SignupPage({ searchParams }: Search) {
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-5 py-16">
       <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <h1 className="font-serif text-2xl font-bold text-stone-900">
+        <h1 className="font-display text-2xl font-bold text-stone-900">
           Create your account
         </h1>
         <p className="mt-1 text-sm text-stone-500">

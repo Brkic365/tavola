@@ -40,7 +40,7 @@ export default async function Home() {
       <nav className="sticky top-0 z-20 border-b border-hair bg-[var(--background)]/85 backdrop-blur">
         <div className={`${SECTION} flex items-center justify-between py-4`}>
           <Link href="/" className="flex items-baseline gap-1.5">
-            <span className="font-serif text-2xl font-semibold tracking-tight text-strong">
+            <span className="font-display text-2xl font-semibold tracking-tight text-strong">
               Tavola
             </span>
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
@@ -83,7 +83,7 @@ export default async function Home() {
               <Ruler className="h-3.5 w-3.5" strokeWidth={2} />
               True-to-scale AR menu
             </span>
-            <h1 className="mt-6 font-serif text-[2.75rem] font-semibold leading-[1.04] tracking-tight text-strong sm:text-6xl">
+            <h1 className="mt-6 font-display text-[2.75rem] font-semibold leading-[1.04] tracking-tight text-strong sm:text-6xl">
               See every dish at its{" "}
               <em className="italic text-accent">real</em> size — before you
               order.
@@ -125,7 +125,7 @@ export default async function Home() {
                 <Hero3D src="/models/dishes/hobotnica-peka.glb" alt="A 3D octopus peka dish, rotating" />
               </div>
               <figcaption className="flex items-center justify-between gap-3 border-t border-hair px-5 py-3.5">
-                <span className="font-serif text-sm font-medium text-strong">
+                <span className="font-display text-sm font-medium text-strong">
                   Shown life-size in AR
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-strong">
@@ -177,7 +177,7 @@ export default async function Home() {
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-strong">
             How it works
           </p>
-          <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-strong">
+          <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight text-strong">
             From table QR to life-size, in three taps.
           </h2>
         </div>
@@ -200,13 +200,13 @@ export default async function Home() {
             },
           ].map((s, i) => (
             <li key={s.title} className="relative">
-              <span className="font-serif text-5xl font-semibold text-[var(--hairline)]">
+              <span className="font-display text-5xl font-semibold text-[var(--hairline)]">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <div className="mt-2 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent-strong">
                 <s.Icon className="h-5 w-5" strokeWidth={1.75} />
               </div>
-              <h3 className="mt-4 font-serif text-xl font-semibold text-strong">
+              <h3 className="mt-4 font-display text-xl font-semibold text-strong">
                 {s.title}
               </h3>
               <p className="mt-2 max-w-xs text-[15px] leading-relaxed text-soft">
@@ -224,7 +224,7 @@ export default async function Home() {
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-strong">
               Why it matters
             </p>
-            <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-strong">
+            <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight text-strong">
               Portion transparency, not just a party trick.
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-soft">
@@ -258,7 +258,7 @@ export default async function Home() {
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft text-accent-strong">
                   <f.Icon className="h-6 w-6" strokeWidth={1.5} />
                 </div>
-                <h3 className="mt-5 font-serif text-xl font-semibold text-strong">
+                <h3 className="mt-5 font-display text-xl font-semibold text-strong">
                   {f.title}
                 </h3>
                 <p className="mt-2 text-[15px] leading-relaxed text-soft">
@@ -273,7 +273,7 @@ export default async function Home() {
       {/* ---- credibility stat ---- */}
       <section className="bg-[var(--foreground)] text-[var(--background)]">
         <div className={`${SECTION} py-20 text-center`}>
-          <p className="mx-auto max-w-3xl font-serif text-3xl font-medium leading-snug tracking-tight sm:text-[2.5rem]">
+          <p className="mx-auto max-w-3xl font-display text-3xl font-medium leading-snug tracking-tight sm:text-[2.5rem]">
             <span className="text-accent">48%</span> of diners have left food
             because the portion was too big — and half want clearer portion
             information before they order.
@@ -291,7 +291,7 @@ export default async function Home() {
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-strong">
             For restaurants
           </p>
-          <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-strong">
+          <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight text-strong">
             A menu tool, not just a party trick.
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-soft">
@@ -337,7 +337,7 @@ export default async function Home() {
                 <f.Icon className="h-5 w-5" strokeWidth={1.75} />
               </div>
               <div>
-                <h3 className="font-serif text-lg font-semibold text-strong">
+                <h3 className="font-display text-lg font-semibold text-strong">
                   {f.title}
                 </h3>
                 <p className="mt-1.5 text-[15px] leading-relaxed text-soft">
@@ -349,7 +349,7 @@ export default async function Home() {
         </div>
         <div className="mx-auto mt-14 flex max-w-2xl flex-col items-center gap-4 rounded-3xl border border-hair surface p-8 text-center shadow-sm sm:flex-row sm:text-left">
           <div className="flex-1">
-            <h3 className="font-serif text-2xl font-semibold text-strong">
+            <h3 className="font-display text-2xl font-semibold text-strong">
               Pilot it free.
             </h3>
             <p className="mt-1.5 text-[15px] leading-relaxed text-soft">
@@ -375,7 +375,7 @@ export default async function Home() {
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-strong">
             Try it now
           </p>
-          <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-strong">
+          <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight text-strong">
             Open a live menu.
           </h2>
         </div>
@@ -396,7 +396,7 @@ export default async function Home() {
                   className="group flex items-center justify-between gap-4 rounded-2xl border border-hair surface p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:shadow-md"
                 >
                   <div>
-                    <p className="font-serif text-xl font-semibold text-strong">
+                    <p className="font-display text-xl font-semibold text-strong">
                       {r.name}
                     </p>
                     <p className="mt-0.5 text-sm text-soft">
@@ -417,7 +417,7 @@ export default async function Home() {
       {/* ---- closing CTA ---- */}
       <section className="border-t border-hair bg-accent-soft">
         <div className={`${SECTION} py-16 text-center`}>
-          <h2 className="font-serif text-4xl font-semibold tracking-tight text-strong">
+          <h2 className="font-display text-4xl font-semibold tracking-tight text-strong">
             Put your menu on the table.
           </h2>
           <p className="mx-auto mt-3 max-w-md text-soft">
@@ -440,7 +440,7 @@ export default async function Home() {
           className={`${SECTION} flex flex-col items-center justify-between gap-3 py-8 text-sm text-soft sm:flex-row`}
         >
           <div className="flex items-baseline gap-1.5">
-            <span className="font-serif text-lg font-semibold text-strong">
+            <span className="font-display text-lg font-semibold text-strong">
               Tavola
             </span>
             <span className="h-1 w-1 rounded-full bg-accent" />

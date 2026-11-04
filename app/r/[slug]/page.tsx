@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { headers, cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { Ruler, FileText, Phone, Globe } from "lucide-react";
+import { Box, FileText, Phone, Globe } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { brandStyle } from "@/lib/theme";
 import { getLocale } from "@/lib/locale";
@@ -112,48 +112,42 @@ export default async function MenuPage({ params }: Params) {
         dangerouslySetInnerHTML={{ __html: jsonLd }}
       />
       <TableCapture />
-      <header className="bg-brand text-white">
-        <div className="mx-auto w-full max-w-2xl px-5 py-8 text-center">
-          <div className="mb-4 flex items-center justify-end gap-2">
-            <ThemeToggle initial={themeMode} />
-            <LanguageSwitcher current={locale} />
-          </div>
-          {restaurant.logoUrl && (
+      <header className="mx-auto w-full max-w-4xl px-4 pt-4 sm:px-6">
+        <div className="flex items-center justify-between gap-3">
+          {restaurant.logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={restaurant.logoUrl}
-              alt={restaurant.name}
-              className="mx-auto mb-4 h-16 w-16 rounded-full object-cover ring-2 ring-white/40"
+              alt=""
+              className="h-11 w-11 rounded-full object-cover ring-1 ring-[var(--hairline)]"
             />
+          ) : (
+            <span />
           )}
-          <p className="text-xs font-medium uppercase tracking-[0.3em] text-white/70">
-            {t(locale, "menu")}
-          </p>
-          <h1 className="mt-2 font-serif text-4xl font-bold tracking-tight">
-            {restaurant.name}
-          </h1>
-          <p className="mt-2 text-sm text-white/70">
-            {totalDishes} · {t(locale, "tapHint")}
-          </p>
-          <p className="mt-5 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-sm">
-            <Ruler className="h-3.5 w-3.5" strokeWidth={1.75} />
-            {t(locale, "tagline")}
-          </p>
-          <p className="mt-3.5 text-sm">
-            <Link
-              href={`/r/${restaurant.slug}/menu`}
-              className="inline-flex items-center gap-1.5 text-white/80 underline underline-offset-2 hover:text-white"
-            >
-              <FileText className="h-3.5 w-3.5" strokeWidth={1.75} />
-              {t(locale, "printable")}
-            </Link>
-          </p>
+          <div className="flex items-center gap-2">
+            <ThemeToggle initial={themeMode} />
+            <LanguageSwitcher current={locale} />
+          </div>
+        </div>
+
+        <h1 className="mt-5 font-display text-[2.6rem] font-extrabold leading-[1.02] tracking-tight text-strong sm:text-5xl">
+          {restaurant.name}
+        </h1>
+        <p className="mt-1.5 text-base text-soft">
+          {t(locale, "menu")} · {totalDishes} {t(locale, "dishesOnMenu")}
+        </p>
+
+        <div className="mt-5 flex items-start gap-3 rounded-xl bg-brand-soft p-4 text-strong">
+          <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand text-white">
+            <Box className="h-5 w-5" strokeWidth={2} aria-hidden />
+          </span>
+          <p className="text-base leading-snug">{t(locale, "menuIntro")}</p>
         </div>
       </header>
 
       <main
         id="main-content"
-        className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-5"
+        className="mx-auto w-full max-w-4xl flex-1 px-4 pb-10 pt-4 sm:px-6"
       >
         {groups.length === 0 ? (
           <p className="rounded-xl border border-dashed border-hair p-8 text-center text-soft">
@@ -169,7 +163,7 @@ export default async function MenuPage({ params }: Params) {
         )}
       </main>
 
-      <footer className="mx-auto w-full max-w-2xl px-5 py-8 text-center text-xs text-soft">
+      <footer className="mx-auto w-full max-w-4xl border-t border-hair px-4 py-8 text-center text-sm text-soft sm:px-6">
         {(restaurant.address || restaurant.phone || restaurant.website) && (
           <div className="mb-4 flex flex-col items-center gap-1 text-sm text-soft">
             {restaurant.address && <p>{restaurant.address}</p>}
@@ -199,9 +193,25 @@ export default async function MenuPage({ params }: Params) {
         )}
         {hours && <OpeningHours days={hours} locale={locale} />}
         <p>{t(locale, "kcalStatement")}</p>
-        <p className="mt-1">
-          Powered by <span className="font-serif">Tavola</span> · true-to-scale
-          AR menus
+        <p className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+          <Link
+            href={`/r/${restaurant.slug}/menu`}
+            className="inline-flex min-h-11 items-center gap-1.5 font-semibold text-strong underline underline-offset-4"
+          >
+            <FileText className="h-4 w-4" strokeWidth={2} aria-hidden />
+            {t(locale, "printable")}
+          </Link>
+          <Link
+            href="/credits"
+            className="inline-flex min-h-11 items-center font-semibold text-strong underline underline-offset-4"
+          >
+            {t(locale, "scanCredits")}
+          </Link>
+        </p>
+        <p className="mt-3">
+          <Link href="/" className="hover:text-strong">
+            Menu by Tavola
+          </Link>
         </p>
       </footer>
     </div>

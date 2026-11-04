@@ -149,7 +149,7 @@ export default async function TableCardPage({ params, searchParams }: Props) {
                   className="mx-auto mb-2 h-12 w-12 rounded-full object-cover ring-2 ring-white/40"
                 />
               )}
-              <h1 className="font-serif text-xl font-bold tracking-tight">
+              <h1 className="font-display text-xl font-bold tracking-tight">
                 {restaurant.name}
               </h1>
               {c.label ? (
@@ -182,7 +182,7 @@ export default async function TableCardPage({ params, searchParams }: Props) {
             </div>
 
             <div className="border-t border-stone-100 px-6 py-2.5 text-[11px] text-stone-400">
-              Powered by <span className="font-serif">Tavola</span>
+              Powered by <span className="font-display">Tavola</span>
             </div>
           </article>
         ))}

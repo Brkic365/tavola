@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Star, Users, Ruler, Scale, Flame, ArrowRight } from "lucide-react";
+import { Star, Box } from "lucide-react";
 import DishThumb from "@/components/DishThumb";
-import { formatPrice, formatDimensions, formatWeight } from "@/lib/format";
+import { formatPrice, formatWeight } from "@/lib/format";
 import { parseAllergens } from "@/lib/allergens";
 import { parseDietary } from "@/lib/dietary";
 import { allergenIcon, dietaryIcon } from "@/lib/glyphs";
@@ -30,159 +30,154 @@ type DishCardProps = {
     available: boolean;
     variants?: unknown;
   };
+  /** The "add to my table" control, rendered in the card's action row. */
+  action?: React.ReactNode;
 };
 
-/** A single menu entry, styled like a restaurant menu row (not an app card). */
+/**
+ * One dish on the guest menu. Big photo of the real scan, name and price you
+ * can read at arm's length, one plain line of portion facts, and a single
+ * obvious button into the 3D view.
+ */
 export default function DishCard({
   slug,
   currency,
   locale,
   dish,
+  action,
 }: DishCardProps) {
-  const dims = formatDimensions(dish.widthCm, dish.depthCm, dish.heightCm);
   const weight = formatWeight(dish.weightG);
   const allergens = parseAllergens(dish.allergens, locale);
   const dietary = parseDietary(dish.dietary, locale);
   const soldOut = !dish.available;
   const variants = parseVariants(dish.variants);
   const fromPrice = minVariantPrice(variants);
+  const href = `/r/${slug}/dish/${dish.id}`;
+  const widest = Math.max(dish.widthCm ?? 0, dish.depthCm ?? 0);
+
+  const facts = [
+    dish.serves ? `${t(locale, "serves")} ${dish.serves}` : null,
+    weight,
+    widest > 0 ? `${widest} cm` : null,
+    dish.calories != null ? `${dish.calories} kcal` : null,
+  ].filter(Boolean);
 
   return (
-    <Link
-      href={`/r/${slug}/dish/${dish.id}`}
-      aria-disabled={soldOut}
-      className={`group flex gap-4 px-5 py-5 transition-colors hover:bg-[var(--card-2)] ${
-        soldOut ? "opacity-60" : ""
+    <article
+      className={`overflow-hidden rounded-xl border border-hair surface ${
+        soldOut ? "opacity-70" : ""
       }`}
     >
-      {/* thumbnail with a small 3D/AR affordance */}
-      <div className="relative h-[4.75rem] w-[4.75rem] shrink-0 overflow-hidden rounded-xl ring-1 ring-[var(--hairline)]">
-        <DishThumb name={dish.name} seed={dish.id} thumbnailUrl={dish.thumbnailUrl} />
-        {soldOut ? (
-          <span className="absolute inset-0 flex items-center justify-center bg-[var(--foreground)]/55 text-center text-[9px] font-bold uppercase leading-tight tracking-wide text-[var(--background)]">
-            {t(locale, "soldOut")}
-          </span>
-        ) : (
-          <span className="absolute bottom-1 right-1 rounded-md bg-[var(--foreground)]/80 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[0.08em] text-[var(--background)]">
-            3D · AR
-          </span>
-        )}
-      </div>
-
-      <div className="flex min-w-0 flex-1 flex-col">
-        {soldOut ? (
-          <span className="mb-1.5 inline-flex w-fit items-center gap-1 rounded-full bg-rose-500/12 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-rose-600">
-            {t(locale, "soldOut")}
-          </span>
-        ) : (
-          dish.featured && (
-            <span className="mb-1.5 inline-flex w-fit items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-brand-strong">
-              <Star className="h-2.5 w-2.5 fill-current" strokeWidth={0} />
-              {t(locale, "chefsPick")}
+      <Link href={href} className="group block" aria-label={dish.name}>
+        <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--card-2)]">
+          <DishThumb
+            name={dish.name}
+            seed={dish.id}
+            thumbnailUrl={dish.thumbnailUrl}
+            className={`transition-transform duration-300 group-hover:scale-[1.02] ${
+              soldOut ? "grayscale" : ""
+            }`}
+          />
+          {soldOut ? (
+            <span className="absolute left-3 top-3 rounded-md bg-[var(--foreground)] px-2.5 py-1 text-sm font-bold text-[var(--background)]">
+              {t(locale, "soldOut")}
             </span>
-          )
-        )}
-        <div className="flex items-baseline justify-between gap-3">
-          <h3 className="font-serif text-[1.2rem] font-semibold leading-snug text-strong">
-            {dish.name}
-          </h3>
-          <span className="shrink-0 font-serif text-lg font-semibold text-strong">
-            {fromPrice !== null ? (
-              <>
-                <span className="mr-1 text-xs font-normal text-soft">
-                  {t(locale, "fromPrice")}
-                </span>
-                {formatPrice(fromPrice, currency)}
-              </>
-            ) : (
-              formatPrice(dish.price, currency)
-            )}
-          </span>
+          ) : (
+            dish.featured && (
+              <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md bg-white px-2.5 py-1 text-sm font-bold text-stone-900 shadow-sm">
+                <Star
+                  className="h-3.5 w-3.5 fill-current text-brand"
+                  strokeWidth={0}
+                  aria-hidden
+                />
+                {t(locale, "chefsPick")}
+              </span>
+            )
+          )}
         </div>
 
-        {dish.description && (
-          <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-soft">
-            {dish.description}
-          </p>
-        )}
+        <div className="px-4 pt-3.5">
+          <div className="flex items-start justify-between gap-4">
+            <h3 className="font-display text-[1.45rem] font-bold leading-tight text-strong">
+              {dish.name}
+            </h3>
+            <span className="shrink-0 pt-0.5 font-display text-[1.35rem] font-bold tabular-nums text-strong">
+              {fromPrice !== null ? (
+                <>
+                  <span className="mr-1 text-sm font-normal text-soft">
+                    {t(locale, "fromPrice")}
+                  </span>
+                  {formatPrice(fromPrice, currency)}
+                </>
+              ) : (
+                formatPrice(dish.price, currency)
+              )}
+            </span>
+          </div>
 
-        {/* portion line — the Tavola differentiator, kept understated */}
-        <div className="mt-2.5 flex flex-wrap items-center gap-x-3.5 gap-y-1.5 text-xs text-soft">
-          {dish.serves && (
-            <span className="inline-flex items-center gap-1.5">
-              <Users className="h-3.5 w-3.5" strokeWidth={1.75} />
-              {t(locale, "serves")} {dish.serves}
-            </span>
+          {dish.description && (
+            <p className="mt-1 line-clamp-2 text-[0.95rem] leading-snug text-soft">
+              {dish.description}
+            </p>
           )}
-          {dims && (
-            <span className="inline-flex items-center gap-1.5">
-              <Ruler className="h-3.5 w-3.5" strokeWidth={1.75} />
-              {dims}
-            </span>
-          )}
-          {weight && (
-            <span className="inline-flex items-center gap-1.5">
-              <Scale className="h-3.5 w-3.5" strokeWidth={1.75} />
-              {weight}
-            </span>
-          )}
-          {dish.calories != null && (
-            <span className="inline-flex items-center gap-1.5">
-              <Flame className="h-3.5 w-3.5" strokeWidth={1.75} />
-              {dish.calories} kcal
-            </span>
-          )}
-          {allergens.length > 0 && (
-            <span className="inline-flex items-center gap-1 text-[var(--muted)]">
-              <span className="sr-only">
-                {t(locale, "allergens")}:{" "}
-                {allergens.map((a) => a.label).join(", ")}
-              </span>
-              {allergens.map((a) => {
-                const Icon = allergenIcon(a.key);
+
+          {(facts.length > 0 || allergens.length > 0 || dietary.length > 0) && (
+            <p className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-strong">
+              {facts.length > 0 && <span>{facts.join("  ·  ")}</span>}
+              {dietary.map((d) => {
+                const Icon = dietaryIcon(d.key);
                 return (
-                  <Icon
-                    key={a.key}
-                    className="h-3.5 w-3.5"
-                    strokeWidth={1.75}
-                    aria-hidden
-                  />
+                  <span
+                    key={d.key}
+                    className="inline-flex items-center gap-1 font-semibold"
+                    style={{ color: "var(--olive)" }}
+                  >
+                    <Icon className="h-4 w-4" strokeWidth={2} aria-hidden />
+                    {d.label}
+                  </span>
                 );
               })}
-            </span>
+              {allergens.length > 0 && (
+                <span
+                  className="inline-flex items-center gap-1 text-soft"
+                  title={allergens.map((a) => a.label).join(", ")}
+                >
+                  <span className="sr-only">
+                    {t(locale, "allergens")}:{" "}
+                    {allergens.map((a) => a.label).join(", ")}
+                  </span>
+                  {allergens.map((a) => {
+                    const Icon = allergenIcon(a.key);
+                    return (
+                      <Icon
+                        key={a.key}
+                        className="h-4 w-4"
+                        strokeWidth={1.75}
+                        aria-hidden
+                      />
+                    );
+                  })}
+                </span>
+              )}
+            </p>
           )}
         </div>
+      </Link>
 
-        {dietary.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {dietary.map((d) => {
-              const Icon = dietaryIcon(d.key);
-              return (
-                <span
-                  key={d.key}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-hair surface-2 px-2.5 py-0.5 text-[11px] font-medium text-strong"
-                >
-                  <Icon
-                    className="h-3 w-3"
-                    strokeWidth={1.75}
-                    style={{ color: "var(--olive)" }}
-                    aria-hidden
-                  />
-                  {d.label}
-                </span>
-              );
-            })}
-          </div>
-        )}
-
-        <span className="mt-2.5 inline-flex items-center gap-1 text-sm font-medium text-brand opacity-90 transition-opacity group-hover:opacity-100">
-          {t(locale, "viewInAr")}
-          <ArrowRight
-            className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
-            strokeWidth={2}
-          />
-        </span>
+      <div className="flex items-center gap-2 px-4 pb-4 pt-3.5">
+        <Link
+          href={href}
+          className={`inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-lg px-4 text-base font-bold transition active:scale-[0.98] ${
+            soldOut
+              ? "border border-hair text-strong"
+              : "bg-brand text-white hover:brightness-110"
+          }`}
+        >
+          <Box className="h-5 w-5" strokeWidth={2} aria-hidden />
+          {t(locale, "seeIn3d")}
+        </Link>
+        {action}
       </div>
-    </Link>
+    </article>
   );
 }

@@ -33,7 +33,7 @@ export default async function JoinPage({ params }: Params) {
         {!restaurant ? (
           <>
             <div className="text-4xl">⏳</div>
-            <h1 className="mt-3 font-serif text-xl font-bold text-stone-900">
+            <h1 className="mt-3 font-display text-xl font-bold text-stone-900">
               Invite invalid or expired
             </h1>
             <p className="mt-1 text-sm text-stone-500">
@@ -49,7 +49,7 @@ export default async function JoinPage({ params }: Params) {
         ) : (
           <>
             <div className="text-4xl">👋</div>
-            <h1 className="mt-3 font-serif text-2xl font-bold text-stone-900">
+            <h1 className="mt-3 font-display text-2xl font-bold text-stone-900">
               Join {restaurant.name}
             </h1>
             <p className="mt-1 text-sm text-stone-500">

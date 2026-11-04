@@ -22,7 +22,7 @@ export default function LanguageSwitcher({ current }: { current: Locale }) {
     <div
       role="group"
       aria-label="Language"
-      className="inline-flex items-center gap-0.5 rounded-full bg-white/15 p-1"
+      className="inline-flex items-center rounded-lg border border-hair surface p-0.5"
     >
       {LOCALES.map((l) => {
         const active = l.code === current;
@@ -33,10 +33,10 @@ export default function LanguageSwitcher({ current }: { current: Locale }) {
             onClick={() => choose(l.code)}
             aria-pressed={active}
             title={l.label}
-            className={`rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide transition ${
+            className={`min-h-10 min-w-10 rounded-md px-2 text-sm font-bold uppercase transition ${
               active
-                ? "bg-white/95 text-stone-900 shadow"
-                : "text-white/75 hover:text-white"
+                ? "bg-[var(--foreground)] text-[var(--background)]"
+                : "text-soft hover:text-strong"
             }`}
           >
             <span aria-hidden>{l.code}</span>

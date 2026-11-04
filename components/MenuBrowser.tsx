@@ -1,12 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import { Search, X, Star, Plus, Check } from "lucide-react";
+import { Search, X, Plus, Check, SlidersHorizontal } from "lucide-react";
 import DishCard from "@/components/DishCard";
-import DishThumb from "@/components/DishThumb";
 import TablePlanner from "@/components/TablePlanner";
-import { formatPrice } from "@/lib/format";
 import { parseDietary, type DietaryInfo } from "@/lib/dietary";
 import { parseAllergens, type AllergenInfo } from "@/lib/allergens";
 import { allergenIcon, dietaryIcon } from "@/lib/glyphs";
@@ -59,12 +56,6 @@ export default function MenuBrowser({
   locale: Locale;
 }) {
   const allDishes = useMemo(() => groups.flatMap((g) => g.dishes), [groups]);
-
-  // Spotlight: in-stock chef's picks, surfaced at the top when not filtering.
-  const featured = useMemo(
-    () => allDishes.filter((d) => d.featured && d.available),
-    [allDishes],
-  );
 
   const dietaryOptions = useMemo(() => {
     const map = new Map<string, DietaryInfo>();
@@ -150,14 +141,50 @@ export default function MenuBrowser({
     setQuery("");
   }
 
+  const filterCount = diet.size + avoid.size;
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const chip = (on: boolean) =>
+    `inline-flex min-h-11 items-center gap-2 rounded-lg border px-3.5 text-[0.95rem] font-semibold transition ${
+      on
+        ? "border-transparent text-white"
+        : "border-hair surface text-strong hover:border-[var(--muted)]"
+    }`;
+
   return (
     <div>
-      <div className="mb-8 space-y-3 rounded-2xl border border-hair surface p-3 shadow-sm">
-        <div className="relative">
+      {/* Categories: a plain tab bar that stays put while scrolling. */}
+      {groups.length >= 2 && (
+        <nav
+          aria-label={t(locale, "menu")}
+          className="sticky top-0 z-20 -mx-4 border-b border-hair bg-[var(--background)] sm:-mx-6"
+        >
+          <div className="flex gap-1 overflow-x-auto px-4 [scrollbar-width:none] sm:px-6">
+            {filteredGroups.map((group) => (
+              <button
+                key={group.key}
+                type="button"
+                onClick={() =>
+                  document
+                    .getElementById(`cat-sec-${group.key}`)
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" })
+                }
+                className="min-h-12 shrink-0 whitespace-nowrap border-b-[3px] border-transparent px-3 text-base font-bold text-strong transition hover:border-[var(--brand)]"
+              >
+                {group.name}
+              </button>
+            ))}
+          </div>
+        </nav>
+      )}
+
+      {/* Search + one button for allergies/diet (hidden until asked for). */}
+      <div className="mt-4 flex gap-2">
+        <div className="relative min-w-0 flex-1">
           <Search
             aria-hidden
-            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-soft"
-            strokeWidth={1.75}
+            className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-soft"
+            strokeWidth={2}
           />
           <input
             type="search"
@@ -165,61 +192,58 @@ export default function MenuBrowser({
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t(locale, "searchDishes")}
             aria-label={t(locale, "searchDishes")}
-            className="w-full rounded-xl border border-hair surface-2 py-2.5 pl-10 pr-10 text-sm text-strong placeholder:text-soft focus:border-[var(--brand)] focus:outline-none focus:ring-1 focus:ring-[var(--brand)]"
+            className="min-h-12 w-full rounded-lg border border-hair surface py-2.5 pl-11 pr-11 text-base text-strong placeholder:text-soft focus:border-[var(--brand)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/30"
           />
           {query && (
             <button
               type="button"
               onClick={() => setQuery("")}
               aria-label={t(locale, "clearSearch")}
-              className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-soft transition-colors hover:bg-[var(--card-2)] hover:text-strong"
+              className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-md text-soft hover:bg-[var(--card-2)] hover:text-strong"
             >
-              <X className="h-4 w-4" strokeWidth={2} />
+              <X className="h-5 w-5" strokeWidth={2} />
             </button>
           )}
         </div>
-
         {hasChips && (
-          <>
-            {dietaryOptions.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wide text-soft">
-                {t(locale, "dietary")}
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((o) => !o)}
+            aria-expanded={filtersOpen}
+            aria-controls="menu-filters"
+            className={`inline-flex min-h-12 shrink-0 items-center gap-2 rounded-lg border px-3.5 text-base font-bold transition ${
+              filterCount > 0 || filtersOpen
+                ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]"
+                : "border-hair surface text-strong"
+            }`}
+          >
+            <SlidersHorizontal className="h-5 w-5" strokeWidth={2} aria-hidden />
+            <span className="whitespace-nowrap sm:hidden">
+              {t(locale, "allergiesShort")}
+            </span>
+            <span className="hidden whitespace-nowrap sm:inline">
+              {t(locale, "allergiesDiet")}
+            </span>
+            {filterCount > 0 && (
+              <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-[var(--background)] px-1.5 text-sm text-[var(--foreground)]">
+                {filterCount}
               </span>
-              {dietaryOptions.map((d) => {
-                const on = diet.has(d.key);
-                const Icon = dietaryIcon(d.key);
-                return (
-                  <button
-                    key={d.key}
-                    type="button"
-                    aria-pressed={on}
-                    onClick={() => toggle(setDiet, d.key)}
-                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ring-1 transition ${
-                      on
-                        ? "text-white ring-transparent"
-                        : "surface-2 text-strong ring-[var(--hairline)] hover:bg-[var(--hairline)]"
-                    }`}
-                    style={on ? { backgroundColor: "var(--olive)" } : undefined}
-                  >
-                    <Icon
-                      className="h-3.5 w-3.5"
-                      strokeWidth={1.75}
-                      style={on ? undefined : { color: "var(--olive)" }}
-                      aria-hidden
-                    />
-                    {d.label}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+            )}
+          </button>
+        )}
+      </div>
 
-            {allergenOptions.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-semibold uppercase tracking-wide text-soft">
-                  {t(locale, "avoid")}
-                </span>
+      {hasChips && filtersOpen && (
+        <div
+          id="menu-filters"
+          className="mt-2 space-y-4 rounded-xl border border-hair surface p-4"
+        >
+          {allergenOptions.length > 0 && (
+            <fieldset>
+              <legend className="mb-2 text-base font-bold text-strong">
+                {t(locale, "avoid")}
+              </legend>
+              <div className="flex flex-wrap gap-2">
                 {allergenOptions.map((a) => {
                   const on = avoid.has(a.key);
                   const Icon = allergenIcon(a.key);
@@ -229,165 +253,159 @@ export default function MenuBrowser({
                       type="button"
                       aria-pressed={on}
                       onClick={() => toggle(setAvoid, a.key)}
-                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ring-1 transition ${
-                        on
-                          ? "bg-rose-600 text-white ring-rose-600"
-                          : "surface-2 text-soft ring-[var(--hairline)] hover:bg-[var(--hairline)]"
-                      }`}
+                      className={chip(on)}
+                      style={on ? { backgroundColor: "#be123c" } : undefined}
                     >
-                      <Icon className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+                      {on ? (
+                        <Check className="h-4 w-4" strokeWidth={2.5} aria-hidden />
+                      ) : (
+                        <Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                      )}
                       {/* "No dairy" only reads right in English; the "Avoid" heading covers other languages. */}
                       {locale === "en" ? `No ${a.label.toLowerCase()}` : a.label}
                     </button>
                   );
                 })}
               </div>
+            </fieldset>
+          )}
+          {dietaryOptions.length > 0 && (
+            <fieldset>
+              <legend className="mb-2 text-base font-bold text-strong">
+                {t(locale, "showOnly")}
+              </legend>
+              <div className="flex flex-wrap gap-2">
+                {dietaryOptions.map((d) => {
+                  const on = diet.has(d.key);
+                  const Icon = dietaryIcon(d.key);
+                  return (
+                    <button
+                      key={d.key}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => toggle(setDiet, d.key)}
+                      className={chip(on)}
+                      style={on ? { backgroundColor: "var(--olive)" } : undefined}
+                    >
+                      {on ? (
+                        <Check className="h-4 w-4" strokeWidth={2.5} aria-hidden />
+                      ) : (
+                        <Icon
+                          className="h-4 w-4"
+                          strokeWidth={1.75}
+                          style={{ color: "var(--olive)" }}
+                          aria-hidden
+                        />
+                      )}
+                      {d.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
+          )}
+          <div className="flex items-center justify-between border-t border-hair pt-3">
+            {filterCount > 0 ? (
+              <button
+                type="button"
+                onClick={clearAll}
+                className="min-h-11 text-base font-semibold text-brand underline underline-offset-4"
+              >
+                {t(locale, "clearFilters")}
+              </button>
+            ) : (
+              <span />
             )}
-          </>
-        )}
-
-        {active && (
-          <div className="flex items-center justify-between border-t border-hair pt-2 text-xs">
-            <span className="text-soft">
-              {total} {t(locale, "match")}
-            </span>
             <button
               type="button"
-              onClick={clearAll}
-              className="font-medium text-brand hover:underline"
+              onClick={() => setFiltersOpen(false)}
+              className="inline-flex min-h-11 items-center rounded-lg bg-[var(--foreground)] px-5 text-base font-bold text-[var(--background)]"
             >
-              {t(locale, "clearFilters")}
+              {t(locale, "done")} · {total}
             </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      {!active && featured.length > 0 && (
-        <section className="mb-8" aria-label={t(locale, "chefsPicks")}>
-          <div className="mb-3 flex items-center gap-2">
-            <Star
-              className="h-4 w-4 fill-current text-brand"
-              strokeWidth={0}
-              aria-hidden
-            />
-            <h2 className="font-serif text-lg font-semibold tracking-tight text-strong">
-              {t(locale, "chefsPicks")}
-            </h2>
-          </div>
-          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:-mx-5 sm:px-5">
-            {featured.map((d) => (
-              <Link
-                key={d.id}
-                href={`/r/${slug}/dish/${d.id}`}
-                className="group flex w-40 shrink-0 flex-col overflow-hidden rounded-2xl border border-hair surface shadow-sm transition hover:shadow-md"
-              >
-                <div className="relative h-24 w-full overflow-hidden">
-                  <DishThumb
-                    name={d.name}
-                    seed={d.id}
-                    thumbnailUrl={d.thumbnailUrl}
-                  />
-                  <span className="absolute bottom-1 right-1 rounded-md bg-stone-900/75 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
-                    3D · AR
-                  </span>
-                </div>
-                <div className="flex flex-1 flex-col gap-1 p-2.5">
-                  <span className="line-clamp-2 font-serif text-sm font-semibold leading-snug text-strong">
-                    {d.name}
-                  </span>
-                  <span className="mt-auto text-sm font-semibold text-soft">
-                    {formatPrice(d.price, currency)}
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
+      {active && !filtersOpen && (
+        <div className="mt-3 flex items-center justify-between text-base">
+          <span className="text-soft">
+            {total} {t(locale, "match")}
+          </span>
+          <button
+            type="button"
+            onClick={clearAll}
+            className="min-h-11 font-semibold text-brand underline underline-offset-4"
+          >
+            {t(locale, "clearFilters")}
+          </button>
+        </div>
       )}
 
       {filteredGroups.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-hair p-8 text-center text-soft">
+        <p className="mt-8 rounded-xl border border-dashed border-hair p-8 text-center text-base text-soft">
           {t(locale, "noMatch")}{" "}
           <button
             type="button"
             onClick={clearAll}
-            className="font-medium text-brand hover:underline"
+            className="font-semibold text-brand underline underline-offset-4"
           >
             {t(locale, "clearFilters")}
           </button>
         </p>
       ) : (
-        <div className="space-y-12">
-          {filteredGroups.length >= 2 && (
-            <nav
-              aria-label={t(locale, "menu")}
-              className="sticky top-0 z-10 -mx-4 mb-2 flex gap-2 overflow-x-auto border-b border-hair surface px-4 py-2.5 [scrollbar-width:none] sm:-mx-5 sm:px-5"
-            >
-              {filteredGroups.map((group) => (
-                <button
-                  key={group.key}
-                  type="button"
-                  onClick={() =>
-                    document
-                      .getElementById(`cat-sec-${group.key}`)
-                      ?.scrollIntoView({ behavior: "smooth", block: "start" })
-                  }
-                  className="shrink-0 whitespace-nowrap rounded-full surface-2 px-3 py-1 text-sm font-medium text-strong transition hover:bg-[var(--hairline)]"
-                >
-                  {group.name}
-                </button>
-              ))}
-            </nav>
-          )}
+        <div className="mt-8 space-y-12">
           {filteredGroups.map((group) => (
             <section
               key={group.key}
               id={`cat-sec-${group.key}`}
               className="scroll-mt-16"
+              aria-labelledby={`cat-h-${group.key}`}
             >
-              <div
-                className={`flex items-center gap-4 ${
-                  group.description ? "mb-2" : "mb-5"
-                }`}
+              <h2
+                id={`cat-h-${group.key}`}
+                className="font-display text-3xl font-extrabold uppercase tracking-tight text-strong"
               >
-                <span className="h-px flex-1 bg-[var(--hairline)]" />
-                <h2 className="font-serif text-2xl font-semibold tracking-tight text-stone-800">
-                  {group.name}
-                </h2>
-                <span className="h-px flex-1 bg-[var(--hairline)]" />
-              </div>
+                {group.name}
+              </h2>
               {group.description && (
-                <p className="mb-5 text-center text-sm italic text-soft">
-                  {group.description}
-                </p>
+                <p className="mt-1 text-base text-soft">{group.description}</p>
               )}
-              <ul className="divide-y divide-[var(--hairline)] overflow-hidden rounded-2xl border border-hair surface shadow-sm">
+              <ul className="mt-4 grid gap-4 md:grid-cols-2">
                 {group.dishes.map((dish) => (
-                  <li key={dish.id} className="relative">
+                  <li key={dish.id}>
                     <DishCard
                       slug={slug}
                       currency={currency}
                       dish={dish}
                       locale={locale}
+                      action={
+                        dish.available ? (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setQty(dish.id, (picks[dish.id] ?? 0) + 1)
+                            }
+                            aria-label={`${t(locale, "addToTable")}: ${dish.name}`}
+                            className={`inline-flex min-h-12 shrink-0 items-center gap-1.5 rounded-lg border px-3.5 text-base font-bold transition active:scale-[0.98] ${
+                              picks[dish.id]
+                                ? "border-[var(--brand)] text-brand"
+                                : "border-hair text-strong hover:border-[var(--muted)]"
+                            }`}
+                          >
+                            {picks[dish.id] ? (
+                              <>
+                                <Check className="h-5 w-5" strokeWidth={2.5} aria-hidden />
+                                {picks[dish.id]}
+                              </>
+                            ) : (
+                              <Plus className="h-5 w-5" strokeWidth={2.5} aria-hidden />
+                            )}
+                            <span>{t(locale, "myTable")}</span>
+                          </button>
+                        ) : undefined
+                      }
                     />
-                    {dish.available && (
-                      <button
-                        type="button"
-                        onClick={() => setQty(dish.id, (picks[dish.id] ?? 0) + 1)}
-                        aria-label={`${t(locale, "addToTable")}: ${dish.name}`}
-                        className="absolute bottom-4 right-5 inline-flex items-center gap-1 rounded-full surface-2 px-3 py-1 text-xs font-semibold text-strong ring-1 ring-[var(--hairline)] transition hover:bg-[var(--hairline)]"
-                      >
-                        {picks[dish.id] ? (
-                          <>
-                            <Check className="h-3.5 w-3.5 text-brand" strokeWidth={2.25} aria-hidden />
-                            <span>{picks[dish.id]} ·</span>
-                          </>
-                        ) : (
-                          <Plus className="h-3.5 w-3.5" strokeWidth={2.25} aria-hidden />
-                        )}
-                        {t(locale, "myTable")}
-                      </button>
-                    )}
                   </li>
                 ))}
               </ul>
@@ -397,22 +415,20 @@ export default function MenuBrowser({
       )}
 
       {(allergenOptions.length > 0 || dietaryOptions.length > 0) && (
-        <details className="mt-10 rounded-2xl border border-hair surface p-4 shadow-sm">
-          <summary className="cursor-pointer text-sm font-semibold text-strong">
+        <details className="mt-12 rounded-xl border border-hair surface p-4">
+          <summary className="min-h-8 cursor-pointer text-base font-bold text-strong">
             {t(locale, "allergenKey")}
           </summary>
           {dietaryOptions.length > 0 && (
             <div className="mt-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-soft">
-                {t(locale, "dietary")}
-              </p>
-              <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-soft">
+              <p className="text-sm font-bold text-soft">{t(locale, "dietary")}</p>
+              <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-2 text-base text-strong">
                 {dietaryOptions.map((d) => {
                   const Icon = dietaryIcon(d.key);
                   return (
-                    <li key={d.key} className="inline-flex items-center gap-1.5">
+                    <li key={d.key} className="inline-flex items-center gap-2">
                       <Icon
-                        className="h-4 w-4"
+                        className="h-5 w-5"
                         strokeWidth={1.75}
                         style={{ color: "var(--olive)" }}
                         aria-hidden
@@ -425,16 +441,14 @@ export default function MenuBrowser({
             </div>
           )}
           {allergenOptions.length > 0 && (
-            <div className="mt-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-soft">
-                {t(locale, "allergens")}
-              </p>
-              <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-soft">
+            <div className="mt-4">
+              <p className="text-sm font-bold text-soft">{t(locale, "allergens")}</p>
+              <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-2 text-base text-strong">
                 {allergenOptions.map((a) => {
                   const Icon = allergenIcon(a.key);
                   return (
-                    <li key={a.key} className="inline-flex items-center gap-1.5">
-                      <Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                    <li key={a.key} className="inline-flex items-center gap-2">
+                      <Icon className="h-5 w-5" strokeWidth={1.75} aria-hidden />
                       {a.label}
                     </li>
                   );

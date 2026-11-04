@@ -6,35 +6,41 @@
    the whole menu re-themes (light / dark) from one palette.
    --------------------------------------------------------------------------- */
 
-:root {
-  --background: #f7f2e9; /* warm ivory paper */
-  --foreground: #241e18; /* espresso ink */
-  --card: #fffdf8; /* warm paper white */
-  --card-2: #f0e8da; /* parchment (muted surface) */
-  --hairline: #e6dccb; /* warm hairline */
-  --muted: #7a7060; /* warm taupe */
+/* ---------------------------------------------------------------------------
+   Tavola tokens. Plain and legible: white surfaces, near-black ink, one
+   accent. Tavola's own pages use tomato red; each guest menu swaps the accent
+   for the restaurant's colour (--brand). No gradients, no glass.
+   --------------------------------------------------------------------------- */
 
-  /* Tavola signature accent (terracotta) + supporting tones. */
-  --accent: #b0563a;
-  --accent-strong: #954730;
-  --accent-soft: #f1e2d9;
-  --olive: #6e7357; /* rare tertiary — success / verified */
+:root {
+  --background: #f4f3ef; /* page: a neutral, slightly warm grey */
+  --foreground: #171614; /* ink */
+  --card: #ffffff;
+  --card-2: #ecebe6; /* muted surface (chips, tracks) */
+  --hairline: #dedcd5;
+  --muted: #5f5c55; /* secondary text, >= 6:1 on white */
+
+  --accent: #d13a1a; /* tomato */
+  --accent-strong: #a62c12;
+  --accent-soft: #fbe6df;
+  --olive: #2f6b33; /* dietary / verified (a real green, readable) */
 
   /* Per-restaurant menu accent; overridden inline from Restaurant.brandColor. */
   --brand: #0f766e;
 }
 
-/* Opt-in dark palette (warm espresso), scoped to guest pages via .theme-dark. */
+/* Opt-in dark palette, scoped to guest pages via .theme-dark. */
 .theme-dark {
-  --background: #191410;
-  --foreground: #f2eadd;
-  --card: #221b15;
-  --card-2: #1c1611;
-  --hairline: #372e25;
-  --muted: #a99c89;
-  --accent: #cf7050;
-  --accent-strong: #e08a66;
-  --accent-soft: #2c2018;
+  --background: #121211;
+  --foreground: #f1f0ec;
+  --card: #1d1c1a;
+  --card-2: #2a2926;
+  --hairline: #34322f;
+  --muted: #b1ada4;
+  --accent: #f0623f;
+  --accent-strong: #ff8a6b;
+  --accent-soft: #3a1f17;
+  --olive: #7fbf7f;
   background: var(--background);
   color: var(--foreground);
   color-scheme: dark;
@@ -42,17 +48,18 @@
 
 /* Force light (e.g. the printable menu — meant for white paper). */
 .theme-light {
-  --background: #f7f2e9;
-  --foreground: #241e18;
-  --card: #fffdf8;
-  --card-2: #f0e8da;
-  --hairline: #e6dccb;
-  --muted: #7a7060;
-  --accent: #b0563a;
-  --accent-strong: #954730;
-  --accent-soft: #f1e2d9;
-  background: #fffdf8;
-  color: #241e18;
+  --background: #ffffff;
+  --foreground: #171614;
+  --card: #ffffff;
+  --card-2: #ecebe6;
+  --hairline: #dedcd5;
+  --muted: #5f5c55;
+  --accent: #d13a1a;
+  --accent-strong: #a62c12;
+  --accent-soft: #fbe6df;
+  --olive: #2f6b33;
+  background: #ffffff;
+  color: #171614;
   color-scheme: light;
 }
 
@@ -86,9 +93,8 @@
   --color-accent-soft: var(--accent-soft);
   --color-olive: var(--olive);
 
-  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-fraunces), ui-serif, Georgia, "Times New Roman",
-    serif;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
@@ -99,13 +105,16 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-instrument), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body), system-ui, -apple-system, sans-serif;
   font-synthesis-weight: none;
+  font-size: 17px; /* guests read this at arm's length, often without glasses */
+  line-height: 1.5;
 }
 
-/* Fraunces looks best with optical sizing driven by the font size. */
-.font-serif {
-  font-optical-sizing: auto;
+/* Headings: the same Archivo, narrowed. Compact so long dish names fit. */
+.font-display {
+  font-variation-settings: "wdth" 78;
+  letter-spacing: -0.005em;
 }
 
 /* Warm text selection. */

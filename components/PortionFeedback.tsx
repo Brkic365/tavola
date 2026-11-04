@@ -65,7 +65,7 @@ export default function PortionFeedback({
   return (
     <section
       aria-label={t(locale, "portionQuestion")}
-      className="rounded-2xl border border-hair surface-2 px-4 py-3"
+      className="rounded-xl border border-hair surface p-4"
     >
       {voted ? (
         <p className="inline-flex items-center gap-1.5 text-sm text-soft">
@@ -78,7 +78,7 @@ export default function PortionFeedback({
         </p>
       ) : (
         <>
-          <p className="text-sm font-medium text-soft">
+          <p className="font-display text-xl font-bold text-strong">
             {t(locale, "portionQuestion")}
           </p>
           <div className="mt-2 flex gap-2">
@@ -87,9 +87,9 @@ export default function PortionFeedback({
                 key={o.verdict}
                 type="button"
                 onClick={() => vote(o.verdict)}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-hair surface px-2 py-2 text-sm font-medium text-soft transition hover:border-[var(--brand)] hover:bg-brand-soft hover:text-strong"
+                className="flex min-h-12 flex-1 items-center justify-center gap-1.5 rounded-lg border border-hair surface px-2 text-base font-semibold text-strong transition hover:border-[var(--brand)] hover:bg-brand-soft hover:text-strong"
               >
-                <o.Icon className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+                <o.Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
                 {t(locale, o.labelKey)}
               </button>
             ))}
