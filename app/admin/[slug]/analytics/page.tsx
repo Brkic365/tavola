@@ -149,7 +149,7 @@ export default async function AnalyticsPage({ params }: Params) {
         </Link>
       </div>
 
-      <h1 className="text-2xl font-bold tracking-tight text-stone-900">
+      <h1 className="font-display text-3xl font-extrabold tracking-tight text-stone-900">
         Analytics
       </h1>
       <p className="mt-1 text-sm text-stone-500">
@@ -166,14 +166,14 @@ export default async function AnalyticsPage({ params }: Params) {
       </div>
 
       {/* 7-day trend */}
-      <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+      <section className="mt-6 rounded-xl border border-stone-200 bg-white p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
             Last 7 days
           </h2>
           <div className="flex gap-3 text-xs text-stone-500">
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-sm bg-accent" /> Views
+              <span className="h-2 w-2 rounded-sm bg-stone-900" /> Views
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-sm bg-amber-500" /> AR
@@ -185,7 +185,7 @@ export default async function AnalyticsPage({ params }: Params) {
             <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
               <div className="flex h-24 w-full items-end justify-center gap-1">
                 <div
-                  className="w-2.5 rounded-t-sm bg-accent"
+                  className="w-2.5 rounded-t-sm bg-stone-900"
                   style={{ height: `${(d.views / maxDay) * 100}%` }}
                   title={`${d.views} views`}
                 />
@@ -212,7 +212,7 @@ export default async function AnalyticsPage({ params }: Params) {
           <p className="mt-1 text-sm text-stone-500">
             Activity from per-table QR codes — busiest tables first.
           </p>
-          <div className="mt-3 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+          <div className="mt-3 overflow-hidden rounded-xl border border-stone-200 bg-white">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-stone-200 text-left text-xs uppercase tracking-wide text-stone-400">
@@ -254,7 +254,7 @@ export default async function AnalyticsPage({ params }: Params) {
           No activity yet. Open the menu and a dish to start collecting data.
         </p>
       ) : (
-        <div className="mt-3 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+        <div className="mt-3 overflow-hidden rounded-xl border border-stone-200 bg-white">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-stone-200 text-left text-xs uppercase tracking-wide text-stone-400">
@@ -271,7 +271,7 @@ export default async function AnalyticsPage({ params }: Params) {
                     <div className="font-medium text-stone-800">{d.name}</div>
                     <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-stone-100">
                       <div
-                        className="h-full rounded-full bg-accent"
+                        className="h-full rounded-full bg-stone-900"
                         style={{
                           width: `${Math.round((d._count.views / maxViews) * 100)}%`,
                         }}
@@ -316,7 +316,7 @@ export default async function AnalyticsPage({ params }: Params) {
             return (
               <div
                 key={d.name}
-                className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm"
+                className="rounded-xl border border-stone-200 bg-white p-4"
               >
                 <div className="flex items-baseline justify-between gap-3">
                   <span className="font-medium text-stone-800">
@@ -386,7 +386,7 @@ function Metric({
   hint?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+    <div className="rounded-xl border border-stone-200 bg-white p-4">
       <div className="text-2xl font-bold text-stone-900">{value}</div>
       <div className="mt-0.5 text-xs font-medium uppercase tracking-wide text-stone-500">
         {label}

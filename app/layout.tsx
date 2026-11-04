@@ -1,11 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Sans, Geist_Mono, Fraunces } from "next/font/google";
+import { Archivo, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-// Humanist sans for body/UI — warm, legible, pairs with Fraunces.
-const instrumentSans = Instrument_Sans({
-  variable: "--font-instrument",
-  subsets: ["latin"],
+// One family, two voices: Archivo at normal width for reading (plain, open
+// shapes, unambiguous numbers for prices) and narrowed via its width axis for
+// headings, so long dish names fit on a phone. See .font-display in globals.
+const archivo = Archivo({
+  variable: "--font-body",
+  subsets: ["latin", "latin-ext"],
+  axes: ["wdth"],
 });
 
 const geistMono = Geist_Mono({
@@ -13,24 +16,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Fraunces — a warm, high-contrast "old style" serif with optical sizing; the
-// editorial voice for headings, dish names and prices.
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
-  title: "Tavola — see your dish, life-size, before you order",
+  title: "Tavola · Restaurant menus in 3D",
   description:
-    "Scan, tap a dish, and view it in AR at true real-world scale. Real dimensions, weight, and portions — no more 'the photo looked bigger'.",
+    "Guests scan the QR code on the table and see every dish in 3D, at its real size, before they order. No app needed.",
 };
 
 // Mobile-first: guests open this on their phones at the table.
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f7f2e9", // warm ivory — matches the editorial palette
+  themeColor: "#f4f3ef",
 };
 
 export default function RootLayout({
@@ -41,7 +38,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${instrumentSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${archivo.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

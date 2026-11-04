@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Moon, Sun } from "lucide-react";
 import { THEME_COOKIE, type ThemeMode } from "@/lib/theme-mode";
 
 /**
@@ -26,9 +27,13 @@ export default function ThemeToggle({ initial }: { initial: ThemeMode }) {
       aria-pressed={dark}
       aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
       title={dark ? "Light mode" : "Dark mode"}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/30 text-base text-white/90 transition hover:bg-white/10"
+      className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-hair surface text-strong transition hover:border-[var(--muted)]"
     >
-      <span aria-hidden>{dark ? "☀️" : "🌙"}</span>
+      {dark ? (
+        <Sun className="h-5 w-5" strokeWidth={2} aria-hidden />
+      ) : (
+        <Moon className="h-5 w-5" strokeWidth={2} aria-hidden />
+      )}
     </button>
   );
 }

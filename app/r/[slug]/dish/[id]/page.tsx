@@ -20,6 +20,7 @@ import PortionFeedback from "@/components/PortionFeedback";
 import TableCapture from "@/components/TableCapture";
 import DishThumb from "@/components/DishThumb";
 import { libraryUsdz } from "@/lib/bundledModels";
+import { scanCreditFor, SCAN_LICENSE } from "@/lib/scanCredits";
 
 type Params = { params: Promise<{ slug: string; id: string }> };
 
@@ -85,6 +86,8 @@ export default async function DishPage({ params }: Params) {
 
   // Caption shown right under the AR viewer so portion info is visible even
   // without launching AR.
+  const credit = scanCreditFor(dish.glbUrl);
+
   const captionParts = [
     dims,
     weight,
@@ -96,19 +99,16 @@ export default async function DishPage({ params }: Params) {
     <main
       id="main-content"
       style={brandStyle(restaurant.brandColor)}
-      className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-4"
+      className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 pb-12 pt-4"
     >
       <ViewBeacon dishId={dish.id} />
       <TableCapture />
       <Link
         href={`/r/${slug}`}
-        className="group mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-soft transition-colors hover:text-[var(--foreground)]"
+        className="mb-3 inline-flex min-h-12 w-fit items-center gap-2 rounded-lg border border-hair surface px-4 text-base font-bold text-strong transition hover:border-[var(--muted)]"
       >
-        <ArrowLeft
-          className="h-4 w-4 transition-transform group-hover:-translate-x-0.5"
-          strokeWidth={1.75}
-        />
-        {restaurant.name}
+        <ArrowLeft className="h-5 w-5" strokeWidth={2.25} aria-hidden />
+        {t(locale, "menu")}
       </Link>
 
       {!dish.available && (
@@ -129,25 +129,54 @@ export default async function DishPage({ params }: Params) {
         locale={locale}
       />
 
-      {captionParts.length > 0 && (
-        <p className="mt-2 text-center text-xs text-soft">
-          {captionParts.join(" · ")}
+      <p className="mt-2 text-center text-sm text-soft">
+        {t(locale, "dragToTurn")}
+      </p>
+      {credit && (
+        <p className="mt-1 text-center text-xs text-soft">
+          {t(locale, "scanCredit")}:{" "}
+          <a
+            href={credit.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2"
+          >
+            {credit.title}
+          </a>{" "}
+          ·{" "}
+          <a
+            href={credit.authorUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2"
+          >
+            {credit.author}
+          </a>{" "}
+          ·{" "}
+          <a
+            href={SCAN_LICENSE.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2"
+          >
+            {SCAN_LICENSE.name}
+          </a>
         </p>
       )}
 
-      <div className="mt-5 space-y-5">
-        <div className="flex items-start justify-between gap-3">
+      <div className="mt-5 space-y-6">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="font-serif text-3xl font-bold tracking-tight text-strong">
+            <h1 className="font-display text-[2.1rem] font-extrabold leading-tight tracking-tight text-strong">
               {content.name}
             </h1>
-            {dish.serves && (
-              <p className="mt-1 text-sm text-soft">
-                {t(locale, "serves")} {dish.serves}
+            {captionParts.length > 0 && (
+              <p className="mt-1 text-base text-strong">
+                {captionParts.join("  ·  ")}
               </p>
             )}
           </div>
-          <span className="shrink-0 font-serif text-2xl font-bold text-strong">
+          <span className="shrink-0 pt-1 font-display text-[1.9rem] font-extrabold tabular-nums text-strong">
             {fromPrice !== null ? (
               <>
                 <span className="mr-1 text-sm font-normal text-soft">
@@ -162,15 +191,17 @@ export default async function DishPage({ params }: Params) {
         </div>
 
         {content.description && (
-          <p className="leading-relaxed text-soft">{content.description}</p>
+          <p className="text-[1.05rem] leading-relaxed text-strong">
+            {content.description}
+          </p>
         )}
 
         {variants.length > 0 && (
           <section
             aria-label={t(locale, "portionOptions")}
-            className="rounded-2xl border border-hair surface p-4 shadow-sm"
+            className="rounded-xl border border-hair surface p-4"
           >
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-soft">
+            <h2 className="font-display text-xl font-bold text-strong">
               {t(locale, "portionOptions")}
             </h2>
             <ul className="mt-2 divide-y divide-[var(--hairline)]">
@@ -187,7 +218,7 @@ export default async function DishPage({ params }: Params) {
                         {formatWeight(v.weightG)}
                       </span>
                     )}
-                    <span className="font-serif text-lg font-semibold text-strong">
+                    <span className="font-display text-lg font-semibold text-strong">
                       {formatPrice(v.price, restaurant.currency)}
                     </span>
                   </span>
@@ -216,7 +247,7 @@ export default async function DishPage({ params }: Params) {
         {(dietary.length > 0 || dish.calories != null) && (
           <section className="flex flex-wrap items-center gap-2">
             {dish.calories != null && (
-              <span className="inline-flex items-center gap-1.5 rounded-full surface-2 px-3 py-1 text-sm font-medium text-soft">
+              <span className="inline-flex min-h-9 items-center gap-1.5 rounded-lg surface-2 px-3 text-base text-strong">
                 <Flame className="h-4 w-4" strokeWidth={1.75} />
                 {dish.calories} {t(locale, "caloriesPerPortion")}
               </span>
@@ -226,7 +257,7 @@ export default async function DishPage({ params }: Params) {
               return (
                 <span
                   key={d.key}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-hair surface-2 px-3 py-1 text-sm font-medium text-strong"
+                  className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-hair surface px-3 text-base font-semibold text-strong"
                 >
                   <Icon
                     className="h-4 w-4"
@@ -243,7 +274,7 @@ export default async function DishPage({ params }: Params) {
 
         {allergens.length > 0 && (
           <section>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-soft">
+            <h2 className="font-display text-xl font-bold text-strong">
               {t(locale, "allergens")}
             </h2>
             <ul className="mt-2 flex flex-wrap gap-2">
@@ -252,7 +283,7 @@ export default async function DishPage({ params }: Params) {
                 return (
                   <li
                     key={a.key}
-                    className="inline-flex items-center gap-1.5 rounded-full surface-2 px-3 py-1 text-sm text-soft"
+                    className="inline-flex min-h-9 items-center gap-1.5 rounded-lg surface-2 px-3 text-base text-strong"
                   >
                     <Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
                     {a.label}
@@ -267,7 +298,7 @@ export default async function DishPage({ params }: Params) {
 
         {siblings.length > 0 && (
           <section aria-label={t(locale, "moreDishes")}>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-soft">
+            <h2 className="font-display text-xl font-bold text-strong">
               {t(locale, "moreDishes")}
             </h2>
             <div className="-mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
@@ -275,7 +306,7 @@ export default async function DishPage({ params }: Params) {
                 <Link
                   key={s.id}
                   href={`/r/${slug}/dish/${s.id}`}
-                  className="group flex w-36 shrink-0 flex-col overflow-hidden rounded-2xl border border-hair surface shadow-sm transition hover:shadow-md"
+                  className="group flex w-40 shrink-0 flex-col overflow-hidden rounded-xl border border-hair surface transition hover:border-[var(--muted)]"
                 >
                   <div className="relative h-24 w-full overflow-hidden">
                     <DishThumb
@@ -285,10 +316,10 @@ export default async function DishPage({ params }: Params) {
                     />
                   </div>
                   <div className="flex flex-1 flex-col gap-1 p-2.5">
-                    <span className="line-clamp-2 font-serif text-sm font-semibold leading-snug text-strong">
+                    <span className="line-clamp-2 font-display text-base font-bold leading-snug text-strong">
                       {s.name}
                     </span>
-                    <span className="mt-auto text-sm font-semibold text-soft">
+                    <span className="mt-auto text-base text-strong">
                       {formatPrice(s.price, restaurant.currency)}
                     </span>
                   </div>

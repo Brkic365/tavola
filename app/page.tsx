@@ -1,215 +1,307 @@
 import Link from "next/link";
-import {
-  QrCode,
-  MousePointerClick,
-  ScanLine,
-  Ruler,
-  Scale,
-  Box,
-  Users,
-  Flame,
-  Leaf,
-  ArrowRight,
-  ArrowUpRight,
-  BarChart3,
-  Languages,
-  BadgeCheck,
-  Printer,
-  FileSpreadsheet,
-  ClipboardCheck,
-} from "lucide-react";
+import { headers } from "next/headers";
+import QRCode from "qrcode";
+import { Check, ArrowRight, X } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { formatPrice, formatWeight } from "@/lib/format";
 import Hero3D from "@/components/Hero3D";
 
 // Always reflect current DB state (restaurants change via admin).
 export const dynamic = "force-dynamic";
 
-const SECTION = "mx-auto w-full max-w-6xl px-6";
+const WRAP = "mx-auto w-full max-w-6xl px-4 sm:px-8";
+
+const OWNER_POINTS = [
+  "We scan your real dishes and set up the menu for you.",
+  "Numbered QR cards for every table, ready to print.",
+  "English, Croatian, German and Italian built in.",
+  "Mark a dish sold out or change a price in seconds.",
+  "See which dishes guests look at, table by table.",
+  "Guests tell you if a portion matched what they expected.",
+];
 
 export default async function Home() {
   const restaurants = await prisma.restaurant.findMany({
     orderBy: { createdAt: "asc" },
-    include: { _count: { select: { dishes: true } } },
+    select: { id: true, slug: true, name: true, currency: true },
   });
-  const primary = restaurants[0];
-  const demoHref = primary ? `/r/${primary.slug}` : "/admin";
+  const demo =
+    restaurants.find((r) => r.slug === "tavola-demo") ?? restaurants[0];
+  const demoHref = demo ? `/r/${demo.slug}` : "/admin";
+
+  const dishes = demo
+    ? await prisma.dish.findMany({
+        where: { restaurantId: demo.id, thumbnailUrl: { not: null } },
+        orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+        take: 6,
+      })
+    : [];
+  const currency = demo?.currency ?? "EUR";
+
+  // The dish shown in the hero phones: the black risotto when present.
+  const heroDish =
+    dishes.find((d) => d.glbUrl.includes("crni-rizot")) ?? dishes[0] ?? null;
+  const heroGlb = heroDish?.glbUrl ?? "/models/dishes/crni-rizot.glb";
+  const heroName = heroDish?.name ?? "Crni rižot";
+  const heroWidth = Math.max(heroDish?.widthCm ?? 0, heroDish?.depthCm ?? 0);
+  const otherDish = dishes.find((d) => d.id !== heroDish?.id) ?? null;
+
+  // QR so someone on a laptop can open the demo on their phone.
+  const h = await headers();
+  const host = h.get("host") ?? "localhost:3000";
+  const proto =
+    h.get("x-forwarded-proto") ??
+    (host.startsWith("localhost") ? "http" : "https");
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || `${proto}://${host}`;
+  const qrSvg = await QRCode.toString(`${origin}${demoHref}`, {
+    type: "svg",
+    margin: 0,
+    color: { dark: "#171614", light: "#ffffff" },
+  });
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col bg-white text-[#171614]">
       {/* ---- nav ---- */}
-      <nav className="sticky top-0 z-20 border-b border-hair bg-[var(--background)]/85 backdrop-blur">
-        <div className={`${SECTION} flex items-center justify-between py-4`}>
-          <Link href="/" className="flex items-baseline gap-1.5">
-            <span className="font-serif text-2xl font-semibold tracking-tight text-strong">
-              Tavola
-            </span>
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+      <nav className={`${WRAP} flex items-center justify-between py-5`}>
+        <Link
+          href="/"
+          className="font-display text-2xl font-black tracking-tight"
+        >
+          tavola
+        </Link>
+        <div className="flex items-center gap-2 text-base sm:gap-6">
+          <a href="#how" className="hidden hover:underline sm:block">
+            How it works
+          </a>
+          <a href="#restaurants" className="hidden hover:underline sm:block">
+            For restaurants
+          </a>
+          <Link
+            href={demoHref}
+            className="inline-flex min-h-11 items-center rounded-lg bg-[#0f766e] px-4 font-bold text-white hover:bg-[#0c5f59]"
+          >
+            Open the demo
           </Link>
-          <div className="flex items-center gap-6 text-sm">
-            <a
-              href="#how"
-              className="hidden text-soft transition-colors hover:text-strong sm:block"
-            >
-              How it works
-            </a>
-            <a
-              href="#value"
-              className="hidden text-soft transition-colors hover:text-strong sm:block"
-            >
-              Why it matters
-            </a>
-            <a
-              href="#for-restaurants"
-              className="text-soft transition-colors hover:text-strong"
-            >
-              For restaurants
-            </a>
-            <Link
-              href={demoHref}
-              className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 font-medium text-white shadow-sm transition-colors hover:bg-accent-strong"
-            >
-              Live demo
-              <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
-            </Link>
-          </div>
         </div>
       </nav>
 
       {/* ---- hero ---- */}
-      <section id="main-content" className={`${SECTION} pt-16 pb-14 md:pt-24`}>
-        <div className="grid items-center gap-14 md:grid-cols-[1.05fr_0.95fr]">
-          <div className="animate-rise">
-            <span className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-accent-strong">
-              <Ruler className="h-3.5 w-3.5" strokeWidth={2} />
-              True-to-scale AR menu
-            </span>
-            <h1 className="mt-6 font-serif text-[2.75rem] font-semibold leading-[1.04] tracking-tight text-strong sm:text-6xl">
-              See every dish at its{" "}
-              <em className="italic text-accent">real</em> size — before you
-              order.
-            </h1>
-            <p className="mt-6 max-w-md text-lg leading-relaxed text-soft">
-              Guests scan the table QR, tap a dish, and it appears in AR at true
-              real-world scale — with honest dimensions, weight and
-              &ldquo;serves&nbsp;N.&rdquo; No more &ldquo;the photo looked
-              bigger.&rdquo;
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link
-                href={demoHref}
-                className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-strong"
-              >
-                See the demo menu
-                <ArrowRight className="h-4 w-4" strokeWidth={2} />
-              </Link>
-              <Link
-                href="/admin"
-                className="inline-flex items-center gap-2 rounded-full border border-hair surface px-6 py-3 text-sm font-semibold text-strong transition-colors hover:border-[var(--muted)]"
-              >
-                I run a restaurant
-              </Link>
-            </div>
-            <p className="mt-6 text-sm text-soft">
-              No app to install · works from any phone camera.
+      <section
+        id="main-content"
+        className={`${WRAP} grid items-center gap-12 pb-20 pt-6 md:grid-cols-[1.05fr_0.95fr] md:pt-12`}
+      >
+        <div>
+          <h1 className="font-display text-[3.2rem] font-black leading-[0.95] tracking-tight sm:text-7xl lg:text-[5.4rem]">
+            See the dish before you order it.
+          </h1>
+          <p className="mt-6 max-w-[34rem] text-lg leading-relaxed text-[#55524c]">
+            Every dish on your menu becomes a 3D scan of the real food. Guests
+            scan the QR code on the table, tap a dish, and see it sitting on
+            their own table through the phone camera, at its real size.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href={demoHref}
+              className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-[#0f766e] px-6 text-base font-bold text-white hover:bg-[#0c5f59]"
+            >
+              Try the demo menu
+              <ArrowRight className="h-5 w-5" strokeWidth={2.25} aria-hidden />
+            </Link>
+            <a
+              href="#restaurants"
+              className="inline-flex min-h-12 items-center rounded-lg border-[1.5px] border-[#cfccc4] px-6 text-base font-bold hover:border-[#171614]"
+            >
+              I own a restaurant
+            </a>
+          </div>
+          <div className="mt-8 hidden max-w-sm items-center gap-4 rounded-xl border-[1.5px] border-[#e2dfd8] p-3 md:flex">
+            <span
+              className="block h-20 w-20 shrink-0 [&>svg]:h-full [&>svg]:w-full"
+              role="img"
+              aria-label="QR code that opens the demo menu"
+              dangerouslySetInnerHTML={{ __html: qrSvg }}
+            />
+            <p className="text-[0.95rem] leading-snug text-[#3d3b37]">
+              <b>On a computer?</b>
+              <br />
+              Scan this with your phone to open the demo menu, just like a
+              guest would.
             </p>
           </div>
+        </div>
 
-          {/* live 3D showpiece */}
-          <div className="animate-rise-late relative">
+        {/* Two phones: the menu, then the dish on the table. */}
+        <div
+          className="relative mx-auto h-[540px] w-full max-w-[460px] sm:h-[600px]"
+          aria-label={`A phone showing the menu, and a second phone showing ${heroName} on a real table through the camera`}
+          role="img"
+        >
+          <div className="absolute left-0 top-10 w-[56%] max-w-[250px] -rotate-[4deg] rounded-[34px] bg-[#171614] p-2.5 shadow-[0_30px_50px_-25px_rgba(0,0,0,0.45)]">
+            <div className="flex aspect-[9/18.5] flex-col gap-2.5 overflow-hidden rounded-[26px] bg-[#f4f3ef] px-3 py-4">
+              <span className="font-display text-xl font-extrabold leading-none">
+                {demo?.name ?? "Konoba Tavola"}
+              </span>
+              <span className="rounded-lg bg-[#dcefec] p-2 text-[0.7rem] leading-snug">
+                Tap a dish to see it in 3D. On your phone you can put it on the
+                table at its real size.
+              </span>
+              {heroDish && (
+                <span className="overflow-hidden rounded-lg border border-[#e1ded7] bg-white">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={heroDish.thumbnailUrl ?? ""}
+                    alt=""
+                    className="aspect-[16/10] w-full object-cover"
+                  />
+                  <span className="flex justify-between px-2.5 pt-2 font-display text-base font-extrabold">
+                    <span>{heroName}</span>
+                    <span>{formatPrice(heroDish.price, currency)}</span>
+                  </span>
+                  <span className="block px-2.5 text-[0.65rem] text-[#5d5a54]">
+                    {[
+                      heroDish.serves ? `Serves ${heroDish.serves}` : null,
+                      formatWeight(heroDish.weightG),
+                      heroWidth ? `${heroWidth} cm` : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </span>
+                  <span className="m-2.5 block rounded-md bg-[#0f766e] py-2 text-center text-[0.75rem] font-bold text-white">
+                    Put it on my table
+                  </span>
+                </span>
+              )}
+              {otherDish && (
+                <span className="overflow-hidden rounded-lg border border-[#e1ded7] bg-white">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={otherDish.thumbnailUrl ?? ""}
+                    alt=""
+                    className="aspect-[16/10] w-full object-cover"
+                  />
+                </span>
+              )}
+            </div>
+          </div>
+
+          <span className="absolute left-[40%] top-[24%] z-20 rounded-full bg-[#0f766e] px-3 py-1.5 text-sm font-bold text-white shadow-lg">
+            tap →
+          </span>
+
+          <div className="absolute right-0 top-0 z-10 w-[58%] max-w-[262px] rounded-[34px] bg-[#171614] p-2.5 shadow-[0_30px_60px_-25px_rgba(0,0,0,0.55)]">
             <div
-              aria-hidden
-              className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-[radial-gradient(60%_60%_at_50%_35%,var(--accent-soft),transparent)]"
-            />
-            <figure className="overflow-hidden rounded-[2rem] border border-hair surface shadow-[0_30px_60px_-25px_rgba(36,30,24,0.35)]">
-              <div className="surface-2">
-                <Hero3D src="/models/dishes/hobotnica-peka.glb" alt="A 3D octopus peka dish, rotating" />
+              className="relative aspect-[9/18.5] overflow-hidden rounded-[26px] bg-cover bg-center"
+              style={{ backgroundImage: "url(/landing/ar-table.jpg)" }}
+            >
+              <div className="absolute inset-0">
+                <Hero3D src={heroGlb} alt={`3D scan of ${heroName}`} />
               </div>
-              <figcaption className="flex items-center justify-between gap-3 border-t border-hair px-5 py-3.5">
-                <span className="font-serif text-sm font-medium text-strong">
-                  Shown life-size in AR
+              <span className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/45 text-white">
+                <X className="h-4 w-4" strokeWidth={2.5} aria-hidden />
+              </span>
+              <span className="absolute right-3 top-3.5 rounded-full bg-black/55 px-2.5 py-1 text-[0.7rem] font-bold text-white">
+                Real size
+              </span>
+              {heroWidth > 0 && (
+                <span className="absolute left-1/2 top-[77%] -translate-x-1/2 rounded-full bg-white px-2.5 py-0.5 font-display text-xs font-extrabold">
+                  {heroWidth} cm wide
                 </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-strong">
-                  <ScanLine className="h-3 w-3" strokeWidth={2} /> To scale
+              )}
+              <span className="absolute inset-x-2.5 bottom-2.5 flex items-center justify-between rounded-xl bg-white/95 px-3 py-2">
+                <span>
+                  <span className="block font-display text-base font-extrabold leading-tight">
+                    {heroName}
+                  </span>
+                  <span className="block text-[0.65rem] text-[#55524c]">
+                    {[
+                      heroDish?.serves ? `Serves ${heroDish.serves}` : null,
+                      formatWeight(heroDish?.weightG ?? null),
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </span>
                 </span>
-              </figcaption>
-            </figure>
-            <p className="mt-3 text-center text-xs text-soft">
-              Drag to rotate · on a phone, tap &ldquo;View in your space.&rdquo;
-            </p>
+                {heroDish && (
+                  <span className="font-display text-lg font-extrabold">
+                    {formatPrice(heroDish.price, currency)}
+                  </span>
+                )}
+              </span>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ---- what every dish shows (hairline strip) ---- */}
-      <div className="border-y border-hair">
-        <div
-          className={`${SECTION} flex flex-wrap items-center justify-center gap-x-8 gap-y-3 py-5 text-sm text-soft`}
-        >
-          <span className="text-xs font-semibold uppercase tracking-[0.16em] text-soft">
-            Every dish shows
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <Ruler className="h-4 w-4 text-accent" strokeWidth={1.75} />
-            Dimensions
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <Scale className="h-4 w-4 text-accent" strokeWidth={1.75} />
-            Weight
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <Users className="h-4 w-4 text-accent" strokeWidth={1.75} />
-            Serves
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <Flame className="h-4 w-4 text-accent" strokeWidth={1.75} />
-            Calories
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <Leaf className="h-4 w-4 text-accent" strokeWidth={1.75} />
-            Allergens
-          </span>
-        </div>
-      </div>
+      {/* ---- real dishes from the demo ---- */}
+      {demo && dishes.length > 0 && (
+        <section className="border-y border-[#e6e3dc] bg-[#f4f3ef]">
+          <div className={`${WRAP} py-16`}>
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <h2 className="max-w-xl font-display text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
+                These are real dishes. Tap one.
+              </h2>
+              <p className="max-w-sm text-base text-[#55524c]">
+                Each one is a 3D scan of real food from our demo restaurant,{" "}
+                {demo.name}. Open it on your phone to put it on your table.
+              </p>
+            </div>
+            <ul className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+              {dishes.map((d) => (
+                <li key={d.id}>
+                  <Link
+                    href={`/r/${demo.slug}/dish/${d.id}`}
+                    className="group block overflow-hidden rounded-xl border border-[#e1ded7] bg-white transition hover:border-[#171614]"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={d.thumbnailUrl ?? ""}
+                      alt=""
+                      className="aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                    />
+                    <span className="flex items-baseline justify-between gap-3 px-3 py-3 sm:px-4">
+                      <span className="font-display text-lg font-extrabold leading-tight sm:text-xl">
+                        {d.name}
+                      </span>
+                      <span className="shrink-0 text-base">
+                        {formatPrice(d.price, currency)}
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
-      {/* ---- how it works ---- */}
-      <section id="how" className={`${SECTION} py-20`}>
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-strong">
-            How it works
-          </p>
-          <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-strong">
-            From table QR to life-size, in three taps.
-          </h2>
-        </div>
-        <ol className="mt-14 grid gap-10 sm:grid-cols-3">
+      {/* ---- how it works (a real sequence, so it's numbered) ---- */}
+      <section id="how" className={`${WRAP} scroll-mt-4 py-20`}>
+        <h2 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
+          How it works for a guest
+        </h2>
+        <ol className="mt-10 grid gap-8 sm:grid-cols-3">
           {[
             {
-              Icon: QrCode,
-              title: "Scan the QR",
-              body: "Each table has its own QR. Guests scan to open the menu — nothing to install.",
+              title: "Scan the QR on the table",
+              body: "Their phone camera opens the menu. Nothing to install, no account.",
             },
             {
-              Icon: MousePointerClick,
               title: "Tap a dish",
-              body: "Browse by category and open any dish to see it in 3D with real portion details.",
+              body: "They see the real food in 3D, with the price, grams and how many people it feeds.",
             },
             {
-              Icon: ScanLine,
-              title: "View it life-size",
-              body: "“View in your space” drops the dish onto the real table at true 1:1 scale.",
+              title: "Put it on the table",
+              body: "One button places the dish on their table through the camera, at its real size.",
             },
           ].map((s, i) => (
-            <li key={s.title} className="relative">
-              <span className="font-serif text-5xl font-semibold text-[var(--hairline)]">
-                {String(i + 1).padStart(2, "0")}
+            <li key={s.title} className="border-t-[3px] border-[#171614] pt-4">
+              <span className="font-display text-lg font-extrabold text-[#0f766e]">
+                Step {i + 1}
               </span>
-              <div className="mt-2 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent-strong">
-                <s.Icon className="h-5 w-5" strokeWidth={1.75} />
-              </div>
-              <h3 className="mt-4 font-serif text-xl font-semibold text-strong">
+              <h3 className="mt-1 font-display text-2xl font-extrabold leading-tight">
                 {s.title}
               </h3>
-              <p className="mt-2 max-w-xs text-[15px] leading-relaxed text-soft">
+              <p className="mt-2 text-base leading-relaxed text-[#55524c]">
                 {s.body}
               </p>
             </li>
@@ -217,243 +309,68 @@ export default async function Home() {
         </ol>
       </section>
 
-      {/* ---- value ---- */}
-      <section id="value" className="border-y border-hair surface-2">
-        <div className={`${SECTION} py-20`}>
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-strong">
-              Why it matters
-            </p>
-            <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-strong">
-              Portion transparency, not just a party trick.
+      {/* ---- for restaurants ---- */}
+      <section
+        id="restaurants"
+        className="scroll-mt-4 bg-[#171614] text-[#f1f0ec]"
+      >
+        <div className={`${WRAP} grid gap-12 py-20 md:grid-cols-2`}>
+          <div>
+            <h2 className="font-display text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
+              For restaurant owners
             </h2>
-            <p className="mt-4 text-lg leading-relaxed text-soft">
-              The point isn&apos;t the AR novelty — it&apos;s helping guests
-              order with confidence and cutting &ldquo;that&apos;s smaller than
-              I expected&rdquo; complaints.
+            <p className="mt-5 max-w-md text-lg leading-relaxed text-[#c9c6be]">
+              Fewer &ldquo;it looked bigger in the photo&rdquo; moments, and
+              guests who order with confidence, especially tourists reading a
+              menu in another language.
             </p>
-          </div>
-          <div className="mt-14 grid gap-5 sm:grid-cols-3">
-            {[
-              {
-                Icon: Ruler,
-                title: "Real dimensions",
-                body: "Width × depth × height in centimetres, shown on every dish and verified against the 3D model.",
-              },
-              {
-                Icon: Scale,
-                title: "Weight & serves",
-                body: "Know the gram weight and how many people a plate actually feeds before it arrives.",
-              },
-              {
-                Icon: Box,
-                title: "True-to-scale AR",
-                body: "Models placed at 1:1 on your table — what you see is exactly what the kitchen sends out.",
-              },
-            ].map((f) => (
-              <div
-                key={f.title}
-                className="rounded-2xl border border-hair surface p-7 shadow-[0_1px_0_rgba(36,30,24,0.03)]"
+            <div className="mt-8 rounded-xl border border-[#3a3834] p-5">
+              <p className="font-display text-2xl font-extrabold">
+                Try it free for a month
+              </p>
+              <p className="mt-1.5 text-base text-[#c9c6be]">
+                We set up your first dishes and print the table cards. If your
+                guests don&apos;t like it, take it off the tables.
+              </p>
+              <Link
+                href="/admin/signup"
+                className="mt-5 inline-flex min-h-12 items-center gap-2 rounded-lg bg-white px-6 text-base font-bold text-[#171614] hover:bg-[#e8e6e0]"
               >
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft text-accent-strong">
-                  <f.Icon className="h-6 w-6" strokeWidth={1.5} />
-                </div>
-                <h3 className="mt-5 font-serif text-xl font-semibold text-strong">
-                  {f.title}
-                </h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-soft">
-                  {f.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ---- credibility stat ---- */}
-      <section className="bg-[var(--foreground)] text-[var(--background)]">
-        <div className={`${SECTION} py-20 text-center`}>
-          <p className="mx-auto max-w-3xl font-serif text-3xl font-medium leading-snug tracking-tight sm:text-[2.5rem]">
-            <span className="text-accent">48%</span> of diners have left food
-            because the portion was too big — and half want clearer portion
-            information before they order.
-          </p>
-          <p className="mx-auto mt-6 max-w-md text-sm text-[var(--background)]/60">
-            Tavola turns that guesswork into something they can see at real
-            scale — the honest signal a photo can&apos;t give.
-          </p>
-        </div>
-      </section>
-
-      {/* ---- for restaurants (the buyer) ---- */}
-      <section id="for-restaurants" className={`${SECTION} py-20`}>
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-strong">
-            For restaurants
-          </p>
-          <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-strong">
-            A menu tool, not just a party trick.
-          </h2>
-          <p className="mt-4 text-lg leading-relaxed text-soft">
-            Behind the guest experience is a full menu dashboard — built for a
-            busy service, not for a software manual.
-          </p>
-        </div>
-        <div className="mt-14 grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            {
-              Icon: BarChart3,
-              title: "Analytics that prove it",
-              body: "See which dishes guests view and place in AR — per table — and hear directly whether portions matched expectations.",
-            },
-            {
-              Icon: Languages,
-              title: "Four languages built in",
-              body: "English, Croatian, German and Italian out of the box, with your own default. Made for a tourist dining room.",
-            },
-            {
-              Icon: BadgeCheck,
-              title: "“Verified to scale” is earned",
-              body: "Stated dimensions are checked against the actual 3D model. The trust badge only appears when they match.",
-            },
-            {
-              Icon: Printer,
-              title: "Table cards in one click",
-              body: "Print-ready, numbered QR cards for every table — branded with your logo and colour.",
-            },
-            {
-              Icon: FileSpreadsheet,
-              title: "Your menu, in a spreadsheet",
-              body: "Export the whole menu as CSV, edit it in Excel, import it back. Sold-out, prices, sizes — all bulk-editable.",
-            },
-            {
-              Icon: ClipboardCheck,
-              title: "Menu health at a glance",
-              body: "A checklist that shows exactly which dishes still need sizes, translations or an iOS model — and how to fix them.",
-            },
-          ].map((f) => (
-            <div key={f.title} className="flex gap-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent-strong">
-                <f.Icon className="h-5 w-5" strokeWidth={1.75} />
-              </div>
-              <div>
-                <h3 className="font-serif text-lg font-semibold text-strong">
-                  {f.title}
-                </h3>
-                <p className="mt-1.5 text-[15px] leading-relaxed text-soft">
-                  {f.body}
-                </p>
-              </div>
+                Start with your menu
+                <ArrowRight className="h-5 w-5" strokeWidth={2.25} aria-hidden />
+              </Link>
             </div>
-          ))}
-        </div>
-        <div className="mx-auto mt-14 flex max-w-2xl flex-col items-center gap-4 rounded-3xl border border-hair surface p-8 text-center shadow-sm sm:flex-row sm:text-left">
-          <div className="flex-1">
-            <h3 className="font-serif text-2xl font-semibold text-strong">
-              Pilot it free.
-            </h3>
-            <p className="mt-1.5 text-[15px] leading-relaxed text-soft">
-              We set up your first dishes, print the table cards, and run it
-              for a month. If your guests don&apos;t love it, take it off the
-              tables — nothing lost.
-            </p>
           </div>
-          <Link
-            href="/admin"
-            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-strong"
-          >
-            Start with your menu
-            <ArrowRight className="h-4 w-4" strokeWidth={2} />
-          </Link>
-        </div>
-      </section>
-
-      {/* ---- live demo ---- */}
-      <section className="border-t border-hair surface-2">
-        <div className={`${SECTION} py-20`}>
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-strong">
-            Try it now
-          </p>
-          <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-strong">
-            Open a live menu.
-          </h2>
-        </div>
-        {restaurants.length === 0 ? (
-          <p className="mx-auto mt-10 max-w-md rounded-2xl border border-dashed border-hair p-6 text-center text-soft">
-            No restaurants yet — run{" "}
-            <code className="rounded surface-2 px-1.5 py-0.5 text-sm">
-              npm run db:seed
-            </code>
-            .
-          </p>
-        ) : (
-          <ul className="mx-auto mt-10 grid max-w-3xl gap-4 sm:grid-cols-2">
-            {restaurants.map((r) => (
-              <li key={r.id}>
-                <Link
-                  href={`/r/${r.slug}`}
-                  className="group flex items-center justify-between gap-4 rounded-2xl border border-hair surface p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:shadow-md"
-                >
-                  <div>
-                    <p className="font-serif text-xl font-semibold text-strong">
-                      {r.name}
-                    </p>
-                    <p className="mt-0.5 text-sm text-soft">
-                      /r/{r.slug} · {r._count.dishes} dishes
-                    </p>
-                  </div>
-                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent-strong transition-colors group-hover:bg-accent group-hover:text-white">
-                    <ArrowUpRight className="h-5 w-5" strokeWidth={2} />
-                  </span>
-                </Link>
+          <ul className="space-y-4 self-center">
+            {OWNER_POINTS.map((p) => (
+              <li key={p} className="flex gap-3 text-lg">
+                <Check
+                  className="mt-1 h-5 w-5 shrink-0 text-[#5fd0c4]"
+                  strokeWidth={2.75}
+                  aria-hidden
+                />
+                {p}
               </li>
             ))}
           </ul>
-        )}
-        </div>
-      </section>
-
-      {/* ---- closing CTA ---- */}
-      <section className="border-t border-hair bg-accent-soft">
-        <div className={`${SECTION} py-16 text-center`}>
-          <h2 className="font-serif text-4xl font-semibold tracking-tight text-strong">
-            Put your menu on the table.
-          </h2>
-          <p className="mx-auto mt-3 max-w-md text-soft">
-            Set up a restaurant, add your dishes, print the table QR — guests are
-            viewing dishes to scale in minutes.
-          </p>
-          <Link
-            href="/admin"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-strong"
-          >
-            Get started
-            <ArrowRight className="h-4 w-4" strokeWidth={2} />
-          </Link>
         </div>
       </section>
 
       {/* ---- footer ---- */}
-      <footer className="border-t border-hair">
-        <div
-          className={`${SECTION} flex flex-col items-center justify-between gap-3 py-8 text-sm text-soft sm:flex-row`}
-        >
-          <div className="flex items-baseline gap-1.5">
-            <span className="font-serif text-lg font-semibold text-strong">
-              Tavola
-            </span>
-            <span className="h-1 w-1 rounded-full bg-accent" />
-            <span className="ml-1.5">true-to-scale AR menus</span>
-          </div>
-          <div className="flex items-center gap-6">
-            <Link href={demoHref} className="hover:text-strong">
-              Live demo
-            </Link>
-            <Link href="/admin" className="hover:text-strong">
-              Restaurant admin
-            </Link>
-          </div>
+      <footer className={`${WRAP} flex flex-col gap-4 py-8 text-base text-[#55524c] sm:flex-row sm:items-center sm:justify-between`}>
+        <span className="font-display text-xl font-black text-[#171614]">
+          tavola
+        </span>
+        <div className="flex flex-wrap gap-x-6 gap-y-2">
+          <Link href={demoHref} className="hover:text-[#171614] hover:underline">
+            Demo menu
+          </Link>
+          <Link href="/admin" className="hover:text-[#171614] hover:underline">
+            Restaurant login
+          </Link>
+          <Link href="/credits" className="hover:text-[#171614] hover:underline">
+            3D scan credits
+          </Link>
         </div>
       </footer>
     </div>

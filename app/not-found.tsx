@@ -7,7 +7,7 @@ export default function NotFound() {
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-soft text-accent-strong">
         <UtensilsCrossed className="h-7 w-7" strokeWidth={1.5} />
       </div>
-      <h1 className="font-serif text-2xl font-semibold text-strong">
+      <h1 className="font-display text-2xl font-semibold text-strong">
         Not found
       </h1>
       <p className="text-soft">

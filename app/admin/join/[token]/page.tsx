@@ -29,11 +29,11 @@ export default async function JoinPage({ params }: Params) {
 
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-5 py-16">
-      <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm text-center">
+      <div className="rounded-xl border border-stone-200 bg-white p-6 text-center">
         {!restaurant ? (
           <>
             <div className="text-4xl">⏳</div>
-            <h1 className="mt-3 font-serif text-xl font-bold text-stone-900">
+            <h1 className="mt-3 font-display text-xl font-bold text-stone-900">
               Invite invalid or expired
             </h1>
             <p className="mt-1 text-sm text-stone-500">
@@ -41,7 +41,7 @@ export default async function JoinPage({ params }: Params) {
             </p>
             <Link
               href="/admin"
-              className="mt-4 inline-block rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-strong"
+              className="mt-4 inline-block rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-700"
             >
               Go to admin
             </Link>
@@ -49,7 +49,7 @@ export default async function JoinPage({ params }: Params) {
         ) : (
           <>
             <div className="text-4xl">👋</div>
-            <h1 className="mt-3 font-serif text-2xl font-bold text-stone-900">
+            <h1 className="mt-3 font-display text-3xl font-extrabold text-stone-900">
               Join {restaurant.name}
             </h1>
             <p className="mt-1 text-sm text-stone-500">
@@ -60,7 +60,7 @@ export default async function JoinPage({ params }: Params) {
               <input type="hidden" name="token" value={token} />
               <button
                 type="submit"
-                className="w-full rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-strong"
+                className="w-full rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-700"
               >
                 Join as manager
               </button>

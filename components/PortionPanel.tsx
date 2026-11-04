@@ -34,15 +34,15 @@ export default function PortionPanel({
   if (!hasAny) return null;
 
   return (
-    <section className="rounded-2xl border border-brand-soft bg-brand-soft p-5">
+    <section className="rounded-xl border border-hair surface p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.12em] text-brand-strong">
-          <Ruler className="h-4 w-4" strokeWidth={1.75} />
+        <h2 className="flex items-center gap-2 font-display text-xl font-bold text-strong">
+          <Ruler className="h-5 w-5 text-brand" strokeWidth={2} />
           {t(locale, "realPortionSize")}
         </h2>
         {verified && (
           <span
-            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold text-white"
+            className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-sm font-bold text-white"
             style={{ backgroundColor: "var(--olive)" }}
           >
             <BadgeCheck className="h-3.5 w-3.5" strokeWidth={2} />
@@ -58,7 +58,7 @@ export default function PortionPanel({
       </div>
 
       {(widthCm || depthCm || heightCm) && (
-        <dl className="mt-4 grid grid-cols-3 gap-2 border-t border-brand-soft pt-4 text-center">
+        <dl className="mt-4 grid grid-cols-3 gap-2 border-t border-hair pt-4 text-center">
           <Dim label={t(locale, "width")} cm={widthCm} />
           <Dim label={t(locale, "depth")} cm={depthCm} />
           <Dim label={t(locale, "height")} cm={heightCm} />
@@ -67,7 +67,7 @@ export default function PortionPanel({
 
       {/* Only claim real size when the model is verified against the dish. */}
       {verified && (
-        <p className="mt-4 text-xs leading-relaxed text-brand-strong/80">
+        <p className="mt-4 text-sm leading-relaxed text-soft">
           {t(locale, "lifeSizeNote")}
         </p>
       )}
@@ -85,14 +85,14 @@ function Stat({
   hint?: string;
 }) {
   return (
-    <div className="rounded-xl surface px-2 py-3.5 text-center shadow-[0_1px_2px_rgba(36,30,24,0.04)]">
-      <div className="font-serif text-lg font-semibold leading-tight text-strong">
+    <div className="rounded-lg surface-2 px-2 py-3 text-center">
+      <div className="font-display text-xl font-bold leading-tight text-strong">
         {value}
       </div>
-      <div className="mt-1 text-[11px] font-medium uppercase tracking-[0.08em] text-soft">
+      <div className="mt-1 text-sm text-soft">
         {label}
       </div>
-      {hint && <div className="text-[10px] text-soft">{hint}</div>}
+      {hint && <div className="text-xs text-soft">{hint}</div>}
     </div>
   );
 }
@@ -100,10 +100,10 @@ function Stat({
 function Dim({ label, cm }: { label: string; cm: number | null }) {
   return (
     <div>
-      <dt className="text-[11px] uppercase tracking-[0.08em] text-brand-strong/70">
+      <dt className="text-sm text-soft">
         {label}
       </dt>
-      <dd className="text-sm font-semibold text-strong">
+      <dd className="text-base font-bold text-strong">
         {cm ? `${cm} cm` : "—"}
       </dd>
     </div>

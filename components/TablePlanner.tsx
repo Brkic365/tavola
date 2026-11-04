@@ -57,22 +57,22 @@ export default function TablePlanner({
     <div className="fixed inset-x-0 bottom-0 z-30 px-3 pb-3 sm:px-5">
       <section
         aria-label={t(locale, "myTable")}
-        className="mx-auto max-w-2xl overflow-hidden rounded-2xl border border-hair surface shadow-lg"
+        className="mx-auto max-w-2xl overflow-hidden rounded-xl border-2 border-[var(--foreground)] surface shadow-xl"
       >
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
-          className="flex w-full items-center gap-3 px-4 py-3 text-left"
+          className="flex min-h-16 w-full items-center gap-3 px-4 py-3 text-left"
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-soft text-sm font-bold text-brand-strong">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand text-base font-bold text-white">
             {s.dishes}
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block font-serif text-base font-semibold text-strong">
+            <span className="block font-display text-lg font-bold text-strong">
               {t(locale, "myTable")}
             </span>
-            <span className="block truncate text-xs text-soft">
+            <span className="block truncate text-sm text-soft">
               {s.servesMax > 0 && (
                 <>
                   {t(locale, "feeds")} {range} ·{" "}
@@ -82,7 +82,7 @@ export default function TablePlanner({
               {s.calories > 0 && ` · ${s.calories} kcal`}
             </span>
           </span>
-          <span className="font-serif text-lg font-semibold text-strong">
+          <span className="font-display text-xl font-bold text-strong">
             {formatPrice(s.price, currency)}
           </span>
           {open ? (
@@ -118,7 +118,7 @@ export default function TablePlanner({
               {rows.map(({ dish, qty }) => (
                 <li key={dish.id} className="flex items-center gap-3 py-2">
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-medium text-strong">
+                    <span className="block truncate text-base font-semibold text-strong">
                       {dish.name}
                     </span>
                     {dish.serves && (
@@ -165,7 +165,7 @@ function Stepper({
   label: string;
 }) {
   const btn =
-    "flex h-7 w-7 items-center justify-center rounded-full surface-2 text-strong ring-1 ring-[var(--hairline)] hover:bg-[var(--hairline)]";
+    "flex h-10 w-10 items-center justify-center rounded-lg surface-2 text-strong ring-1 ring-[var(--hairline)] hover:bg-[var(--hairline)]";
   return (
     <span className="inline-flex items-center gap-2">
       <button

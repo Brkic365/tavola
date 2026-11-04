@@ -93,7 +93,7 @@ export default async function TextMenuPage({ params }: Params) {
       </div>
 
       <header className="mb-6 border-b border-stone-300 pb-4 text-center">
-        <h1 className="font-serif text-3xl font-bold">{restaurant.name}</h1>
+        <h1 className="font-display text-3xl font-bold">{restaurant.name}</h1>
         <p className="mt-1 text-sm text-stone-600">{t(locale, "menu")}</p>
       </header>
 
@@ -105,7 +105,7 @@ export default async function TextMenuPage({ params }: Params) {
             <section key={group.key} aria-labelledby={`cat-${group.key}`}>
               <h2
                 id={`cat-${group.key}`}
-                className="border-b border-stone-200 pb-1 font-serif text-xl font-semibold"
+                className="border-b border-stone-200 pb-1 font-display text-xl font-semibold"
               >
                 {group.name}
               </h2>
@@ -138,7 +138,7 @@ export default async function TextMenuPage({ params }: Params) {
                     <li key={dish.id}>
                       <article className="break-inside-avoid">
                         <div className="flex items-baseline justify-between gap-3">
-                          <h3 className="font-serif text-lg font-semibold">
+                          <h3 className="font-display text-lg font-semibold">
                             {dish.name}
                             {!dish.available && (
                               <span className="ml-2 align-middle text-xs font-semibold uppercase tracking-wide text-rose-700">
@@ -146,7 +146,7 @@ export default async function TextMenuPage({ params }: Params) {
                               </span>
                             )}
                           </h3>
-                          <span className="shrink-0 font-serif text-lg font-semibold tabular-nums">
+                          <span className="shrink-0 font-display text-lg font-semibold tabular-nums">
                             {fromPrice !== null
                               ? `${t(locale, "fromPrice")} ${formatPrice(fromPrice, restaurant.currency)}`
                               : formatPrice(dish.price, restaurant.currency)}
